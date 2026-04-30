@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1e293b"/>
+      <stop offset="100%" style="stop-color:#0f172a"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f59e0b"/>
+      <stop offset="100%" style="stop-color:#d97706"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <circle cx="600" cy="315" r="180" fill="url(#gold)" opacity="0.2"/>
+  <circle cx="600" cy="315" r="140" fill="none" stroke="url(#gold)" stroke-width="4"/>
+  <rect x="520" y="245" width="160" height="240" rx="20" fill="url(#gold)"/>
+  <rect x="535" y="260" width="130" height="180" rx="10" fill="#1e293b"/>
+  <rect x="548" y="275" width="35" height="25" rx="4" fill="url(#gold)"/>
+  <circle cx="600" cy="235" r="12" fill="#1e293b" stroke="url(#gold)" stroke-width="3"/>
+  <circle cx="600" cy="445" r="15" fill="none" stroke="url(#gold)" stroke-width="4"/>
+  <text x="600" y="520" text-anchor="middle" font-family="Arial, sans-serif" font-size="48" font-weight="bold" fill="url(#gold)">Alphamobitech</text>
+  <text x="600" y="560" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" fill="#94a3b8">Professional Phone Repair Services</text>
+  <text x="600" y="590" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" fill="#64748b">Nairobi, Kenya</text>
+</svg>
