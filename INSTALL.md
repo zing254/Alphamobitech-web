@@ -62,15 +62,15 @@ cp .env.example .env
 
 2. Edit `.env` with your settings:
 ```bash
-VITE_ADMIN_EMAIL=admin@alphamobitech.com
-VITE_ADMIN_PASSWORD=YourSecurePassword123!
+VITE_ADMIN_EMAIL=alphamobitech767@gmail.com
+VITE_ADMIN_PASSWORD=jimmy@99
 ```
 
 ### Customizing Admin Credentials
 
 The default credentials are:
-- Email: `admin@alphamobitech.com`
-- Password: `AlphaTech2024!`
+- Email: `alphamobitech767@gmail.com`
+- Password: `jimmy@99`
 
 To change, update the `.env` file as shown above.
 

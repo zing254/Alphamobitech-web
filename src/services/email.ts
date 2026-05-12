@@ -67,7 +67,7 @@ export const sendBookingConfirmationEmail = async (
       appointment_time: orderDetails.time,
       amount: `KSh ${orderDetails.amount.toLocaleString()}`,
       payment_method: orderDetails.paymentMethod === 'mpesa' ? 'M-Pesa' : 'Pay at Pickup',
-      location: 'Stan Bank House, 3rd Floor Room 10, Next to Nairobi National Archives',
+      location: 'Stanbank, 3rd Floor Room 10, Nairobi',
     };
 
     await emailjs.send(
@@ -112,8 +112,7 @@ Appointment: ${orderDetails.date} at ${orderDetails.time}
 Amount: KSh ${orderDetails.amount.toLocaleString()}
 
 Location:
-Stan Bank House, 3rd Floor Room 10
-Next to Nairobi National Archives
+Stanbank, 3rd Floor Room 10, Nairobi
 
 We will notify you when your device is ready!
 

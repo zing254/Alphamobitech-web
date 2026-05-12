@@ -14,6 +14,11 @@ import CookieConsent from './components/CookieConsent';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import TermsOfService from './components/TermsOfService';
 import { validateBookingForm, validateContactForm, sanitizeString, sanitizeEmail, sanitizePhone, generateConfirmationNumber } from './utils/validation';
+import {
+  getServices, getGallery, getSocialLinks, getHeroSlides, getFeatures,
+  getIconComponent, SERVICE_CATEGORIES,
+  type Service as ContentService
+} from './data/content';
 
 type Page = 'home' | 'services' | 'gallery' | 'reviews' | 'faq' | 'contact' | 'about' | 'booking' | 'admin' | 'store' | 'cart' | 'checkout' | 'wishlist' | 'orders' | 'privacy' | 'terms';
 
@@ -46,16 +51,7 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boole
   }
 }
 
-interface Service {
-  id: number;
-  name: string;
-  description: string;
-  price: number;
-  category: string;
-  icon: React.ReactNode;
-  duration: string;
-  popular?: boolean;
-}
+type Service = ContentService;
 
 interface Testimonial {
   name: string;
@@ -385,22 +381,8 @@ const App = () => {
     { id: 100, name: 'MacBook Air M3 13"', brand: 'Apple', category: 'laptop', price: 165000, description: '256GB, 8GB RAM. Midnight.', specs: ['256GB SSD', 'M3 Chip', '13.6" Display', '8GB RAM'], features: ['Free Delivery', '1 Year Warranty'], image: '/images/macbook-air.jpg', inStock: true, rating: 4.8, reviews: 98 },
   ];
 
-  const services: Service[] = [
-    { id: 1, name: 'iPhone Screen Replacement', description: 'Premium display replacement using original parts with warranty', price: 3500, category: 'iPhone', icon: <Smartphone className="w-8 h-8" />, duration: '1-2 hours', popular: true },
-    { id: 2, name: 'Samsung Screen Repair', description: 'Galaxy S/Note/A series screen replacement', price: 3000, category: 'Samsung', icon: <Smartphone className="w-8 h-8" />, duration: '1-2 hours', popular: true },
-    { id: 3, name: 'OnePlus Screen Service', description: 'Fast screen replacement for all OnePlus models', price: 2800, category: 'OnePlus', icon: <Smartphone className="w-8 h-8" />, duration: '1-2 hours' },
-    { id: 4, name: 'Google Pixel Display', description: 'Pixel screen repair for all generations', price: 3200, category: 'Google Pixel', icon: <Smartphone className="w-8 h-8" />, duration: '1-2 hours' },
-    { id: 5, name: 'iPhone Battery Service', description: 'Original capacity battery replacement', price: 2500, category: 'iPhone', icon: <Battery className="w-8 h-8" />, duration: '30-45 mins', popular: true },
-    { id: 6, name: 'Samsung Battery', description: 'High-quality battery with warranty', price: 2000, category: 'Samsung', icon: <Battery className="w-8 h-8" />, duration: '30-45 mins' },
-    { id: 7, name: 'Charging Port Repair', description: 'All brands charging port replacement', price: 2000, category: 'Hardware', icon: <Zap className="w-8 h-8" />, duration: '1 hour' },
-    { id: 8, name: 'Camera Repair', description: 'Front & back camera fixes', price: 2500, category: 'Hardware', icon: <Camera className="w-8 h-8" />, duration: '1-2 hours' },
-    { id: 9, name: 'Speaker/Mic Repair', description: 'Audio restoration service', price: 1500, category: 'Hardware', icon: <Speaker className="w-8 h-8" />, duration: '1 hour' },
-    { id: 10, name: 'Water Damage', description: 'Professional recovery service', price: 3500, category: 'Hardware', icon: <Droplets className="w-8 h-8" />, duration: '1-3 days' },
-    { id: 11, name: 'Screen Guard', description: 'Tempered glass screen protector installation', price: 500, category: 'Accessories', icon: <Shield className="w-8 h-8" />, duration: '15 mins' },
-    { id: 12, name: 'Back Glass Replacement', description: 'Premium back glass replacement for all models', price: 2500, category: 'Hardware', icon: <Smartphone className="w-8 h-8" />, duration: '1-2 hours' },
-  ];
-
-  const categories = ['All', 'iPhone', 'Samsung', 'OnePlus', 'Google Pixel', 'Hardware', 'Accessories'];
+  const services: Service[] = getServices();
+  const categories = SERVICE_CATEGORIES;
   const filteredServices = activeTab === 'All' ? services : services.filter(s => s.category === activeTab);
 
   const testimonials: Testimonial[] = [
@@ -414,51 +396,20 @@ const App = () => {
     { name: 'Robert Langat', role: 'Driver', text: "Fixed my charging port issue that other shops could not solve. Fair prices and excellent workmanship.", avatar: 'RL', rating: 5 },
   ];
 
-  const features = [
-    { icon: <Truck className="w-8 h-8" />, title: 'Free Pickup & Delivery', description: 'We come to you anywhere in Nairobi' },
-    { icon: <CreditCard className="w-8 h-8" />, title: 'Affordable Pricing', description: 'Best rates in Kenya' },
-    { icon: <Users className="w-8 h-8" />, title: '500+ Happy Clients', description: 'Satisfied customers nationwide' },
-    { icon: <Shield className="w-8 h-8" />, title: 'Warranty on Repairs', description: '30-day guarantee on all services' },
-    { icon: <Zap className="w-8 h-8" />, title: 'Same Day Service', description: 'Most repairs done in 1-2 hours' },
-    { icon: <Headphones className="w-8 h-8" />, title: '24/7 Support', description: 'Always here to help' },
-  ];
+  const features = getFeatures();
+  const socialLinks = getSocialLinks();
 
-  const heroSlides = [
-    { 
-      title: 'Expert Phone Repair Services', 
-      subtitle: 'All Brands Supported', 
-      description: 'Premium repair services for iPhone, Samsung, OnePlus, Google Pixel and more. Get your device back to perfect condition.',
-      cta: 'Book Now',
-      image: 'phone-repair-hero.png'
-    },
-    { 
-      title: 'Battery Replacement', 
-      subtitle: 'All Brands', 
-      description: 'Original capacity batteries for iPhone, Samsung, OnePlus and more. Fast replacement service.',
-      cta: 'Get Help Now',
-      image: 'battery-service.png'
-    },
-    { 
-      title: 'Charging Port Repair', 
-      subtitle: 'Expert Technicians', 
-      description: 'Fix charging issues for all brands. Your trusted mobile repair experts in Kenya.',
-      cta: 'Learn More',
-      image: 'charging-service.png'
-    },
-  ];
+  const DynIcon = ({ name, className }: { name: string; className?: string }) => {
+    const Icon = getIconComponent(name);
+    return <Icon className={className} />;
+  };
 
-  const galleryItems: GalleryItem[] = [
-    { id: 1, title: 'iPhone Screen Repair', description: 'Before & After', image: '/images/iphone-screen-1.jpeg', category: 'Screen' },
-    { id: 2, title: 'Samsung Screen', description: 'Premium replacement', image: '/images/samsung-repair.jpeg', category: 'Screen' },
-    { id: 3, title: 'Battery Service', description: 'New battery installed', image: '/images/battery-replacement.jpeg', category: 'Battery' },
-    { id: 4, title: 'Water Damage', description: 'Recovery success', image: '/images/charging-port.jpeg', category: 'Repair' },
-    { id: 5, title: 'Data Recovery', description: 'Files restored', image: '/images/data-recovery.jpeg', category: 'Software' },
-    { id: 6, title: 'iPad Repair', description: 'Complete service', image: '/images/ipad-repair.jpeg', category: 'Repair' },
-  ];
+  const heroSlides = getHeroSlides();
+  const galleryItems = getGallery();
 
   const faqs = [
     { q: 'How long does a typical repair take?', a: 'Most common repairs like screen or battery replacements take about 60-90 minutes. More complex repairs may take 24-48 hours. We always aim for same-day service.' },
-    { q: 'Do you offer warranty on repairs?', a: 'Yes! We offer a 30-day warranty on all screen and battery replacements. Hardware repairs come with our quality guarantee.' },
+    { q: 'Do you offer warranty on repairs?', a: 'Yes! We offer a 6-month warranty on all repairs. New gadgets come with a 2-year warranty.' },
     { q: 'Do you use original parts?', a: 'We use high-quality OEM or equivalent parts that meet or exceed original manufacturer specifications. All parts are tested for quality.' },
     { q: 'Can you repair water-damaged devices?', a: 'Yes, we specialize in water damage recovery. Success depends on the extent of damage - bring your device in for a free assessment.' },
     { q: 'Do you offer pickup and delivery?', a: 'Absolutely! We offer free pickup and delivery within Nairobi CBD. Schedule your convenient time.' },
@@ -477,19 +428,19 @@ const App = () => {
       <div className="top-bar bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white py-2 px-4 hidden lg:block">
         <div className="max-w-7xl mx-auto flex justify-between items-center text-sm">
           <div className="flex items-center gap-4">
-            <span className="flex items-center gap-2"><MapPin className="w-4 h-4 text-amber-500" /> Nairobi CBD, Kenya</span>
+            <span className="flex items-center gap-2"><MapPin className="w-4 h-4 text-amber-500" /> Stanbank, 3rd Floor Room 10, Nairobi</span>
             <span className="flex items-center gap-2"><Phone className="w-4 h-4 text-amber-500" /> 0703555449</span>
           </div>
           <div className="flex items-center gap-4">
             <span className="text-amber-500 font-medium">Premium Phone Repair Services in Kenya</span>
             <div className="flex gap-3">
-              <a href="#" className="p-2 rounded-full bg-white/10 hover:bg-white/30 hover:scale-110 transition-all duration-300 cursor-pointer">
+              <a href={socialLinks.facebook} className="p-2 rounded-full bg-white/10 hover:bg-white/30 hover:scale-110 transition-all duration-300 cursor-pointer">
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
               </a>
-              <a href="#" className="p-2 rounded-full bg-white/10 hover:bg-white/30 hover:scale-110 transition-all duration-300 cursor-pointer">
+              <a href={socialLinks.instagram} className="p-2 rounded-full bg-white/10 hover:bg-white/30 hover:scale-110 transition-all duration-300 cursor-pointer">
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
               </a>
-              <a href="#" className="p-2 rounded-full bg-white/10 hover:bg-white/30 hover:scale-110 transition-all duration-300 cursor-pointer">
+              <a href={socialLinks.twitter} className="p-2 rounded-full bg-white/10 hover:bg-white/30 hover:scale-110 transition-all duration-300 cursor-pointer">
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
               </a>
               <a href="https://wa.me/254703555449" className="p-2 rounded-full bg-green-600 hover:bg-green-500 hover:scale-110 transition-all duration-300 cursor-pointer">
@@ -581,7 +532,7 @@ const App = () => {
             </nav>
             <div className="flex items-center gap-2 text-white text-sm py-3">
               <Clock className="w-4 h-4" />
-              <span>Mon - Sat: 8AM - 6PM</span>
+              <span>Mon - Sat: 8AM - 7PM</span>
             </div>
           </div>
         </div>
@@ -757,7 +708,7 @@ const App = () => {
               style={{ animationDelay: `${i * 100}ms` }}
             >
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-100 to-amber-200 text-amber-600 mb-4 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
-                {feature.icon}
+                <DynIcon name={feature.iconName} className="w-8 h-8" />
               </div>
               <h3 className="font-semibold text-slate-800 mb-1 group-hover:text-amber-600 transition-colors">{feature.title}</h3>
               <p className="text-sm text-slate-500">{feature.description}</p>
@@ -814,7 +765,7 @@ const App = () => {
                 </div>
               )}
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-100 to-amber-200 text-amber-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                {service.icon}
+                <DynIcon name={service.iconName} className="w-8 h-8" />
               </div>
               <div className="text-xs font-medium text-slate-400 mb-2">{service.category}</div>
               <h3 className="font-bold text-slate-800 mb-2">{service.name}</h3>
@@ -1179,7 +1130,7 @@ const App = () => {
                   </div>
                   <div>
                     <div className="font-semibold">Location</div>
-                    <div className="opacity-80">Nairobi CBD, Kenya</div>
+                    <div className="opacity-80">Stanbank, 3rd Floor Room 10, Nairobi</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
@@ -1197,7 +1148,7 @@ const App = () => {
                   </div>
                   <div>
                     <div className="font-semibold">Email</div>
-                    <div className="opacity-80">odhiamboj791@gmail.com</div>
+                    <div className="opacity-80">alphamobitech767@gmail.com</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
@@ -1206,19 +1157,19 @@ const App = () => {
                   </div>
                   <div>
                     <div className="font-semibold">Hours</div>
-                    <div className="opacity-80">Mon - Sat: 8AM - 6PM</div>
+                    <div className="opacity-80">Mon - Sat: 8AM - 7PM</div>
                   </div>
                 </div>
               </div>
 
               <div className="flex gap-4 mt-8">
-                <a href="#" className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 transition-colors">
+                <a href={socialLinks.facebook} className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 transition-colors">
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
                 </a>
-                <a href="#" className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 transition-colors">
+                <a href={socialLinks.instagram} className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 transition-colors">
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
                 </a>
-                <a href="#" className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 transition-colors">
+                <a href={socialLinks.twitter} className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 transition-colors">
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
                 </a>
                 <a href="https://wa.me/254703555449" className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 transition-colors">
@@ -1330,13 +1281,13 @@ const App = () => {
               Professional phone repair services in Nairobi, Kenya. Expert technicians with warranty on all repairs.
             </p>
             <div className="flex gap-4">
-              <a href="#" className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center hover:bg-amber-600 transition-colors">
+              <a href={socialLinks.facebook} className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center hover:bg-amber-600 transition-colors">
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
               </a>
-              <a href="#" className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center hover:bg-amber-600 transition-colors">
+              <a href={socialLinks.instagram} className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center hover:bg-amber-600 transition-colors">
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
               </a>
-              <a href="#" className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center hover:bg-amber-600 transition-colors">
+              <a href={socialLinks.twitter} className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center hover:bg-amber-600 transition-colors">
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
               </a>
               <a href="https://wa.me/254703555449" className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center hover:bg-green-500 transition-colors">
@@ -1383,11 +1334,11 @@ const App = () => {
               </li>
               <li className="flex items-center gap-3 text-slate-400">
                 <Mail className="w-5 h-5 text-amber-500" />
-                <span>odhiamboj791@gmail.com</span>
+                <span>alphamobitech767@gmail.com</span>
               </li>
               <li className="flex items-center gap-3 text-slate-400">
                 <MapPin className="w-5 h-5 text-amber-500" />
-                <span>Nairobi CBD, Kenya</span>
+                <span>Stanbank, 3rd Floor Room 10, Nairobi</span>
               </li>
             </ul>
           </div>
@@ -1458,11 +1409,11 @@ const App = () => {
                   <div className="flex flex-col sm:flex-row gap-3 sm:gap-6 mt-1">
                     <div>
                       <span className="text-amber-100 text-sm">Paybill:</span>
-                      <span className="font-bold text-lg ml-2">247247</span>
+                      <span className="font-bold text-lg ml-2">714888</span>
                     </div>
                     <div>
                       <span className="text-amber-100 text-sm">Account:</span>
-                      <span className="font-bold text-lg ml-2">0470182181792</span>
+                      <span className="font-bold text-lg ml-2">169405</span>
                     </div>
                   </div>
                 </div>

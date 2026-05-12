@@ -7,8 +7,8 @@ The admin portal is accessible via the "Admin" navigation link or by visiting th
 ### Default Login
 
 - **URL**: / (navigate to Admin page)
-- **Email**: `admin@alphamobitech.com`
-- **Password**: `AlphaTech2024!`
+- **Email**: `alphamobitech767@gmail.com`
+- **Password**: `jimmy@99`
 
 ## Security Features
 
@@ -18,8 +18,8 @@ Admin credentials are stored in environment variables:
 
 ```bash
 # .env file
-VITE_ADMIN_EMAIL=admin@alphamobitech.com
-VITE_ADMIN_PASSWORD=AlphaTech2024!
+VITE_ADMIN_EMAIL=alphamobitech767@gmail.com
+VITE_ADMIN_PASSWORD=jimmy@99
 ```
 
 ### 2. Session Management

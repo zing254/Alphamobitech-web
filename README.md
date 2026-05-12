@@ -65,8 +65,8 @@ cp .env.example .env
 ```
 
 Default admin credentials (change in production):
-- Email: `admin@alphamobitech.com`
-- Password: `AlphaTech2024!`
+- Email: `alphamobitech767@gmail.com`
+- Password: `jimmy@99`
 
 ## Project Structure
 
