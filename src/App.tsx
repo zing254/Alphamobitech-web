@@ -14,16 +14,11 @@ import CookieConsent from './components/CookieConsent';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import TermsOfService from './components/TermsOfService';
 import { validateBookingForm, validateContactForm, sanitizeString, sanitizeEmail, sanitizePhone, generateConfirmationNumber } from './utils/validation';
-import {
-  getServices, getGallery, getSocialLinks, getHeroSlides, getFeatures,
-  getIconComponent, SERVICE_CATEGORIES,
-  type Service as ContentService
-} from './data/content';
 
 type Page = 'home' | 'services' | 'gallery' | 'reviews' | 'faq' | 'contact' | 'about' | 'booking' | 'admin' | 'store' | 'cart' | 'checkout' | 'wishlist' | 'orders' | 'privacy' | 'terms';
 
 class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean; error: Error | null }> {
-  constructor(props: { children: ReactNode }) {
+  constructor(props) {
     super(props);
     this.state = { hasError: false, error: null };
   }
@@ -51,7 +46,16 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boole
   }
 }
 
-type Service = ContentService;
+interface Service {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  category: string;
+  icon: React.ReactNode;
+  duration: string;
+  popular?: boolean;
+}
 
 interface Testimonial {
   name: string;
@@ -143,6 +147,24 @@ const App = () => {
   useEffect(() => {
     localStorage.setItem('wishlist', JSON.stringify(wishlist));
   }, [wishlist]);
+
+  // Synchronize currentPage with URL
+  useEffect(() => {
+    const handlePopState = () => {
+      const path = window.location.pathname.slice(1) || 'home';
+      const validPaths = ['home','services','store','orders','gallery','reviews','faq','contact','about','admin','cart','wishlist','checkout','privacy','terms'];
+      const page = validPaths.includes(path as Page) ? (path as Page) : 'home';
+      setCurrentPage(page);
+    };
+
+    const path = window.location.pathname.slice(1) || 'home';
+    const validPaths = ['home','services','store','orders','gallery','reviews','faq','contact','about','admin','cart','wishlist','checkout','privacy','terms'];
+    const page = validPaths.includes(path as Page) ? (path as Page) : 'home';
+    setCurrentPage(page);
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   const toggleDarkMode = () => {
     const newMode = !isDarkMode;
@@ -279,110 +301,124 @@ const App = () => {
   ];
 
   const products: Product[] = [
-    { id: 1, name: 'Redmi A7 3/64GB', brand: 'Xiaomi', category: 'phone', price: 11200, description: '3GB RAM, 64GB Storage. Brand new sealed.', specs: ['3GB RAM', '64GB Storage', '6.5" HD+', '5000mAh'], features: ['Brand New', '1 Year Warranty'], image: '/images/phones/redmi-a7.png', inStock: true, rating: 4.2, reviews: 15, badge: 'NEW' },
-    { id: 2, name: 'Redmi A7 Pro 4/64GB', brand: 'Xiaomi', category: 'phone', price: 12200, description: '4GB RAM, 64GB Storage. Brand new sealed.', specs: ['4GB RAM', '64GB Storage', '6.5" HD+', '5000mAh'], features: ['Brand New', '1 Year Warranty'], image: '/images/phones/redmi-a7pro.png', inStock: true, rating: 4.3, reviews: 12, badge: 'NEW' },
-    { id: 3, name: 'Redmi A7 Pro 4/128GB', brand: 'Xiaomi', category: 'phone', price: 13900, description: '4GB RAM, 128GB Storage. Brand new sealed.', specs: ['4GB RAM', '128GB Storage', '6.5" HD+', '5000mAh'], features: ['Brand New', '1 Year Warranty'], image: '/images/phones/redmi-a7pro.png', inStock: true, rating: 4.4, reviews: 8, badge: 'NEW' },
-    { id: 4, name: 'Redmi 15C 4/128GB', brand: 'Xiaomi', category: 'phone', price: 13700, description: '4GB RAM, 128GB Storage. Hot seller!', specs: ['4GB RAM', '128GB Storage', '6.71" HD+', '5160mAh'], features: ['Brand New', 'Hot Deal'], image: '/images/phones/redmi-15c.png', inStock: true, rating: 4.5, reviews: 22, badge: 'HOT' },
-    { id: 5, name: 'Redmi 15C 6/128GB', brand: 'Xiaomi', category: 'phone', price: 15300, description: '6GB RAM, 128GB Storage. Hot seller!', specs: ['6GB RAM', '128GB Storage', '6.71" HD+', '5160mAh'], features: ['Brand New', 'Hot Deal'], image: '/images/phones/redmi-15c.png', inStock: true, rating: 4.5, reviews: 18, badge: 'HOT' },
-    { id: 6, name: 'Redmi 15C 8/256GB', brand: 'Xiaomi', category: 'phone', price: 17400, description: '8GB RAM, 256GB Storage. Top spec!', specs: ['8GB RAM', '256GB Storage', '6.71" HD+', '5160mAh'], features: ['Brand New', 'Top Spec'], image: '/images/phones/redmi-15c.png', inStock: true, rating: 4.6, reviews: 10 },
-    { id: 7, name: 'Redmi 15 6/128GB', brand: 'Xiaomi', category: 'phone', price: 17900, description: '6GB RAM, 128GB Storage. Latest model.', specs: ['6GB RAM', '128GB Storage', '6.79" FHD+', '5110mAh'], features: ['Brand New', '1 Year Warranty'], image: '/images/phones/redmi-15.png', inStock: true, rating: 4.6, reviews: 14, badge: 'NEW' },
-    { id: 8, name: 'Redmi 15 8/256GB', brand: 'Xiaomi', category: 'phone', price: 19900, description: '8GB RAM, 256GB Storage. Latest model.', specs: ['8GB RAM', '256GB Storage', '6.79" FHD+', '5110mAh'], features: ['Brand New', '1 Year Warranty'], image: '/images/phones/redmi-15.png', inStock: true, rating: 4.7, reviews: 9, badge: 'NEW' },
-    { id: 9, name: 'Redmi Note 15 6/128GB', brand: 'Xiaomi', category: 'phone', price: 23200, description: '6GB RAM, 128GB Storage. Note series.', specs: ['6GB RAM', '128GB Storage', '6.67" AMOLED', '5000mAh'], features: ['Brand New', 'AMOLED Display'], image: '/images/phones/redmi-note15.png', inStock: true, rating: 4.7, reviews: 16, badge: 'NEW' },
-    { id: 10, name: 'Redmi Note 15 8/256GB', brand: 'Xiaomi', category: 'phone', price: 26900, description: '8GB RAM, 256GB Storage. Note series.', specs: ['8GB RAM', '256GB Storage', '6.67" AMOLED', '5000mAh'], features: ['Brand New', 'AMOLED Display'], image: '/images/phones/redmi-note15.png', inStock: true, rating: 4.8, reviews: 11, badge: 'NEW' },
-    { id: 11, name: 'Redmi Note 15 Pro 8/256GB', brand: 'Xiaomi', category: 'phone', price: 34000, description: '8GB RAM, 256GB Storage. Pro model.', specs: ['8GB RAM', '256GB Storage', '6.67" AMOLED 120Hz', '5110mAh'], features: ['Brand New', '108MP Camera'], image: '/images/phones/redmi-note15pro.png', inStock: true, rating: 4.8, reviews: 13, badge: 'NEW' },
-    { id: 12, name: 'Redmi Note 15 Pro 12/512GB', brand: 'Xiaomi', category: 'phone', price: 42000, description: '12GB RAM, 512GB Storage. Top spec Pro.', specs: ['12GB RAM', '512GB Storage', '6.67" AMOLED 120Hz', '5110mAh'], features: ['Brand New', '108MP Camera'], image: '/images/phones/redmi-note15pro.png', inStock: true, rating: 4.9, reviews: 7, badge: 'NEW' },
-    { id: 13, name: 'Redmi Note 15 Pro+ 8/256GB', brand: 'Xiaomi', category: 'phone', price: 50000, description: '8GB RAM, 256GB Storage. Pro Plus flagship.', specs: ['8GB RAM', '256GB Storage', '6.67" AMOLED 144Hz', '5000mAh'], features: ['Brand New', '200MP Camera'], image: '/images/phones/redmi-note15pro-plus.png', inStock: true, rating: 4.9, reviews: 5, badge: 'NEW' },
-    { id: 14, name: 'Redmi Note 15 Pro+ 12/512GB', brand: 'Xiaomi', category: 'phone', price: 59000, description: '12GB RAM, 512GB Storage. Ultimate Pro Plus.', specs: ['12GB RAM', '512GB Storage', '6.67" AMOLED 144Hz', '5000mAh'], features: ['Brand New', '200MP Camera'], image: '/images/phones/redmi-note15pro-plus.png', inStock: true, rating: 5.0, reviews: 3, badge: 'NEW' },
-    { id: 15, name: 'Samsung Galaxy A06 4/64GB', brand: 'Samsung', category: 'phone', price: 11000, description: '4GB RAM, 64GB Storage. Entry level Samsung.', specs: ['4GB RAM', '64GB Storage', '6.7" HD+', '5000mAh'], features: ['EA Warranty', '1 Year Warranty'], image: '/images/phones/samsung-a06.png', inStock: true, rating: 4.1, reviews: 25 },
-    { id: 16, name: 'Samsung Galaxy A06 4/128GB', brand: 'Samsung', category: 'phone', price: 12500, description: '4GB RAM, 128GB Storage. More storage.', specs: ['4GB RAM', '128GB Storage', '6.7" HD+', '5000mAh'], features: ['EA Warranty', '1 Year Warranty'], image: '/images/phones/samsung-a06.png', inStock: true, rating: 4.2, reviews: 20 },
-    { id: 17, name: 'Samsung Galaxy A07 4/64GB', brand: 'Samsung', category: 'phone', price: 12600, description: '4GB RAM, 64GB Storage. New A07.', specs: ['4GB RAM', '64GB Storage', '6.7" HD+', '5000mAh'], features: ['EA Warranty', '1 Year Warranty'], image: '/images/phones/samsung-a07.png', inStock: true, rating: 4.2, reviews: 15 },
-    { id: 18, name: 'Samsung Galaxy A07 4/128GB', brand: 'Samsung', category: 'phone', price: 13400, description: '4GB RAM, 128GB Storage. Hot seller!', specs: ['4GB RAM', '128GB Storage', '6.7" HD+', '5000mAh'], features: ['EA Warranty', '1 Year Warranty'], image: '/images/phones/samsung-a07.png', inStock: true, rating: 4.3, reviews: 18, badge: 'HOT' },
-    { id: 19, name: 'Samsung Galaxy A16 4/128GB', brand: 'Samsung', category: 'phone', price: 16300, description: '4GB RAM, 128GB Storage. Latest A16.', specs: ['4GB RAM', '128GB Storage', '6.7" FHD+', '5000mAh'], features: ['EA Warranty', '1 Year Warranty'], image: '/images/phones/samsung-a16.png', inStock: true, rating: 4.3, reviews: 22, badge: 'NEW' },
-    { id: 20, name: 'Samsung Galaxy A16 6/128GB', brand: 'Samsung', category: 'phone', price: 18000, description: '6GB RAM, 128GB Storage. More power.', specs: ['6GB RAM', '128GB Storage', '6.7" FHD+', '5000mAh'], features: ['EA Warranty', '1 Year Warranty'], image: '/images/phones/samsung-a16.png', inStock: true, rating: 4.4, reviews: 16 },
-    { id: 21, name: 'Samsung Galaxy A17 4/128GB', brand: 'Samsung', category: 'phone', price: 18900, description: '4GB RAM, 128GB Storage. New A17!', specs: ['4GB RAM', '128GB Storage', '6.7" FHD+', '5000mAh'], features: ['EA Warranty', '1 Year Warranty'], image: '/images/phones/samsung-a17.png', inStock: true, rating: 4.4, reviews: 14, badge: 'NEW' },
-    { id: 22, name: 'Samsung Galaxy A17 6/128GB', brand: 'Samsung', category: 'phone', price: 20000, description: '6GB RAM, 128GB Storage. New A17!', specs: ['6GB RAM', '128GB Storage', '6.7" FHD+', '5000mAh'], features: ['EA Warranty', '1 Year Warranty'], image: '/images/phones/samsung-a17.png', inStock: true, rating: 4.5, reviews: 10, badge: 'NEW' },
-    { id: 23, name: 'Samsung Galaxy A17 8/256GB', brand: 'Samsung', category: 'phone', price: 26000, description: '8GB RAM, 256GB Storage. Top A17.', specs: ['8GB RAM', '256GB Storage', '6.7" FHD+', '5000mAh'], features: ['EA Warranty', '1 Year Warranty'], image: '/images/phones/samsung-a17.png', inStock: true, rating: 4.6, reviews: 8, badge: 'NEW' },
-    { id: 24, name: 'Samsung Galaxy A26 6/128GB', brand: 'Samsung', category: 'phone', price: 26000, description: '6GB RAM, 128GB Storage. Temporarily out of stock.', specs: ['6GB RAM', '128GB Storage', '6.7" FHD+ 120Hz', '5000mAh'], features: ['EA Warranty', '1 Year Warranty'], image: '/images/phones/samsung-a26.png', inStock: false, rating: 4.5, reviews: 5 },
-    { id: 25, name: 'Samsung Galaxy A56 8/256GB', brand: 'Samsung', category: 'phone', price: 47500, description: '8GB RAM, 256GB Storage. Premium mid-range.', specs: ['8GB RAM', '256GB Storage', '6.7" FHD+ 120Hz', '5000mAh'], features: ['EA Warranty', 'IP67'], image: '/images/phones/samsung-a56.png', inStock: true, rating: 4.7, reviews: 12 },
-    { id: 26, name: 'Samsung Galaxy A37 8/256GB', brand: 'Samsung', category: 'phone', price: 49000, description: '8GB RAM, 256GB Storage. New A37 hot!', specs: ['8GB RAM', '256GB Storage', '6.7" FHD+ 120Hz', '5000mAh'], features: ['EA Warranty', 'Hot Deal'], image: '/images/phones/samsung-a37.png', inStock: true, rating: 4.7, reviews: 9, badge: 'HOT' },
-    { id: 27, name: 'Samsung Galaxy A57 8/256GB', brand: 'Samsung', category: 'phone', price: 56000, description: '8GB RAM, 256GB Storage. Top A-series hot!', specs: ['8GB RAM', '256GB Storage', '6.7" FHD+ 120Hz', '5000mAh'], features: ['EA Warranty', 'Hot Deal'], image: '/images/phones/samsung-a57.png', inStock: true, rating: 4.8, reviews: 6, badge: 'HOT' },
-    { id: 28, name: 'Samsung Tab A11 4/64GB', brand: 'Samsung', category: 'tablet', price: 16300, description: '4GB RAM, 64GB Storage. Tablet.', specs: ['4GB RAM', '64GB Storage', '11" Display', '7040mAh'], features: ['EA Warranty', '1 Year Warranty'], image: '/images/phones/samsung-tab-a11.png', inStock: true, rating: 4.4, reviews: 8 },
-    { id: 29, name: 'Samsung Tab A11 Plus 6/128GB', brand: 'Samsung', category: 'tablet', price: 31500, description: '6GB RAM, 128GB Storage. Plus tablet.', specs: ['6GB RAM', '128GB Storage', '11" Display', '8000mAh'], features: ['EA Warranty', '1 Year Warranty'], image: '/images/phones/samsung-tab-a11plus.png', inStock: true, rating: 4.6, reviews: 5 },
-    { id: 30, name: 'Samsung S25 Ultra 256GB', brand: 'Samsung', category: 'phone', price: 119000, description: '12GB RAM, 256GB Storage. Ultra flagship.', specs: ['256GB Storage', '12GB RAM', '6.9" QHD+', '200MP Camera'], features: ['EA Warranty', 'S Pen'], image: '/images/phones/samsung-s25ultra.png', inStock: true, rating: 4.9, reviews: 32 },
-    { id: 31, name: 'Samsung S25 Ultra 512GB', brand: 'Samsung', category: 'phone', price: 136000, description: '12GB RAM, 512GB Storage. Ultra flagship.', specs: ['512GB Storage', '12GB RAM', '6.9" QHD+', '200MP Camera'], features: ['EA Warranty', 'S Pen'], image: '/images/phones/samsung-s25ultra.png', inStock: true, rating: 4.9, reviews: 25 },
-    { id: 32, name: 'Samsung S26 Ultra 256GB/12GB', brand: 'Samsung', category: 'phone', price: 140000, description: '12GB RAM, 256GB Storage. Latest Ultra.', specs: ['256GB Storage', '12GB RAM', '6.9" QHD+', '200MP Camera'], features: ['EA Warranty', 'Galaxy AI'], image: '/images/phones/samsung-s26ultra.png', inStock: true, rating: 5.0, reviews: 8, badge: 'NEW' },
-    { id: 33, name: 'Samsung S26 Ultra 512GB/12GB', brand: 'Samsung', category: 'phone', price: 152000, description: '12GB RAM, 512GB Storage. Latest Ultra top.', specs: ['512GB Storage', '12GB RAM', '6.9" QHD+', '200MP Camera'], features: ['EA Warranty', 'Galaxy AI'], image: '/images/phones/samsung-s26ultra.png', inStock: true, rating: 5.0, reviews: 5, badge: 'NEW' },
-    { id: 34, name: 'Samsung S26 256GB', brand: 'Samsung', category: 'phone', price: 107000, description: '12GB RAM, 256GB Storage. Latest S26.', specs: ['256GB Storage', '12GB RAM', '6.7" FHD+', '50MP Camera'], features: ['EA Warranty', 'Galaxy AI'], image: '/images/phones/samsung-s26.png', inStock: true, rating: 4.8, reviews: 6, badge: 'NEW' },
-    { id: 35, name: 'Samsung S22 Ultra 8/128GB', brand: 'Samsung', category: 'phone', price: 46000, description: '8GB RAM, 128GB Storage. Great value.', specs: ['128GB Storage', '8GB RAM', '6.8" QHD+', '108MP Camera'], features: ['Refurbished', 'S Pen'], image: '/images/phones/samsung-s22ultra.png', inStock: true, rating: 4.6, reviews: 45 },
-    { id: 36, name: 'Samsung S22 Ultra 12/256GB', brand: 'Samsung', category: 'phone', price: 50000, description: '12GB RAM, 256GB Storage. Premium used.', specs: ['256GB Storage', '12GB RAM', '6.8" QHD+', '108MP Camera'], features: ['Refurbished', 'S Pen'], image: '/images/phones/samsung-s22ultra.png', inStock: true, rating: 4.7, reviews: 38 },
-    { id: 37, name: 'Samsung S22 Ultra 12/512GB', brand: 'Samsung', category: 'phone', price: 55000, description: '12GB RAM, 512GB Storage. Top spec.', specs: ['512GB Storage', '12GB RAM', '6.8" QHD+', '108MP Camera'], features: ['Refurbished', 'S Pen'], image: '/images/phones/samsung-s22ultra.png', inStock: true, rating: 4.8, reviews: 28 },
-    { id: 38, name: 'Samsung S23 8/256GB', brand: 'Samsung', category: 'phone', price: 42000, description: '8GB RAM, 256GB Storage. Compact flagship.', specs: ['256GB Storage', '8GB RAM', '6.1" FHD+', '50MP Camera'], features: ['Refurbished', '1 Year Warranty'], image: '/images/phones/samsung-s23.png', inStock: true, rating: 4.6, reviews: 22 },
-    { id: 39, name: 'Samsung S23 Ultra 256GB', brand: 'Samsung', category: 'phone', price: 63000, description: '12GB RAM, 256GB Storage. Ultra power.', specs: ['256GB Storage', '12GB RAM', '6.8" QHD+', '200MP Camera'], features: ['Refurbished', 'S Pen'], image: '/images/phones/samsung-s23ultra.png', inStock: true, rating: 4.8, reviews: 35 },
-    { id: 40, name: 'Samsung S23 Ultra 512GB', brand: 'Samsung', category: 'phone', price: 67000, description: '12GB RAM, 512GB Storage. Ultra max.', specs: ['512GB Storage', '12GB RAM', '6.8" QHD+', '200MP Camera'], features: ['Refurbished', 'S Pen'], image: '/images/phones/samsung-s23ultra.png', inStock: true, rating: 4.9, reviews: 25 },
-    { id: 41, name: 'Samsung S24 Plus 256GB', brand: 'Samsung', category: 'phone', price: 60000, description: '12GB RAM, 256GB Storage. Plus size.', specs: ['256GB Storage', '12GB RAM', '6.7" QHD+', '50MP Camera'], features: ['Refurbished', 'Galaxy AI'], image: '/images/phones/samsung-s24plus.png', inStock: true, rating: 4.7, reviews: 18 },
-    { id: 42, name: 'Samsung S24 Ultra 12/256GB', brand: 'Samsung', category: 'phone', price: 82000, description: '12GB RAM, 256GB Storage. Titanium.', specs: ['256GB Storage', '12GB RAM', '6.8" QHD+', '200MP Camera'], features: ['Refurbished', 'Titanium'], image: '/images/phones/samsung-s24ultra.png', inStock: true, rating: 4.9, reviews: 42 },
-    { id: 43, name: 'Samsung S24 Ultra 12/512GB', brand: 'Samsung', category: 'phone', price: 87000, description: '12GB RAM, 512GB Storage. Titanium max.', specs: ['512GB Storage', '12GB RAM', '6.8" QHD+', '200MP Camera'], features: ['Refurbished', 'Titanium'], image: '/images/phones/samsung-s24ultra.png', inStock: true, rating: 4.9, reviews: 35 },
-    { id: 44, name: 'Samsung S25 256GB', brand: 'Samsung', category: 'phone', price: 60000, description: '12GB RAM, 256GB Storage. Latest S25.', specs: ['256GB Storage', '12GB RAM', '6.2" FHD+', '50MP Camera'], features: ['EA Warranty', 'Galaxy AI'], image: '/images/phones/samsung-s25.png', inStock: true, rating: 4.7, reviews: 15, badge: 'NEW' },
-    { id: 45, name: 'Samsung S25 Ultra 12/256GB', brand: 'Samsung', category: 'phone', price: 95000, description: '12GB RAM, 256GB Storage. New Ultra.', specs: ['256GB Storage', '12GB RAM', '6.9" QHD+', '200MP Camera'], features: ['EA Warranty', 'Galaxy AI'], image: '/images/phones/samsung-s25ultra.png', inStock: true, rating: 4.9, reviews: 28, badge: 'NEW' },
-    { id: 46, name: 'Samsung S25 Ultra 12/512GB', brand: 'Samsung', category: 'phone', price: 105000, description: '12GB RAM, 512GB Storage. New Ultra max.', specs: ['512GB Storage', '12GB RAM', '6.9" QHD+', '200MP Camera'], features: ['EA Warranty', 'Galaxy AI'], image: '/images/phones/samsung-s25ultra.png', inStock: true, rating: 5.0, reviews: 18, badge: 'NEW' },
-    { id: 47, name: 'Samsung Galaxy Fold 6 256GB', brand: 'Samsung', category: 'phone', price: 95000, description: '12GB RAM, 256GB Storage. Foldable.', specs: ['256GB Storage', '12GB RAM', '7.6" Foldable', '50MP Camera'], features: ['Refurbished', 'Foldable'], image: '/images/phones/samsung-fold6.png', inStock: true, rating: 4.8, reviews: 12 },
-    { id: 48, name: 'Samsung Galaxy Fold 6 512GB', brand: 'Samsung', category: 'phone', price: 99000, description: '12GB RAM, 512GB Storage. Foldable max.', specs: ['512GB Storage', '12GB RAM', '7.6" Foldable', '50MP Camera'], features: ['Refurbished', 'Foldable'], image: '/images/phones/samsung-fold6.png', inStock: true, rating: 4.9, reviews: 8 },
-    { id: 49, name: 'Samsung A16 4/128GB (Dubai)', brand: 'Samsung', category: 'phone', price: 15800, description: '4GB RAM, 128GB Storage. Dubai version.', specs: ['4GB RAM', '128GB Storage', '6.7" FHD+', '5000mAh'], features: ['Dubai Version', '1 Year Warranty'], image: '/images/phones/samsung-a16.png', inStock: true, rating: 4.3, reviews: 20 },
-    { id: 50, name: 'Samsung A17 8/256GB (Dubai)', brand: 'Samsung', category: 'phone', price: 24000, description: '8GB RAM, 256GB Storage. Dubai version.', specs: ['8GB RAM', '256GB Storage', '6.7" FHD+', '5000mAh'], features: ['Dubai Version', '1 Year Warranty'], image: '/images/phones/samsung-a17.png', inStock: true, rating: 4.5, reviews: 15 },
-    { id: 51, name: 'Samsung A26 6/128GB (Dubai)', brand: 'Samsung', category: 'phone', price: 25500, description: '6GB RAM, 128GB Storage. Dubai version.', specs: ['6GB RAM', '128GB Storage', '6.7" FHD+ 120Hz', '5000mAh'], features: ['Dubai Version', '1 Year Warranty'], image: '/images/phones/samsung-a26.png', inStock: true, rating: 4.5, reviews: 12 },
-    { id: 52, name: 'Samsung A26 8/256GB (Dubai)', brand: 'Samsung', category: 'phone', price: 28500, description: '8GB RAM, 256GB Storage. Dubai version.', specs: ['8GB RAM', '256GB Storage', '6.7" FHD+ 120Hz', '5000mAh'], features: ['Dubai Version', '1 Year Warranty'], image: '/images/phones/samsung-a26.png', inStock: true, rating: 4.6, reviews: 8 },
-    { id: 53, name: 'Samsung A36 6/128GB (Dubai)', brand: 'Samsung', category: 'phone', price: 33000, description: '6GB RAM, 128GB Storage. Dubai version.', specs: ['6GB RAM', '128GB Storage', '6.7" FHD+ 120Hz', '5000mAh'], features: ['Dubai Version', '1 Year Warranty'], image: '/images/phones/samsung-a36.png', inStock: true, rating: 4.6, reviews: 10 },
-    { id: 54, name: 'Samsung A36 8/256GB (Dubai)', brand: 'Samsung', category: 'phone', price: 35000, description: '8GB RAM, 256GB Storage. Dubai version.', specs: ['8GB RAM', '256GB Storage', '6.7" FHD+ 120Hz', '5000mAh'], features: ['Dubai Version', '1 Year Warranty'], image: '/images/phones/samsung-a36.png', inStock: true, rating: 4.7, reviews: 7 },
-    { id: 55, name: 'Samsung A56 8/256GB (Dubai)', brand: 'Samsung', category: 'phone', price: 44000, description: '8GB RAM, 256GB Storage. Dubai version.', specs: ['8GB RAM', '256GB Storage', '6.7" FHD+ 120Hz', '5000mAh'], features: ['Dubai Version', 'IP67'], image: '/images/phones/samsung-a56.png', inStock: true, rating: 4.7, reviews: 9 },
-    { id: 56, name: 'iPhone 11 128GB', brand: 'Apple', category: 'phone', price: 27000, description: '128GB Storage. A13 Bionic chip. Great value.', specs: ['128GB Storage', 'A13 Bionic', '6.1" Display', '12MP Camera'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/iphone-11.png', inStock: true, rating: 4.4, reviews: 85 },
-    { id: 57, name: 'iPhone 11 256GB', brand: 'Apple', category: 'phone', price: 29000, description: '256GB Storage. A13 Bionic chip.', specs: ['256GB Storage', 'A13 Bionic', '6.1" Display', '12MP Camera'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/iphone-11.png', inStock: true, rating: 4.5, reviews: 72 },
-    { id: 58, name: 'iPhone 11 Pro 256GB', brand: 'Apple', category: 'phone', price: 34000, description: '256GB Storage. A13 Bionic. Triple camera.', specs: ['256GB Storage', 'A13 Bionic', '5.8" OLED', '12MP Triple'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/iphone-11pro.png', inStock: true, rating: 4.6, reviews: 65 },
-    { id: 59, name: 'iPhone 11 Pro Max 256GB', brand: 'Apple', category: 'phone', price: 38000, description: '256GB Storage. A13 Bionic. Max screen.', specs: ['256GB Storage', 'A13 Bionic', '6.5" OLED', '12MP Triple'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/iphone-11promax.png', inStock: true, rating: 4.7, reviews: 58 },
-    { id: 60, name: 'iPhone 11 Pro Max 512GB', brand: 'Apple', category: 'phone', price: 40000, description: '512GB Storage. A13 Bionic. Max storage.', specs: ['512GB Storage', 'A13 Bionic', '6.5" OLED', '12MP Triple'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/iphone-11promax.png', inStock: true, rating: 4.7, reviews: 42 },
-    { id: 61, name: 'iPhone 12 128GB', brand: 'Apple', category: 'phone', price: 32000, description: '128GB Storage. A14 Bionic. 5G capable.', specs: ['128GB Storage', 'A14 Bionic', '6.1" OLED', '12MP Dual'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/iphone-12.png', inStock: true, rating: 4.5, reviews: 78 },
-    { id: 62, name: 'iPhone 12 Pro 128GB', brand: 'Apple', category: 'phone', price: 38000, description: '128GB Storage. A14 Bionic. Pro camera.', specs: ['128GB Storage', 'A14 Bionic', '6.1" OLED', '12MP Triple'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/iphone-12pro.png', inStock: true, rating: 4.6, reviews: 65 },
-    { id: 63, name: 'iPhone 12 Pro 256GB', brand: 'Apple', category: 'phone', price: 42000, description: '256GB Storage. A14 Bionic. Pro max.', specs: ['256GB Storage', 'A14 Bionic', '6.1" OLED', '12MP Triple'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/iphone-12pro.png', inStock: true, rating: 4.7, reviews: 52 },
-    { id: 64, name: 'iPhone 12 Pro 512GB', brand: 'Apple', category: 'phone', price: 44000, description: '512GB Storage. A14 Bionic. Top spec.', specs: ['512GB Storage', 'A14 Bionic', '6.1" OLED', '12MP Triple'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/iphone-12pro.png', inStock: true, rating: 4.7, reviews: 38 },
-    { id: 65, name: 'iPhone 12 Pro Max 128GB', brand: 'Apple', category: 'phone', price: 44000, description: '128GB Storage. A14 Bionic. Max size.', specs: ['128GB Storage', 'A14 Bionic', '6.7" OLED', '12MP Triple'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/iphone-12promax.png', inStock: true, rating: 4.7, reviews: 55 },
-    { id: 66, name: 'iPhone 12 Pro Max 256GB', brand: 'Apple', category: 'phone', price: 49000, description: '256GB Storage. A14 Bionic. Max power.', specs: ['256GB Storage', 'A14 Bionic', '6.7" OLED', '12MP Triple'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/iphone-12promax.png', inStock: true, rating: 4.8, reviews: 48 },
-    { id: 67, name: 'iPhone 12 Pro Max 512GB', brand: 'Apple', category: 'phone', price: 50000, description: '512GB Storage. A14 Bionic. Ultimate.', specs: ['512GB Storage', 'A14 Bionic', '6.7" OLED', '12MP Triple'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/iphone-12promax.png', inStock: true, rating: 4.8, reviews: 35 },
-    { id: 68, name: 'iPhone 13 128GB', brand: 'Apple', category: 'phone', price: 40000, description: '128GB Storage. A15 Bionic. Compact power.', specs: ['128GB Storage', 'A15 Bionic', '6.1" OLED', '12MP Dual'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/iphone-13.png', inStock: true, rating: 4.6, reviews: 92 },
-    { id: 69, name: 'iPhone 13 256GB', brand: 'Apple', category: 'phone', price: 42000, description: '256GB Storage. A15 Bionic.', specs: ['256GB Storage', 'A15 Bionic', '6.1" OLED', '12MP Dual'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/iphone-13.png', inStock: true, rating: 4.7, reviews: 78 },
-    { id: 70, name: 'iPhone 13 512GB', brand: 'Apple', category: 'phone', price: 45000, description: '512GB Storage. A15 Bionic.', specs: ['512GB Storage', 'A15 Bionic', '6.1" OLED', '12MP Dual'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/iphone-13.png', inStock: true, rating: 4.7, reviews: 55 },
-    { id: 71, name: 'iPhone 13 Pro 128GB', brand: 'Apple', category: 'phone', price: 50000, description: '128GB Storage. A15 Bionic. Pro camera.', specs: ['128GB Storage', 'A15 Bionic', '6.1" OLED 120Hz', '12MP Triple'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/iphone-13pro.png', inStock: true, rating: 4.8, reviews: 68 },
-    { id: 72, name: 'iPhone 13 Pro 256GB', brand: 'Apple', category: 'phone', price: 55000, description: '256GB Storage. A15 Bionic. Pro max.', specs: ['256GB Storage', 'A15 Bionic', '6.1" OLED 120Hz', '12MP Triple'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/iphone-13pro.png', inStock: true, rating: 4.8, reviews: 58 },
-    { id: 73, name: 'iPhone 13 Pro 512GB', brand: 'Apple', category: 'phone', price: 58000, description: '512GB Storage. A15 Bionic. Top Pro.', specs: ['512GB Storage', 'A15 Bionic', '6.1" OLED 120Hz', '12MP Triple'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/iphone-13pro.png', inStock: true, rating: 4.9, reviews: 42 },
-    { id: 74, name: 'iPhone 13 Pro 1TB', brand: 'Apple', category: 'phone', price: 60000, description: '1TB Storage. A15 Bionic. Ultimate.', specs: ['1TB Storage', 'A15 Bionic', '6.1" OLED 120Hz', '12MP Triple'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/iphone-13pro.png', inStock: true, rating: 4.9, reviews: 28 },
-    { id: 75, name: 'iPhone 13 Pro Max 128GB', brand: 'Apple', category: 'phone', price: 57000, description: '128GB Storage. A15 Bionic. Max screen.', specs: ['128GB Storage', 'A15 Bionic', '6.7" OLED 120Hz', '12MP Triple'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/iphone-13promax.png', inStock: true, rating: 4.8, reviews: 72 },
-    { id: 76, name: 'iPhone 13 Pro Max 256GB', brand: 'Apple', category: 'phone', price: 63000, description: '256GB Storage. A15 Bionic. Max power.', specs: ['256GB Storage', 'A15 Bionic', '6.7" OLED 120Hz', '12MP Triple'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/iphone-13promax.png', inStock: true, rating: 4.9, reviews: 62 },
-    { id: 77, name: 'iPhone 13 Pro Max 512GB', brand: 'Apple', category: 'phone', price: 65000, description: '512GB Storage. A15 Bionic. Max spec.', specs: ['512GB Storage', 'A15 Bionic', '6.7" OLED 120Hz', '12MP Triple'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/iphone-13promax.png', inStock: true, rating: 4.9, reviews: 48 },
-    { id: 78, name: 'iPhone 13 Pro Max 1TB', brand: 'Apple', category: 'phone', price: 67000, description: '1TB Storage. A15 Bionic. Ultimate max.', specs: ['1TB Storage', 'A15 Bionic', '6.7" OLED 120Hz', '12MP Triple'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/iphone-13promax.png', inStock: true, rating: 5.0, reviews: 32 },
-    { id: 79, name: 'iPhone 14 128GB', brand: 'Apple', category: 'phone', price: 45000, description: '128GB Storage. A15 Bionic.', specs: ['128GB Storage', 'A15 Bionic', '6.1" OLED', '12MP Dual'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/iphone-14.png', inStock: true, rating: 4.6, reviews: 85 },
-    { id: 80, name: 'iPhone 14 256GB', brand: 'Apple', category: 'phone', price: 50000, description: '256GB Storage. A15 Bionic.', specs: ['256GB Storage', 'A15 Bionic', '6.1" OLED', '12MP Dual'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/iphone-14.png', inStock: true, rating: 4.7, reviews: 72 },
-    { id: 81, name: 'iPhone 14 Plus 128GB', brand: 'Apple', category: 'phone', price: 49000, description: '128GB Storage. A15 Bionic. Plus size.', specs: ['128GB Storage', 'A15 Bionic', '6.7" OLED', '12MP Dual'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/iphone-14plus.png', inStock: true, rating: 4.6, reviews: 55 },
-    { id: 82, name: 'iPhone 14 Pro 128GB', brand: 'Apple', category: 'phone', price: 63000, description: '128GB Storage. A16 Bionic. Dynamic Island.', specs: ['128GB Storage', 'A16 Bionic', '6.1" OLED 120Hz', '48MP Triple'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/iphone-14pro.png', inStock: true, rating: 4.8, reviews: 68 },
-    { id: 83, name: 'iPhone 14 Pro 256GB eSIM', brand: 'Apple', category: 'phone', price: 60000, description: '256GB Storage. A16 Bionic. eSIM only.', specs: ['256GB Storage', 'A16 Bionic', '6.1" OLED 120Hz', '48MP Triple'], features: ['Refurbished', 'eSIM Only'], image: '/images/phones/iphone-14pro.png', inStock: true, rating: 4.7, reviews: 45 },
-    { id: 84, name: 'iPhone 14 Pro 256GB', brand: 'Apple', category: 'phone', price: 68000, description: '256GB Storage. A16 Bionic. Dynamic Island.', specs: ['256GB Storage', 'A16 Bionic', '6.1" OLED 120Hz', '48MP Triple'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/iphone-14pro.png', inStock: true, rating: 4.8, reviews: 62 },
-    { id: 85, name: 'iPhone 14 Pro Max 256GB eSIM', brand: 'Apple', category: 'phone', price: 70000, description: '256GB Storage. A16 Bionic. eSIM only.', specs: ['256GB Storage', 'A16 Bionic', '6.7" OLED 120Hz', '48MP Triple'], features: ['Refurbished', 'eSIM Only'], image: '/images/phones/iphone-14promax.png', inStock: true, rating: 4.8, reviews: 52 },
-    { id: 86, name: 'iPhone 14 Pro Max 256GB', brand: 'Apple', category: 'phone', price: 76000, description: '256GB Storage. A16 Bionic. Max power.', specs: ['256GB Storage', 'A16 Bionic', '6.7" OLED 120Hz', '48MP Triple'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/iphone-14promax.png', inStock: true, rating: 4.9, reviews: 75 },
-    { id: 87, name: 'iPhone 14 Pro Max 512GB eSIM', brand: 'Apple', category: 'phone', price: 77000, description: '512GB Storage. A16 Bionic. eSIM only.', specs: ['512GB Storage', 'A16 Bionic', '6.7" OLED 120Hz', '48MP Triple'], features: ['Refurbished', 'eSIM Only'], image: '/images/phones/iphone-14promax.png', inStock: true, rating: 4.9, reviews: 38 },
-    { id: 88, name: 'iPhone 14 Pro Max 1TB eSIM', brand: 'Apple', category: 'phone', price: 79000, description: '1TB Storage. A16 Bionic. eSIM only.', specs: ['1TB Storage', 'A16 Bionic', '6.7" OLED 120Hz', '48MP Triple'], features: ['Refurbished', 'eSIM Only'], image: '/images/phones/iphone-14promax.png', inStock: true, rating: 5.0, reviews: 22 },
-    { id: 89, name: 'iPhone 15 128GB eSIM', brand: 'Apple', category: 'phone', price: 60000, description: '128GB Storage. A16 Bionic. eSIM only.', specs: ['128GB Storage', 'A16 Bionic', '6.1" OLED', '48MP Dual'], features: ['Refurbished', 'eSIM Only'], image: '/images/phones/iphone-15.png', inStock: true, rating: 4.7, reviews: 58 },
-    { id: 90, name: 'iPhone 15 128GB', brand: 'Apple', category: 'phone', price: 65000, description: '128GB Storage. A16 Bionic. USB-C.', specs: ['128GB Storage', 'A16 Bionic', '6.1" OLED', '48MP Dual'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/iphone-15.png', inStock: true, rating: 4.8, reviews: 82 },
-    { id: 91, name: 'iPhone 15 Plus 128GB', brand: 'Apple', category: 'phone', price: 67000, description: '128GB Storage. A16 Bionic. Plus size.', specs: ['128GB Storage', 'A16 Bionic', '6.7" OLED', '48MP Dual'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/iphone-15plus.png', inStock: true, rating: 4.7, reviews: 48 },
-    { id: 92, name: 'iPhone 15 Pro Max 256GB eSIM', brand: 'Apple', category: 'phone', price: 85000, description: '256GB Storage. A17 Pro. eSIM only.', specs: ['256GB Storage', 'A17 Pro', '6.7" OLED 120Hz', '48MP Triple'], features: ['Refurbished', 'eSIM Only'], image: '/images/phones/iphone-15promax.png', inStock: true, rating: 4.9, reviews: 65 },
-    { id: 93, name: 'iPhone 15 Pro Max 256GB', brand: 'Apple', category: 'phone', price: 90000, description: '256GB Storage. A17 Pro. Titanium.', specs: ['256GB Storage', 'A17 Pro', '6.7" OLED 120Hz', '48MP Triple'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/iphone-15promax.png', inStock: true, rating: 4.9, reviews: 88 },
-    { id: 94, name: 'iPhone 15 Pro Max 512GB', brand: 'Apple', category: 'phone', price: 95000, description: '512GB Storage. A17 Pro. Titanium max.', specs: ['512GB Storage', 'A17 Pro', '6.7" OLED 120Hz', '48MP Triple'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/iphone-15promax.png', inStock: true, rating: 5.0, reviews: 52 },
-    { id: 95, name: 'iPhone 16 Pro Max 256GB', brand: 'Apple', category: 'phone', price: 113000, description: '256GB Storage. A18 Pro. Latest flagship.', specs: ['256GB Storage', 'A18 Pro', '6.9" OLED 120Hz', '48MP Triple'], features: ['Brand New', '1 Year Warranty'], image: '/images/phones/iphone-16promax.png', inStock: true, rating: 5.0, reviews: 25, badge: 'NEW' },
-    { id: 96, name: 'iPhone 16 Pro Max 512GB', brand: 'Apple', category: 'phone', price: 122000, description: '512GB Storage. A18 Pro. Ultimate.', specs: ['512GB Storage', 'A18 Pro', '6.9" OLED 120Hz', '48MP Triple'], features: ['Brand New', '1 Year Warranty'], image: '/images/phones/iphone-16promax.png', inStock: true, rating: 5.0, reviews: 18, badge: 'NEW' },
-    { id: 97, name: 'iPad Pro 12.9"', brand: 'Apple', category: 'tablet', price: 155000, description: '256GB, Wi-Fi. M2 chip.', specs: ['256GB Storage', 'M2 Chip', '12.9" Display', 'Face ID'], features: ['Free Delivery', '1 Year Warranty'], image: '/images/ipad-pro.jpg', inStock: true, rating: 4.9, reviews: 67 },
-    { id: 98, name: 'iPad Pro 11"', brand: 'Apple', category: 'tablet', price: 125000, description: '256GB, Wi-Fi. M2 chip.', specs: ['256GB Storage', 'M2 Chip', '11" Display', 'Face ID'], features: ['Free Delivery', '1 Year Warranty'], image: '/images/ipad-pro.jpg', inStock: true, rating: 4.8, reviews: 56 },
-    { id: 99, name: 'MacBook Pro 16"', brand: 'Apple', category: 'laptop', price: 385000, description: 'M3 Pro, 18GB RAM, 512GB.', specs: ['512GB SSD', 'M3 Pro', '16.2" Display', '18GB RAM'], features: ['Free Delivery', '1 Year Warranty'], image: '/images/macbook-pro.jpg', inStock: true, rating: 4.9, reviews: 123 },
-    { id: 100, name: 'MacBook Air M3 13"', brand: 'Apple', category: 'laptop', price: 165000, description: '256GB, 8GB RAM. Midnight.', specs: ['256GB SSD', 'M3 Chip', '13.6" Display', '8GB RAM'], features: ['Free Delivery', '1 Year Warranty'], image: '/images/macbook-air.jpg', inStock: true, rating: 4.8, reviews: 98 },
+    { id: 1, name: 'Redmi A7 3/64GB', brand: 'Xiaomi', category: 'phone', price: 11200, description: '3GB RAM, 64GB Storage. Brand new sealed.', specs: ['3GB RAM', '64GB Storage', '6.5" HD+', '5000mAh'], features: ['Brand New', '1 Year Warranty'], image: '/images/phones/a7-3-64.jpg', inStock: true, rating: 4.2, reviews: 15, badge: 'NEW' },
+    { id: 2, name: 'Redmi A7 Pro 4/64GB', brand: 'Xiaomi', category: 'phone', price: 12200, description: '4GB RAM, 64GB Storage. Brand new sealed.', specs: ['4GB RAM', '64GB Storage', '6.5" HD+', '5000mAh'], features: ['Brand New', '1 Year Warranty'], image: '/images/phones/a7pro-4-64.jpg', inStock: true, rating: 4.3, reviews: 12, badge: 'NEW' },
+    { id: 3, name: 'Redmi A7 Pro 4/128GB', brand: 'Xiaomi', category: 'phone', price: 13900, description: '4GB RAM, 128GB Storage. Brand new sealed.', specs: ['4GB RAM', '128GB Storage', '6.5" HD+', '5000mAh'], features: ['Brand New', '1 Year Warranty'], image: '/images/phones/a7pro-4-128.jpg', inStock: true, rating: 4.4, reviews: 8, badge: 'NEW' },
+    { id: 4, name: 'Redmi 15C 4/128GB', brand: 'Xiaomi', category: 'phone', price: 13700, description: '4GB RAM, 128GB Storage. Hot seller!', specs: ['4GB RAM', '128GB Storage', '6.71" HD+', '5160mAh'], features: ['Brand New', 'Hot Deal'], image: '/images/phones/redmi-15c-4-128.jpg', inStock: true, rating: 4.5, reviews: 22, badge: 'HOT' },
+    { id: 5, name: 'Redmi 15C 6/128GB', brand: 'Xiaomi', category: 'phone', price: 15300, description: '6GB RAM, 128GB Storage. Hot seller!', specs: ['6GB RAM', '128GB Storage', '6.71" HD+', '5160mAh'], features: ['Brand New', 'Hot Deal'], image: '/images/phones/redmi-15c-6-128.jpg', inStock: true, rating: 4.5, reviews: 18, badge: 'HOT' },
+    { id: 6, name: 'Redmi 15C 8/256GB', brand: 'Xiaomi', category: 'phone', price: 17400, description: '8GB RAM, 256GB Storage. Top spec!', specs: ['8GB RAM', '256GB Storage', '6.71" HD+', '5160mAh'], features: ['Brand New', 'Top Spec'], image: '/images/phones/redmi-15c-8-256.jpg', inStock: true, rating: 4.6, reviews: 10 },
+    { id: 7, name: 'Redmi 15 6/128GB', brand: 'Xiaomi', category: 'phone', price: 17900, description: '6GB RAM, 128GB Storage. Latest model.', specs: ['6GB RAM', '128GB Storage', '6.79" FHD+', '5110mAh'], features: ['Brand New', '1 Year Warranty'], image: '/images/phones/redmi-15-6-128.jpg', inStock: true, rating: 4.6, reviews: 14, badge: 'NEW' },
+    { id: 8, name: 'Redmi 15 8/256GB', brand: 'Xiaomi', category: 'phone', price: 19900, description: '8GB RAM, 256GB Storage. Latest model.', specs: ['8GB RAM', '256GB Storage', '6.79" FHD+', '5110mAh'], features: ['Brand New', '1 Year Warranty'], image: '/images/phones/redmi-15-8-256.jpg', inStock: true, rating: 4.7, reviews: 9, badge: 'NEW' },
+    { id: 9, name: 'Redmi Note 15 6/128GB', brand: 'Xiaomi', category: 'phone', price: 23200, description: '6GB RAM, 128GB Storage. Note series.', specs: ['6GB RAM', '128GB Storage', '6.67" AMOLED', '5000mAh'], features: ['Brand New', 'AMOLED Display'], image: '/images/phones/note-15-6-128.jpg', inStock: true, rating: 4.7, reviews: 16, badge: 'NEW' },
+    { id: 10, name: 'Redmi Note 15 8/256GB', brand: 'Xiaomi', category: 'phone', price: 26900, description: '8GB RAM, 256GB Storage. Note series.', specs: ['8GB RAM', '256GB Storage', '6.67" AMOLED', '5000mAh'], features: ['Brand New', 'AMOLED Display'], image: '/images/phones/note-15-8-256.jpg', inStock: true, rating: 4.8, reviews: 11, badge: 'NEW' },
+    { id: 11, name: 'Redmi Note 15 Pro 8/256GB', brand: 'Xiaomi', category: 'phone', price: 34000, description: '8GB RAM, 256GB Storage. Pro model.', specs: ['8GB RAM', '256GB Storage', '6.67" AMOLED 120Hz', '5110mAh'], features: ['Brand New', '108MP Camera'], image: '/images/phones/note-15pro-8-256.jpg', inStock: true, rating: 4.8, reviews: 13, badge: 'NEW' },
+    { id: 12, name: 'Redmi Note 15 Pro 12/512GB', brand: 'Xiaomi', category: 'phone', price: 42000, description: '12GB RAM, 512GB Storage. Top spec Pro.', specs: ['12GB RAM', '512GB Storage', '6.67" AMOLED 120Hz', '5110mAh'], features: ['Brand New', '108MP Camera'], image: '/images/phones/note-15pro-12-512.jpg', inStock: true, rating: 4.9, reviews: 7, badge: 'NEW' },
+    { id: 13, name: 'Redmi Note 15 Pro+ 8/256GB', brand: 'Xiaomi', category: 'phone', price: 50000, description: '8GB RAM, 256GB Storage. Pro Plus flagship.', specs: ['8GB RAM', '256GB Storage', '6.67" AMOLED 144Hz', '5000mAh'], features: ['Brand New', '200MP Camera'], image: '/images/phones/note-15pro-8-256.jpg', inStock: true, rating: 4.9, reviews: 5, badge: 'NEW' },
+    { id: 14, name: 'Redmi Note 15 Pro+ 12/512GB', brand: 'Xiaomi', category: 'phone', price: 59000, description: '12GB RAM, 512GB Storage. Ultimate Pro Plus.', specs: ['12GB RAM', '512GB Storage', '6.67" AMOLED 144Hz', '5000mAh'], features: ['Brand New', '200MP Camera'], image: '/images/phones/note-15pro-12-512.jpg', inStock: true, rating: 5.0, reviews: 3, badge: 'NEW' },
+    { id: 15, name: 'Samsung Galaxy A06 4/64GB', brand: 'Samsung', category: 'phone', price: 11000, description: '4GB RAM, 64GB Storage. Entry level Samsung.', specs: ['4GB RAM', '64GB Storage', '6.7" HD+', '5000mAh'], features: ['EA Warranty', '1 Year Warranty'], image: '/images/phones/a06-4-64.jpg', inStock: true, rating: 4.1, reviews: 25 },
+    { id: 16, name: 'Samsung Galaxy A06 4/128GB', brand: 'Samsung', category: 'phone', price: 12500, description: '4GB RAM, 128GB Storage. More storage.', specs: ['4GB RAM', '128GB Storage', '6.7" HD+', '5000mAh'], features: ['EA Warranty', '1 Year Warranty'], image: '/images/phones/a06-4-128.jpg', inStock: true, rating: 4.2, reviews: 20 },
+    { id: 17, name: 'Samsung Galaxy A07 4/64GB', brand: 'Samsung', category: 'phone', price: 12600, description: '4GB RAM, 64GB Storage. New A07.', specs: ['4GB RAM', '64GB Storage', '6.7" HD+', '5000mAh'], features: ['EA Warranty', '1 Year Warranty'], image: '/images/phones/a07-4-64.jpg', inStock: true, rating: 4.2, reviews: 15 },
+    { id: 18, name: 'Samsung Galaxy A07 4/128GB', brand: 'Samsung', category: 'phone', price: 13400, description: '4GB RAM, 128GB Storage. Hot seller!', specs: ['4GB RAM', '128GB Storage', '6.7" HD+', '5000mAh'], features: ['EA Warranty', '1 Year Warranty'], image: '/images/phones/a07-4-128.jpg', inStock: true, rating: 4.3, reviews: 18, badge: 'HOT' },
+    { id: 19, name: 'Samsung Galaxy A16 4/128GB', brand: 'Samsung', category: 'phone', price: 16300, description: '4GB RAM, 128GB Storage. Latest A16.', specs: ['4GB RAM', '128GB Storage', '6.7" FHD+', '5000mAh'], features: ['EA Warranty', '1 Year Warranty'], image: '/images/phones/a16-4-128.jpg', inStock: true, rating: 4.3, reviews: 22, badge: 'NEW' },
+    { id: 20, name: 'Samsung Galaxy A16 6/128GB', brand: 'Samsung', category: 'phone', price: 18000, description: '6GB RAM, 128GB Storage. More power.', specs: ['6GB RAM', '128GB Storage', '6.7" FHD+', '5000mAh'], features: ['EA Warranty', '1 Year Warranty'], image: '/images/phones/a16-6-128.jpg', inStock: true, rating: 4.4, reviews: 16 },
+    { id: 21, name: 'Samsung Galaxy A17 4/128GB', brand: 'Samsung', category: 'phone', price: 18900, description: '4GB RAM, 128GB Storage. New A17!', specs: ['4GB RAM', '128GB Storage', '6.7" FHD+', '5000mAh'], features: ['EA Warranty', '1 Year Warranty'], image: '/images/phones/a17-4-128.jpg', inStock: true, rating: 4.4, reviews: 14, badge: 'NEW' },
+    { id: 22, name: 'Samsung Galaxy A17 6/128GB', brand: 'Samsung', category: 'phone', price: 20000, description: '6GB RAM, 128GB Storage. New A17!', specs: ['6GB RAM', '128GB Storage', '6.7" FHD+', '5000mAh'], features: ['EA Warranty', '1 Year Warranty'], image: '/images/phones/a17-6-128.jpg', inStock: true, rating: 4.5, reviews: 10, badge: 'NEW' },
+    { id: 23, name: 'Samsung Galaxy A17 8/256GB', brand: 'Samsung', category: 'phone', price: 26000, description: '8GB RAM, 256GB Storage. Top A17.', specs: ['8GB RAM', '256GB Storage', '6.7" FHD+', '5000mAh'], features: ['EA Warranty', '1 Year Warranty'], image: '/images/phones/a17-8-256.jpg', inStock: true, rating: 4.6, reviews: 8, badge: 'NEW' },
+    { id: 24, name: 'Samsung Galaxy A26 6/128GB', brand: 'Samsung', category: 'phone', price: 26000, description: '6GB RAM, 128GB Storage. Temporarily out of stock.', specs: ['6GB RAM', '128GB Storage', '6.7" FHD+ 120Hz', '5000mAh'], features: ['EA Warranty', '1 Year Warranty'], image: '/images/phones/a26-6-128.jpg', inStock: false, rating: 4.5, reviews: 5 },
+    { id: 25, name: 'Samsung Galaxy A56 8/256GB', brand: 'Samsung', category: 'phone', price: 47500, description: '8GB RAM, 256GB Storage. Premium mid-range.', specs: ['8GB RAM', '256GB Storage', '6.7" FHD+ 120Hz', '5000mAh'], features: ['EA Warranty', 'IP67'], image: '/images/phones/a56-8-256.jpg', inStock: true, rating: 4.7, reviews: 12 },
+    { id: 26, name: 'Samsung Galaxy A37 8/256GB', brand: 'Samsung', category: 'phone', price: 49000, description: '8GB RAM, 256GB Storage. New A37 hot!', specs: ['8GB RAM', '256GB Storage', '6.7" FHD+ 120Hz', '5000mAh'], features: ['EA Warranty', 'Hot Deal'], image: '/images/phones/a37-8-256.jpg', inStock: true, rating: 4.7, reviews: 9, badge: 'HOT' },
+    { id: 27, name: 'Samsung Galaxy A57 8/256GB', brand: 'Samsung', category: 'phone', price: 56000, description: '8GB RAM, 256GB Storage. Top A-series hot!', specs: ['8GB RAM', '256GB Storage', '6.7" FHD+ 120Hz', '5000mAh'], features: ['EA Warranty', 'Hot Deal'], image: '/images/phones/a57-8-256.jpg', inStock: true, rating: 4.8, reviews: 6, badge: 'HOT' },
+    { id: 28, name: 'Samsung Tab A11 4/64GB', brand: 'Samsung', category: 'tablet', price: 16300, description: '4GB RAM, 64GB Storage. Tablet.', specs: ['4GB RAM', '64GB Storage', '11" Display', '7040mAh'], features: ['EA Warranty', '1 Year Warranty'], image: '/images/phones/tab-a11-64-4.jpg', inStock: true, rating: 4.4, reviews: 8 },
+    { id: 29, name: 'Samsung Tab A11 Plus 6/128GB', brand: 'Samsung', category: 'tablet', price: 31500, description: '6GB RAM, 128GB Storage. Plus tablet.', specs: ['6GB RAM', '128GB Storage', '11" Display', '8000mAh'], features: ['EA Warranty', '1 Year Warranty'], image: '/images/phones/tab-a11-plus-128-6.jpg', inStock: true, rating: 4.6, reviews: 5 },
+    { id: 30, name: 'Samsung S25 Ultra 256GB', brand: 'Samsung', category: 'phone', price: 119000, description: '12GB RAM, 256GB Storage. Ultra flagship.', specs: ['256GB Storage', '12GB RAM', '6.9" QHD+', '200MP Camera'], features: ['EA Warranty', 'S Pen'], image: '/images/phones/s25ultra-256gb.jpg', inStock: true, rating: 4.9, reviews: 32 },
+    { id: 31, name: 'Samsung S25 Ultra 512GB', brand: 'Samsung', category: 'phone', price: 136000, description: '12GB RAM, 512GB Storage. Ultra flagship.', specs: ['512GB Storage', '12GB RAM', '6.9" QHD+', '200MP Camera'], features: ['EA Warranty', 'S Pen'], image: '/images/phones/s25ultra-512gb.jpg', inStock: true, rating: 4.9, reviews: 25 },
+    { id: 32, name: 'Samsung S26 Ultra 256GB/12GB', brand: 'Samsung', category: 'phone', price: 140000, description: '12GB RAM, 256GB Storage. Latest Ultra.', specs: ['256GB Storage', '12GB RAM', '6.9" QHD+', '200MP Camera'], features: ['EA Warranty', 'Galaxy AI'], image: '/images/phones/s26-ultra-25612.jpg', inStock: true, rating: 5.0, reviews: 8, badge: 'NEW' },
+    { id: 33, name: 'Samsung S26 Ultra 512GB/12GB', brand: 'Samsung', category: 'phone', price: 152000, description: '12GB RAM, 512GB Storage. Latest Ultra top.', specs: ['512GB Storage', '12GB RAM', '6.9" QHD+', '200MP Camera'], features: ['EA Warranty', 'Galaxy AI'], image: '/images/phones/s26-ultra-51212.jpg', inStock: true, rating: 5.0, reviews: 5, badge: 'NEW' },
+    { id: 34, name: 'Samsung S26 256GB', brand: 'Samsung', category: 'phone', price: 107000, description: '12GB RAM, 256GB Storage. Latest S26.', specs: ['256GB Storage', '12GB RAM', '6.7" FHD+', '50MP Camera'], features: ['EA Warranty', 'Galaxy AI'], image: '/images/phones/s26-256.jpg', inStock: true, rating: 4.8, reviews: 6, badge: 'NEW' },
+    { id: 35, name: 'Samsung S22 Ultra 8/128GB', brand: 'Samsung', category: 'phone', price: 46000, description: '8GB RAM, 128GB Storage. Great value.', specs: ['128GB Storage', '8GB RAM', '6.8" QHD+', '108MP Camera'], features: ['Refurbished', 'S Pen'], image: '/images/phones/s22-ultra-8128gb.jpg', inStock: true, rating: 4.6, reviews: 45 },
+    { id: 36, name: 'Samsung S22 Ultra 12/256GB', brand: 'Samsung', category: 'phone', price: 50000, description: '12GB RAM, 256GB Storage. Premium used.', specs: ['256GB Storage', '12GB RAM', '6.8" QHD+', '108MP Camera'], features: ['Refurbished', 'S Pen'], image: '/images/phones/s22-ultra-12256gb.jpg', inStock: true, rating: 4.7, reviews: 38 },
+    { id: 37, name: 'Samsung S22 Ultra 12/512GB', brand: 'Samsung', category: 'phone', price: 55000, description: '12GB RAM, 512GB Storage. Top spec.', specs: ['512GB Storage', '12GB RAM', '6.8" QHD+', '108MP Camera'], features: ['Refurbished', 'S Pen'], image: '/images/phones/s22-ultra-12512gb.jpg', inStock: true, rating: 4.8, reviews: 28 },
+    { id: 38, name: 'Samsung S23 8/256GB', brand: 'Samsung', category: 'phone', price: 42000, description: '8GB RAM, 256GB Storage. Compact flagship.', specs: ['256GB Storage', '8GB RAM', '6.1" FHD+', '50MP Camera'], features: ['Refurbished', '1 Year Warranty'], image: '/images/phones/s23-8256gb.jpg', inStock: true, rating: 4.6, reviews: 22 },
+    { id: 39, name: 'Samsung S23 Ultra 256GB', brand: 'Samsung', category: 'phone', price: 63000, description: '12GB RAM, 256GB Storage. Ultra power.', specs: ['256GB Storage', '12GB RAM', '6.8" QHD+', '200MP Camera'], features: ['Refurbished', 'S Pen'], image: '/images/phones/s23-ultra-256gb.jpg', inStock: true, rating: 4.8, reviews: 35 },
+    { id: 40, name: 'Samsung S23 Ultra 512GB', brand: 'Samsung', category: 'phone', price: 67000, description: '12GB RAM, 512GB Storage. Ultra max.', specs: ['512GB Storage', '12GB RAM', '6.8" QHD+', '200MP Camera'], features: ['Refurbished', 'S Pen'], image: '/images/phones/s23-ultra-512gb.jpg', inStock: true, rating: 4.9, reviews: 25 },
+    { id: 41, name: 'Samsung S24 Plus 256GB', brand: 'Samsung', category: 'phone', price: 60000, description: '12GB RAM, 256GB Storage. Plus size.', specs: ['256GB Storage', '12GB RAM', '6.7" QHD+', '50MP Camera'], features: ['Refurbished', 'Galaxy AI'], image: '/images/phones/s24-plus-256gb.jpg', inStock: true, rating: 4.7, reviews: 18 },
+    { id: 42, name: 'Samsung S24 Ultra 12/256GB', brand: 'Samsung', category: 'phone', price: 82000, description: '12GB RAM, 256GB Storage. Titanium.', specs: ['256GB Storage', '12GB RAM', '6.8" QHD+', '200MP Camera'], features: ['Refurbished', 'Titanium'], image: '/images/phones/s24-ultra-12256gb.jpg', inStock: true, rating: 4.9, reviews: 42 },
+    { id: 43, name: 'Samsung S24 Ultra 12/512GB', brand: 'Samsung', category: 'phone', price: 87000, description: '12GB RAM, 512GB Storage. Titanium max.', specs: ['512GB Storage', '12GB RAM', '6.8" QHD+', '200MP Camera'], features: ['Refurbished', 'Titanium'], image: '/images/phones/s24-ultra-12512gb.jpg', inStock: true, rating: 4.9, reviews: 35 },
+    { id: 44, name: 'Samsung S25 256GB', brand: 'Samsung', category: 'phone', price: 60000, description: '12GB RAM, 256GB Storage. Latest S25.', specs: ['256GB Storage', '12GB RAM', '6.2" FHD+', '50MP Camera'], features: ['EA Warranty', 'Galaxy AI'], image: '/images/phones/s25-256gb.jpg', inStock: true, rating: 4.7, reviews: 15, badge: 'NEW' },
+    { id: 45, name: 'Samsung S25 Ultra 12/256GB', brand: 'Samsung', category: 'phone', price: 95000, description: '12GB RAM, 256GB Storage. New Ultra.', specs: ['256GB Storage', '12GB RAM', '6.9" QHD+', '200MP Camera'], features: ['EA Warranty', 'Galaxy AI'], image: '/images/phones/s25-ultra-12256gb.jpg', inStock: true, rating: 4.9, reviews: 28, badge: 'NEW' },
+    { id: 46, name: 'Samsung S25 Ultra 12/512GB', brand: 'Samsung', category: 'phone', price: 105000, description: '12GB RAM, 512GB Storage. New Ultra max.', specs: ['512GB Storage', '12GB RAM', '6.9" QHD+', '200MP Camera'], features: ['EA Warranty', 'Galaxy AI'], image: '/images/phones/s25-ultra-12512gb.jpg', inStock: true, rating: 5.0, reviews: 18, badge: 'NEW' },
+    { id: 47, name: 'Samsung Galaxy Fold 6 256GB', brand: 'Samsung', category: 'phone', price: 95000, description: '12GB RAM, 256GB Storage. Foldable.', specs: ['256GB Storage', '12GB RAM', '7.6" Foldable', '50MP Camera'], features: ['Refurbished', 'Foldable'], image: '/images/phones/fold-6-512gb.jpg', inStock: true, rating: 4.8, reviews: 12 },
+    { id: 48, name: 'Samsung Galaxy Fold 6 512GB', brand: 'Samsung', category: 'phone', price: 99000, description: '12GB RAM, 512GB Storage. Foldable max.', specs: ['512GB Storage', '12GB RAM', '7.6" Foldable', '50MP Camera'], features: ['Refurbished', 'Foldable'], image: '/images/phones/fold-6-512gb.jpg', inStock: true, rating: 4.9, reviews: 8 },
+    { id: 49, name: 'Samsung A16 4/128GB (Dubai)', brand: 'Samsung', category: 'phone', price: 15800, description: '4GB RAM, 128GB Storage. Dubai version.', specs: ['4GB RAM', '128GB Storage', '6.7" FHD+', '5000mAh'], features: ['Dubai Version', '1 Year Warranty'], image: '/images/phones/a16-4-128.jpg', inStock: true, rating: 4.3, reviews: 20 },
+    { id: 50, name: 'Samsung A17 8/256GB (Dubai)', brand: 'Samsung', category: 'phone', price: 24000, description: '8GB RAM, 256GB Storage. Dubai version.', specs: ['8GB RAM', '256GB Storage', '6.7" FHD+', '5000mAh'], features: ['Dubai Version', '1 Year Warranty'], image: '/images/phones/a17-8-256.jpg', inStock: true, rating: 4.5, reviews: 15 },
+    { id: 51, name: 'Samsung A26 6/128GB (Dubai)', brand: 'Samsung', category: 'phone', price: 25500, description: '6GB RAM, 128GB Storage. Dubai version.', specs: ['6GB RAM', '128GB Storage', '6.7" FHD+ 120Hz', '5000mAh'], features: ['Dubai Version', '1 Year Warranty'], image: '/images/phones/a26-6-128.jpg', inStock: true, rating: 4.5, reviews: 12 },
+    { id: 52, name: 'Samsung A26 8/256GB (Dubai)', brand: 'Samsung', category: 'phone', price: 28500, description: '8GB RAM, 256GB Storage. Dubai version.', specs: ['8GB RAM', '256GB Storage', '6.7" FHD+ 120Hz', '5000mAh'], features: ['Dubai Version', '1 Year Warranty'], image: '/images/phones/a26-8-256.jpg', inStock: true, rating: 4.6, reviews: 8 },
+    { id: 53, name: 'Samsung A36 6/128GB (Dubai)', brand: 'Samsung', category: 'phone', price: 33000, description: '6GB RAM, 128GB Storage. Dubai version.', specs: ['6GB RAM', '128GB Storage', '6.7" FHD+ 120Hz', '5000mAh'], features: ['Dubai Version', '1 Year Warranty'], image: '/images/phones/a36-6-128.jpg', inStock: true, rating: 4.6, reviews: 10 },
+    { id: 54, name: 'Samsung A36 8/256GB (Dubai)', brand: 'Samsung', category: 'phone', price: 35000, description: '8GB RAM, 256GB Storage. Dubai version.', specs: ['8GB RAM', '256GB Storage', '6.7" FHD+ 120Hz', '5000mAh'], features: ['Dubai Version', '1 Year Warranty'], image: '/images/phones/a36-8-256.jpg', inStock: true, rating: 4.7, reviews: 7 },
+    { id: 55, name: 'Samsung A56 8/256GB (Dubai)', brand: 'Samsung', category: 'phone', price: 44000, description: '8GB RAM, 256GB Storage. Dubai version.', specs: ['8GB RAM', '256GB Storage', '6.7" FHD+ 120Hz', '5000mAh'], features: ['Dubai Version', 'IP67'], image: '/images/phones/a56-8-256.jpg', inStock: true, rating: 4.7, reviews: 9 },
+    { id: 56, name: 'iPhone 11 128GB', brand: 'Apple', category: 'phone', price: 27000, description: '128GB Storage. A13 Bionic chip. Great value.', specs: ['128GB Storage', 'A13 Bionic', '6.1" Display', '12MP Camera'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/11-128gb.jpg', inStock: true, rating: 4.4, reviews: 85 },
+    { id: 57, name: 'iPhone 11 256GB', brand: 'Apple', category: 'phone', price: 29000, description: '256GB Storage. A13 Bionic chip.', specs: ['256GB Storage', 'A13 Bionic', '6.1" Display', '12MP Camera'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/11-256gb.jpg', inStock: true, rating: 4.5, reviews: 72 },
+    { id: 58, name: 'iPhone 11 Pro 256GB', brand: 'Apple', category: 'phone', price: 34000, description: '256GB Storage. A13 Bionic. Triple camera.', specs: ['256GB Storage', 'A13 Bionic', '5.8" OLED', '12MP Triple'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/11-pro-256gb.jpg', inStock: true, rating: 4.6, reviews: 65 },
+    { id: 59, name: 'iPhone 11 Pro Max 256GB', brand: 'Apple', category: 'phone', price: 38000, description: '256GB Storage. A13 Bionic. Max screen.', specs: ['256GB Storage', 'A13 Bionic', '6.5" OLED', '12MP Triple'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/11-pro-max-256gb.jpg', inStock: true, rating: 4.7, reviews: 58 },
+    { id: 60, name: 'iPhone 11 Pro Max 512GB', brand: 'Apple', category: 'phone', price: 40000, description: '512GB Storage. A13 Bionic. Max storage.', specs: ['512GB Storage', 'A13 Bionic', '6.5" OLED', '12MP Triple'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/11-pro-max-512gb.jpg', inStock: true, rating: 4.7, reviews: 42 },
+    { id: 61, name: 'iPhone 12 128GB', brand: 'Apple', category: 'phone', price: 32000, description: '128GB Storage. A14 Bionic. 5G capable.', specs: ['128GB Storage', 'A14 Bionic', '6.1" OLED', '12MP Dual'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/12-128gb.jpg', inStock: true, rating: 4.5, reviews: 78 },
+    { id: 62, name: 'iPhone 12 Pro 128GB', brand: 'Apple', category: 'phone', price: 38000, description: '128GB Storage. A14 Bionic. Pro camera.', specs: ['128GB Storage', 'A14 Bionic', '6.1" OLED', '12MP Triple'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/12-pro-128gb.jpg', inStock: true, rating: 4.6, reviews: 65 },
+    { id: 63, name: 'iPhone 12 Pro 256GB', brand: 'Apple', category: 'phone', price: 42000, description: '256GB Storage. A14 Bionic. Pro max.', specs: ['256GB Storage', 'A14 Bionic', '6.1" OLED', '12MP Triple'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/12-pro-256gb.jpg', inStock: true, rating: 4.7, reviews: 52 },
+    { id: 64, name: 'iPhone 12 Pro 512GB', brand: 'Apple', category: 'phone', price: 44000, description: '512GB Storage. A14 Bionic. Top spec.', specs: ['512GB Storage', 'A14 Bionic', '6.1" OLED', '12MP Triple'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/12-pro-512gb.jpg', inStock: true, rating: 4.7, reviews: 38 },
+    { id: 65, name: 'iPhone 12 Pro Max 128GB', brand: 'Apple', category: 'phone', price: 44000, description: '128GB Storage. A14 Bionic. Max size.', specs: ['128GB Storage', 'A14 Bionic', '6.7" OLED', '12MP Triple'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/12-pro-max-128gb.jpg', inStock: true, rating: 4.7, reviews: 55 },
+    { id: 66, name: 'iPhone 12 Pro Max 256GB', brand: 'Apple', category: 'phone', price: 49000, description: '256GB Storage. A14 Bionic. Max power.', specs: ['256GB Storage', 'A14 Bionic', '6.7" OLED', '12MP Triple'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/12-pro-max-256gb.jpg', inStock: true, rating: 4.8, reviews: 48 },
+    { id: 67, name: 'iPhone 12 Pro Max 512GB', brand: 'Apple', category: 'phone', price: 50000, description: '512GB Storage. A14 Bionic. Ultimate.', specs: ['512GB Storage', 'A14 Bionic', '6.7" OLED', '12MP Triple'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/12-pro-max-512gb.jpg', inStock: true, rating: 4.8, reviews: 35 },
+    { id: 68, name: 'iPhone 13 128GB', brand: 'Apple', category: 'phone', price: 40000, description: '128GB Storage. A15 Bionic. Compact power.', specs: ['128GB Storage', 'A15 Bionic', '6.1" OLED', '12MP Dual'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/13-128gb.jpg', inStock: true, rating: 4.6, reviews: 92 },
+    { id: 69, name: 'iPhone 13 256GB', brand: 'Apple', category: 'phone', price: 42000, description: '256GB Storage. A15 Bionic.', specs: ['256GB Storage', 'A15 Bionic', '6.1" OLED', '12MP Dual'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/13-256gb.jpg', inStock: true, rating: 4.7, reviews: 78 },
+    { id: 70, name: 'iPhone 13 512GB', brand: 'Apple', category: 'phone', price: 45000, description: '512GB Storage. A15 Bionic.', specs: ['512GB Storage', 'A15 Bionic', '6.1" OLED', '12MP Dual'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/13-512gb.jpg', inStock: true, rating: 4.7, reviews: 55 },
+    { id: 71, name: 'iPhone 13 Pro 128GB', brand: 'Apple', category: 'phone', price: 50000, description: '128GB Storage. A15 Bionic. Pro camera.', specs: ['128GB Storage', 'A15 Bionic', '6.1" OLED 120Hz', '12MP Triple'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/13-pro-128gb.jpg', inStock: true, rating: 4.8, reviews: 68 },
+    { id: 72, name: 'iPhone 13 Pro 256GB', brand: 'Apple', category: 'phone', price: 55000, description: '256GB Storage. A15 Bionic. Pro max.', specs: ['256GB Storage', 'A15 Bionic', '6.1" OLED 120Hz', '12MP Triple'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/13-pro-256gb.jpg', inStock: true, rating: 4.8, reviews: 58 },
+    { id: 73, name: 'iPhone 13 Pro 512GB', brand: 'Apple', category: 'phone', price: 58000, description: '512GB Storage. A15 Bionic. Top Pro.', specs: ['512GB Storage', 'A15 Bionic', '6.1" OLED 120Hz', '12MP Triple'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/13-pro-512gb.jpg', inStock: true, rating: 4.9, reviews: 42 },
+    { id: 74, name: 'iPhone 13 Pro 1TB', brand: 'Apple', category: 'phone', price: 60000, description: '1TB Storage. A15 Bionic. Ultimate.', specs: ['1TB Storage', 'A15 Bionic', '6.1" OLED 120Hz', '12MP Triple'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/13-pro-1tb.jpg', inStock: true, rating: 4.9, reviews: 28 },
+    { id: 75, name: 'iPhone 13 Pro Max 128GB', brand: 'Apple', category: 'phone', price: 57000, description: '128GB Storage. A15 Bionic. Max screen.', specs: ['128GB Storage', 'A15 Bionic', '6.7" OLED 120Hz', '12MP Triple'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/13-pro-max-128gb.jpg', inStock: true, rating: 4.8, reviews: 72 },
+    { id: 76, name: 'iPhone 13 Pro Max 256GB', brand: 'Apple', category: 'phone', price: 63000, description: '256GB Storage. A15 Bionic. Max power.', specs: ['256GB Storage', 'A15 Bionic', '6.7" OLED 120Hz', '12MP Triple'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/13-pro-max-256gb.jpg', inStock: true, rating: 4.9, reviews: 62 },
+    { id: 77, name: 'iPhone 13 Pro Max 512GB', brand: 'Apple', category: 'phone', price: 65000, description: '512GB Storage. A15 Bionic. Max spec.', specs: ['512GB Storage', 'A15 Bionic', '6.7" OLED 120Hz', '12MP Triple'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/13-pro-max-512gb.jpg', inStock: true, rating: 4.9, reviews: 48 },
+    { id: 78, name: 'iPhone 13 Pro Max 1TB', brand: 'Apple', category: 'phone', price: 67000, description: '1TB Storage. A15 Bionic. Ultimate max.', specs: ['1TB Storage', 'A15 Bionic', '6.7" OLED 120Hz', '12MP Triple'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/13-pro-max-1tb.jpg', inStock: true, rating: 5.0, reviews: 32 },
+    { id: 79, name: 'iPhone 14 128GB', brand: 'Apple', category: 'phone', price: 45000, description: '128GB Storage. A15 Bionic.', specs: ['128GB Storage', 'A15 Bionic', '6.1" OLED', '12MP Dual'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/14-128gb.jpg', inStock: true, rating: 4.6, reviews: 85 },
+    { id: 80, name: 'iPhone 14 256GB', brand: 'Apple', category: 'phone', price: 50000, description: '256GB Storage. A15 Bionic.', specs: ['256GB Storage', 'A15 Bionic', '6.1" OLED', '12MP Dual'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/14-256gb.jpg', inStock: true, rating: 4.7, reviews: 72 },
+    { id: 81, name: 'iPhone 14 Plus 128GB', brand: 'Apple', category: 'phone', price: 49000, description: '128GB Storage. A15 Bionic. Plus size.', specs: ['128GB Storage', 'A15 Bionic', '6.7" OLED', '12MP Dual'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/14-plus-128gb.jpg', inStock: true, rating: 4.6, reviews: 55 },
+    { id: 82, name: 'iPhone 14 Pro 128GB', brand: 'Apple', category: 'phone', price: 63000, description: '128GB Storage. A16 Bionic. Dynamic Island.', specs: ['128GB Storage', 'A16 Bionic', '6.1" OLED 120Hz', '48MP Triple'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/14-pro-128gb.jpg', inStock: true, rating: 4.8, reviews: 68 },
+    { id: 83, name: 'iPhone 14 Pro 256GB eSIM', brand: 'Apple', category: 'phone', price: 60000, description: '256GB Storage. A16 Bionic. eSIM only.', specs: ['256GB Storage', 'A16 Bionic', '6.1" OLED 120Hz', '48MP Triple'], features: ['Refurbished', 'eSIM Only'], image: '/images/phones/14-pro-256gb.jpg', inStock: true, rating: 4.7, reviews: 45 },
+    { id: 84, name: 'iPhone 14 Pro 256GB', brand: 'Apple', category: 'phone', price: 68000, description: '256GB Storage. A16 Bionic. Dynamic Island.', specs: ['256GB Storage', 'A16 Bionic', '6.1" OLED 120Hz', '48MP Triple'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/14-pro-256gb.jpg', inStock: true, rating: 4.8, reviews: 62 },
+    { id: 85, name: 'iPhone 14 Pro Max 256GB eSIM', brand: 'Apple', category: 'phone', price: 70000, description: '256GB Storage. A16 Bionic. eSIM only.', specs: ['256GB Storage', 'A16 Bionic', '6.7" OLED 120Hz', '48MP Triple'], features: ['Refurbished', 'eSIM Only'], image: '/images/phones/14-pro-max-256gb.jpg', inStock: true, rating: 4.8, reviews: 52 },
+    { id: 86, name: 'iPhone 14 Pro Max 256GB', brand: 'Apple', category: 'phone', price: 76000, description: '256GB Storage. A16 Bionic. Max power.', specs: ['256GB Storage', 'A16 Bionic', '6.7" OLED 120Hz', '48MP Triple'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/14-pro-max-256gb.jpg', inStock: true, rating: 4.9, reviews: 75 },
+    { id: 87, name: 'iPhone 14 Pro Max 512GB eSIM', brand: 'Apple', category: 'phone', price: 77000, description: '512GB Storage. A16 Bionic. eSIM only.', specs: ['512GB Storage', 'A16 Bionic', '6.7" OLED 120Hz', '48MP Triple'], features: ['Refurbished', 'eSIM Only'], image: '/images/phones/14-pro-max-512gb.jpg', inStock: true, rating: 4.9, reviews: 38 },
+    { id: 88, name: 'iPhone 14 Pro Max 1TB eSIM', brand: 'Apple', category: 'phone', price: 79000, description: '1TB Storage. A16 Bionic. eSIM only.', specs: ['1TB Storage', 'A16 Bionic', '6.7" OLED 120Hz', '48MP Triple'], features: ['Refurbished', 'eSIM Only'], image: '/images/phones/14-pro-max-1tb.jpg', inStock: true, rating: 5.0, reviews: 22 },
+    { id: 89, name: 'iPhone 15 128GB eSIM', brand: 'Apple', category: 'phone', price: 60000, description: '128GB Storage. A16 Bionic. eSIM only.', specs: ['128GB Storage', 'A16 Bionic', '6.1" OLED', '48MP Dual'], features: ['Refurbished', 'eSIM Only'], image: '/images/phones/15-128gb.jpg', inStock: true, rating: 4.7, reviews: 58 },
+    { id: 90, name: 'iPhone 15 128GB', brand: 'Apple', category: 'phone', price: 65000, description: '128GB Storage. A16 Bionic. USB-C.', specs: ['128GB Storage', 'A16 Bionic', '6.1" OLED', '48MP Dual'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/15-128gb.jpg', inStock: true, rating: 4.8, reviews: 82 },
+    { id: 91, name: 'iPhone 15 Plus 128GB', brand: 'Apple', category: 'phone', price: 67000, description: '128GB Storage. A16 Bionic. Plus size.', specs: ['128GB Storage', 'A16 Bionic', '6.7" OLED', '48MP Dual'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/15-plus-128gb.jpg', inStock: true, rating: 4.7, reviews: 48 },
+    { id: 92, name: 'iPhone 15 Pro Max 256GB eSIM', brand: 'Apple', category: 'phone', price: 85000, description: '256GB Storage. A17 Pro. eSIM only.', specs: ['256GB Storage', 'A17 Pro', '6.7" OLED 120Hz', '48MP Triple'], features: ['Refurbished', 'eSIM Only'], image: '/images/phones/15-pro-max-256gb.jpg', inStock: true, rating: 4.9, reviews: 65 },
+    { id: 93, name: 'iPhone 15 Pro Max 256GB', brand: 'Apple', category: 'phone', price: 90000, description: '256GB Storage. A17 Pro. Titanium.', specs: ['256GB Storage', 'A17 Pro', '6.7" OLED 120Hz', '48MP Triple'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/15-pro-max-256gb.jpg', inStock: true, rating: 4.9, reviews: 88 },
+    { id: 94, name: 'iPhone 15 Pro Max 512GB', brand: 'Apple', category: 'phone', price: 95000, description: '512GB Storage. A17 Pro. Titanium max.', specs: ['512GB Storage', 'A17 Pro', '6.7" OLED 120Hz', '48MP Triple'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/15-pro-max-512gb.jpg', inStock: true, rating: 5.0, reviews: 52 },
+    { id: 95, name: 'iPhone 16 Pro Max 256GB', brand: 'Apple', category: 'phone', price: 113000, description: '256GB Storage. A18 Pro. Latest flagship.', specs: ['256GB Storage', 'A18 Pro', '6.9" OLED 120Hz', '48MP Triple'], features: ['Brand New', '1 Year Warranty'], image: '/images/phones/16-pro-max-256gb.jpg', inStock: true, rating: 5.0, reviews: 25, badge: 'NEW' },
+    { id: 96, name: 'iPhone 16 Pro Max 512GB', brand: 'Apple', category: 'phone', price: 122000, description: '512GB Storage. A18 Pro. Ultimate.', specs: ['512GB Storage', 'A18 Pro', '6.9" OLED 120Hz', '48MP Triple'], features: ['Brand New', '1 Year Warranty'], image: '/images/phones/16-pro-max-512gb.jpg', inStock: true, rating: 5.0, reviews: 18, badge: 'NEW' },
+    { id: 97, name: 'iPad Pro 12.9"', brand: 'Apple', category: 'tablet', price: 155000, description: '256GB, Wi-Fi. M2 chip.', specs: ['256GB Storage', 'M2 Chip', '12.9" Display', 'Face ID'], features: ['Free Delivery', '1 Year Warranty'], image: '/images/phones/ipad-pro-129.svg', inStock: true, rating: 4.9, reviews: 67 },
+    { id: 98, name: 'iPad Pro 11"', brand: 'Apple', category: 'tablet', price: 125000, description: '256GB, Wi-Fi. M2 chip.', specs: ['256GB Storage', 'M2 Chip', '11" Display', 'Face ID'], features: ['Free Delivery', '1 Year Warranty'], image: '/images/phones/ipad-pro-11.svg', inStock: true, rating: 4.8, reviews: 56 },
+    { id: 99, name: 'MacBook Pro 16"', brand: 'Apple', category: 'laptop', price: 385000, description: 'M3 Pro, 18GB RAM, 512GB.', specs: ['512GB SSD', 'M3 Pro', '16.2" Display', '18GB RAM'], features: ['Free Delivery', '1 Year Warranty'], image: '/images/phones/macbook-pro-16.svg', inStock: true, rating: 4.9, reviews: 123 },
+    { id: 100, name: 'MacBook Air M3 13"', brand: 'Apple', category: 'laptop', price: 165000, description: '256GB, 8GB RAM. Midnight.', specs: ['256GB SSD', 'M3 Chip', '13.6" Display', '8GB RAM'], features: ['Free Delivery', '1 Year Warranty'], image: '/images/phones/macbook-air-m3-13.svg', inStock: true, rating: 4.8, reviews: 98 },
   ];
 
-  const services: Service[] = getServices();
-  const categories = SERVICE_CATEGORIES;
+  const services: Service[] = [
+    { id: 1, name: 'iPhone Screen Replacement', description: 'Premium display replacement using original parts with warranty', price: 3500, category: 'iPhone', icon: <Smartphone className="w-8 h-8" />, duration: '1-2 hours', popular: true },
+    { id: 2, name: 'Samsung Screen Repair', description: 'Galaxy S/Note/A series screen replacement', price: 3000, category: 'Samsung', icon: <Smartphone className="w-8 h-8" />, duration: '1-2 hours', popular: true },
+    { id: 3, name: 'OnePlus Screen Service', description: 'Fast screen replacement for all OnePlus models', price: 2800, category: 'OnePlus', icon: <Smartphone className="w-8 h-8" />, duration: '1-2 hours' },
+    { id: 4, name: 'Google Pixel Display', description: 'Pixel screen repair for all generations', price: 3200, category: 'Google Pixel', icon: <Smartphone className="w-8 h-8" />, duration: '1-2 hours' },
+    { id: 5, name: 'iPhone Battery Service', description: 'Original capacity battery replacement', price: 2500, category: 'iPhone', icon: <Battery className="w-8 h-8" />, duration: '30-45 mins', popular: true },
+    { id: 6, name: 'Samsung Battery', description: 'High-quality battery with warranty', price: 2000, category: 'Samsung', icon: <Battery className="w-8 h-8" />, duration: '30-45 mins' },
+    { id: 7, name: 'Charging Port Repair', description: 'All brands charging port replacement', price: 2000, category: 'Hardware', icon: <Zap className="w-8 h-8" />, duration: '1 hour' },
+    { id: 8, name: 'Camera Repair', description: 'Front & back camera fixes', price: 2500, category: 'Hardware', icon: <Camera className="w-8 h-8" />, duration: '1-2 hours' },
+    { id: 9, name: 'Speaker/Mic Repair', description: 'Audio restoration service', price: 1500, category: 'Hardware', icon: <Speaker className="w-8 h-8" />, duration: '1 hour' },
+    { id: 10, name: 'Water Damage', description: 'Professional recovery service', price: 3500, category: 'Hardware', icon: <Droplets className="w-8 h-8" />, duration: '1-3 days' },
+    { id: 11, name: 'Screen Guard', description: 'Tempered glass screen protector installation', price: 500, category: 'Accessories', icon: <Shield className="w-8 h-8" />, duration: '15 mins' },
+    { id: 12, name: 'Back Glass Replacement', description: 'Premium back glass replacement for all models', price: 2500, category: 'Hardware', icon: <Smartphone className="w-8 h-8" />, duration: '1-2 hours' },
+  ];
+
+  const categories = ['All', 'iPhone', 'Samsung', 'OnePlus', 'Google Pixel', 'Hardware', 'Accessories'];
   const filteredServices = activeTab === 'All' ? services : services.filter(s => s.category === activeTab);
 
   const testimonials: Testimonial[] = [
@@ -396,20 +432,51 @@ const App = () => {
     { name: 'Robert Langat', role: 'Driver', text: "Fixed my charging port issue that other shops could not solve. Fair prices and excellent workmanship.", avatar: 'RL', rating: 5 },
   ];
 
-  const features = getFeatures();
-  const socialLinks = getSocialLinks();
+  const features = [
+    { icon: <Truck className="w-8 h-8" />, title: 'Free Pickup & Delivery', description: 'We come to you anywhere in Nairobi' },
+    { icon: <CreditCard className="w-8 h-8" />, title: 'Affordable Pricing', description: 'Best rates in Kenya' },
+    { icon: <Users className="w-8 h-8" />, title: '500+ Happy Clients', description: 'Satisfied customers nationwide' },
+    { icon: <Shield className="w-8 h-8" />, title: 'Warranty on Repairs', description: '30-day guarantee on all services' },
+    { icon: <Zap className="w-8 h-8" />, title: 'Same Day Service', description: 'Most repairs done in 1-2 hours' },
+    { icon: <Headphones className="w-8 h-8" />, title: '24/7 Support', description: 'Always here to help' },
+  ];
 
-  const DynIcon = ({ name, className }: { name: string; className?: string }) => {
-    const Icon = getIconComponent(name);
-    return <Icon className={className} />;
-  };
+  const heroSlides = [
+    { 
+      title: 'Expert Phone Repair Services', 
+      subtitle: 'All Brands Supported', 
+      description: 'Premium repair services for iPhone, Samsung, OnePlus, Google Pixel and more. Get your device back to perfect condition.',
+      cta: 'Book Now',
+      image: 'phone-repair-hero.svg'
+    },
+    { 
+      title: 'Battery Replacement', 
+      subtitle: 'All Brands', 
+      description: 'Original capacity batteries for iPhone, Samsung, OnePlus and more. Fast replacement service.',
+      cta: 'Get Help Now',
+      image: 'battery-service.svg'
+    },
+    { 
+      title: 'Charging Port Repair', 
+      subtitle: 'Expert Technicians', 
+      description: 'Fix charging issues for all brands. Your trusted mobile repair experts in Kenya.',
+      cta: 'Learn More',
+      image: 'charging-service.svg'
+    },
+  ];
 
-  const heroSlides = getHeroSlides();
-  const galleryItems = getGallery();
+  const galleryItems: GalleryItem[] = [
+    { id: 1, title: 'iPhone Screen Repair', description: 'Before & After', image: '/images/iphone-screen-1.jpeg', category: 'Screen' },
+    { id: 2, title: 'Samsung Screen', description: 'Premium replacement', image: '/images/samsung-repair.jpeg', category: 'Screen' },
+    { id: 3, title: 'Battery Service', description: 'New battery installed', image: '/images/battery-replacement.jpeg', category: 'Battery' },
+    { id: 4, title: 'Water Damage', description: 'Recovery success', image: '/images/charging-port.jpeg', category: 'Repair' },
+    { id: 5, title: 'Data Recovery', description: 'Files restored', image: '/images/data-recovery.jpeg', category: 'Software' },
+    { id: 6, title: 'iPad Repair', description: 'Complete service', image: '/images/ipad-repair.jpeg', category: 'Repair' },
+  ];
 
   const faqs = [
     { q: 'How long does a typical repair take?', a: 'Most common repairs like screen or battery replacements take about 60-90 minutes. More complex repairs may take 24-48 hours. We always aim for same-day service.' },
-    { q: 'Do you offer warranty on repairs?', a: 'Yes! We offer a 6-month warranty on all repairs. New gadgets come with a 2-year warranty.' },
+    { q: 'Do you offer warranty on repairs?', a: 'Yes! We offer a 30-day warranty on all screen and battery replacements. Hardware repairs come with our quality guarantee.' },
     { q: 'Do you use original parts?', a: 'We use high-quality OEM or equivalent parts that meet or exceed original manufacturer specifications. All parts are tested for quality.' },
     { q: 'Can you repair water-damaged devices?', a: 'Yes, we specialize in water damage recovery. Success depends on the extent of damage - bring your device in for a free assessment.' },
     { q: 'Do you offer pickup and delivery?', a: 'Absolutely! We offer free pickup and delivery within Nairobi CBD. Schedule your convenient time.' },
@@ -428,19 +495,19 @@ const App = () => {
       <div className="top-bar bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white py-2 px-4 hidden lg:block">
         <div className="max-w-7xl mx-auto flex justify-between items-center text-sm">
           <div className="flex items-center gap-4">
-            <span className="flex items-center gap-2"><MapPin className="w-4 h-4 text-amber-500" /> Stanbank, 3rd Floor Room 10, Nairobi</span>
+            <span className="flex items-center gap-2"><MapPin className="w-4 h-4 text-amber-500" /> Nairobi CBD, Kenya</span>
             <span className="flex items-center gap-2"><Phone className="w-4 h-4 text-amber-500" /> 0703555449</span>
           </div>
           <div className="flex items-center gap-4">
             <span className="text-amber-500 font-medium">Premium Phone Repair Services in Kenya</span>
             <div className="flex gap-3">
-              <a href={socialLinks.facebook} className="p-2 rounded-full bg-white/10 hover:bg-white/30 hover:scale-110 transition-all duration-300 cursor-pointer">
+              <a href="#" className="p-2 rounded-full bg-white/10 hover:bg-white/30 hover:scale-110 transition-all duration-300 cursor-pointer">
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
               </a>
-              <a href={socialLinks.instagram} className="p-2 rounded-full bg-white/10 hover:bg-white/30 hover:scale-110 transition-all duration-300 cursor-pointer">
+              <a href="#" className="p-2 rounded-full bg-white/10 hover:bg-white/30 hover:scale-110 transition-all duration-300 cursor-pointer">
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
               </a>
-              <a href={socialLinks.twitter} className="p-2 rounded-full bg-white/10 hover:bg-white/30 hover:scale-110 transition-all duration-300 cursor-pointer">
+              <a href="#" className="p-2 rounded-full bg-white/10 hover:bg-white/30 hover:scale-110 transition-all duration-300 cursor-pointer">
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
               </a>
               <a href="https://wa.me/254703555449" className="p-2 rounded-full bg-green-600 hover:bg-green-500 hover:scale-110 transition-all duration-300 cursor-pointer">
@@ -532,7 +599,7 @@ const App = () => {
             </nav>
             <div className="flex items-center gap-2 text-white text-sm py-3">
               <Clock className="w-4 h-4" />
-              <span>Mon - Sat: 8AM - 7PM</span>
+              <span>Mon - Sat: 8AM - 6PM</span>
             </div>
           </div>
         </div>
@@ -708,7 +775,7 @@ const App = () => {
               style={{ animationDelay: `${i * 100}ms` }}
             >
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-100 to-amber-200 text-amber-600 mb-4 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
-                <DynIcon name={feature.iconName} className="w-8 h-8" />
+                {feature.icon}
               </div>
               <h3 className="font-semibold text-slate-800 mb-1 group-hover:text-amber-600 transition-colors">{feature.title}</h3>
               <p className="text-sm text-slate-500">{feature.description}</p>
@@ -765,7 +832,7 @@ const App = () => {
                 </div>
               )}
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-100 to-amber-200 text-amber-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                <DynIcon name={service.iconName} className="w-8 h-8" />
+                {service.icon}
               </div>
               <div className="text-xs font-medium text-slate-400 mb-2">{service.category}</div>
               <h3 className="font-bold text-slate-800 mb-2">{service.name}</h3>
@@ -1130,7 +1197,7 @@ const App = () => {
                   </div>
                   <div>
                     <div className="font-semibold">Location</div>
-                    <div className="opacity-80">Stanbank, 3rd Floor Room 10, Nairobi</div>
+                    <div className="opacity-80">Nairobi CBD, Kenya</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
@@ -1148,7 +1215,7 @@ const App = () => {
                   </div>
                   <div>
                     <div className="font-semibold">Email</div>
-                    <div className="opacity-80">alphamobitech767@gmail.com</div>
+                    <div className="opacity-80">odhiamboj791@gmail.com</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
@@ -1157,19 +1224,19 @@ const App = () => {
                   </div>
                   <div>
                     <div className="font-semibold">Hours</div>
-                    <div className="opacity-80">Mon - Sat: 8AM - 7PM</div>
+                    <div className="opacity-80">Mon - Sat: 8AM - 6PM</div>
                   </div>
                 </div>
               </div>
 
               <div className="flex gap-4 mt-8">
-                <a href={socialLinks.facebook} className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 transition-colors">
+                <a href="#" className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 transition-colors">
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
                 </a>
-                <a href={socialLinks.instagram} className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 transition-colors">
+                <a href="#" className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 transition-colors">
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
                 </a>
-                <a href={socialLinks.twitter} className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 transition-colors">
+                <a href="#" className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 transition-colors">
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
                 </a>
                 <a href="https://wa.me/254703555449" className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 transition-colors">
@@ -1281,13 +1348,13 @@ const App = () => {
               Professional phone repair services in Nairobi, Kenya. Expert technicians with warranty on all repairs.
             </p>
             <div className="flex gap-4">
-              <a href={socialLinks.facebook} className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center hover:bg-amber-600 transition-colors">
+              <a href="#" className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center hover:bg-amber-600 transition-colors">
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
               </a>
-              <a href={socialLinks.instagram} className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center hover:bg-amber-600 transition-colors">
+              <a href="#" className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center hover:bg-amber-600 transition-colors">
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
               </a>
-              <a href={socialLinks.twitter} className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center hover:bg-amber-600 transition-colors">
+              <a href="#" className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center hover:bg-amber-600 transition-colors">
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
               </a>
               <a href="https://wa.me/254703555449" className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center hover:bg-green-500 transition-colors">
@@ -1334,11 +1401,11 @@ const App = () => {
               </li>
               <li className="flex items-center gap-3 text-slate-400">
                 <Mail className="w-5 h-5 text-amber-500" />
-                <span>alphamobitech767@gmail.com</span>
+                <span>odhiamboj791@gmail.com</span>
               </li>
               <li className="flex items-center gap-3 text-slate-400">
                 <MapPin className="w-5 h-5 text-amber-500" />
-                <span>Stanbank, 3rd Floor Room 10, Nairobi</span>
+                <span>Nairobi CBD, Kenya</span>
               </li>
             </ul>
           </div>
@@ -1409,11 +1476,11 @@ const App = () => {
                   <div className="flex flex-col sm:flex-row gap-3 sm:gap-6 mt-1">
                     <div>
                       <span className="text-amber-100 text-sm">Paybill:</span>
-                      <span className="font-bold text-lg ml-2">714888</span>
+                      <span className="font-bold text-lg ml-2">247247</span>
                     </div>
                     <div>
                       <span className="text-amber-100 text-sm">Account:</span>
-                      <span className="font-bold text-lg ml-2">169405</span>
+                      <span className="font-bold text-lg ml-2">0470182181792</span>
                     </div>
                   </div>
                 </div>

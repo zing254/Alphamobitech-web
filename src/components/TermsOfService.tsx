@@ -44,7 +44,7 @@ const TermsOfService = () => (
         
         <h2 className="text-xl font-semibold text-slate-800 mt-8 mb-4">Warranty</h2>
         <ul className="list-disc list-inside text-slate-600 mb-4 space-y-2">
-          <li>Repairs come with 6-month warranty, new gadgets with 2-year warranty</li>
+          <li>Screen and battery replacements come with 30-day warranty</li>
           <li>Warranty covers manufacturing defects only</li>
           <li>Physical damage voids warranty</li>
           <li>Water damage is not covered under warranty</li>

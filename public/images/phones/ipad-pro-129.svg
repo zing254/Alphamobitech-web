@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
+  <rect fill="#f8fafc" width="400" height="300"/>
+  <rect x="100" y="50" width="200" height="160" rx="16" fill="#e2e8f0" stroke="#cbd5e1" stroke-width="2"/>
+  <rect x="115" y="65" width="170" height="130" rx="4" fill="#f1f5f9"/>
+  <circle cx="200" cy="220" r="4" fill="#94a3b8"/>
+  <text x="200" y="250" text-anchor="middle" font-family="system-ui, sans-serif" font-size="20" font-weight="600" fill="#0f172a">iPad Pro 12.9"</text>
+  <text x="200" y="272" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" fill="#64748b">M2 Chip · 256GB</text>
+</svg>

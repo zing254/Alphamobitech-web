@@ -4,20 +4,9 @@ import {
   TrendingUp, TrendingDown, DollarSign, Phone,
   Clock, CheckCircle, XCircle, Settings,
   LogOut, Search, Eye, Trash2,
-  Edit, Plus, BarChart3, Activity, Loader,
-  Globe, Image, Star, Save, X, ChevronDown, ChevronUp
+  Edit, Plus, BarChart3, Activity, Loader
 } from 'lucide-react';
 import AdminLogin from './components/AdminLogin';
-import {
-  getServices, saveServices,
-  getGallery, saveGallery,
-  getSocialLinks, saveSocialLinks,
-  getHeroSlides, saveHeroSlides,
-  getFeatures, saveFeatures,
-  AVAILABLE_ICONS, SERVICE_CATEGORIES,
-  type Service, type GalleryItem, type SocialLinks,
-  type HeroSlide, type Feature
-} from './data/content';
 
 interface Booking {
   id: string;
@@ -52,8 +41,8 @@ interface Order {
 }
 
 const ADMIN_CREDENTIALS = {
-  email: import.meta.env.VITE_ADMIN_EMAIL || 'alphamobitech767@gmail.com',
-  password: import.meta.env.VITE_ADMIN_PASSWORD || 'jimmy@99'
+  email: import.meta.env.VITE_ADMIN_EMAIL || '',
+  password: import.meta.env.VITE_ADMIN_PASSWORD || ''
 };
 
 const SESSION_DURATION = 24 * 60 * 60 * 1000;
@@ -194,7 +183,6 @@ const AdminDashboard = () => {
           { id: 'bookings', icon: <Calendar className="w-5 h-5" />, label: 'Repair Bookings' },
           { id: 'customers', icon: <Users className="w-5 h-5" />, label: 'Customers' },
           { id: 'services', icon: <Wrench className="w-5 h-5" />, label: 'Services' },
-          { id: 'content', icon: <Globe className="w-5 h-5" />, label: 'Content' },
           { id: 'analytics', icon: <BarChart3 className="w-5 h-5" />, label: 'Analytics' },
           { id: 'settings', icon: <Settings className="w-5 h-5" />, label: 'Settings' },
         ].map(item => (
@@ -604,7 +592,7 @@ const AdminDashboard = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">Email</label>
-                  <input type="email" defaultValue="alphamobitech767@gmail.com" className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:border-amber-500 focus:outline-none" />
+                  <input type="email" defaultValue="admin@alphamobitech.com" className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:border-amber-500 focus:outline-none" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">Phone</label>
@@ -738,307 +726,6 @@ const AdminDashboard = () => {
     );
   };
 
-  const ContentEditor = () => {
-    const [activeContentTab, setActiveContentTab] = useState('services');
-
-    return (
-      <div className="space-y-6">
-        <h1 className="text-2xl font-bold text-slate-800">Content Editor</h1>
-        <div className="flex gap-2 flex-wrap border-b pb-4">
-          {[
-            { id: 'services', label: 'Services', icon: <Wrench className="w-4 h-4" /> },
-            { id: 'gallery', label: 'Gallery', icon: <Image className="w-4 h-4" /> },
-            { id: 'social', label: 'Social Links', icon: <Globe className="w-4 h-4" /> },
-            { id: 'hero', label: 'Hero Slides', icon: <Star className="w-4 h-4" /> },
-            { id: 'features', label: 'Features', icon: <LayoutDashboard className="w-4 h-4" /> },
-          ].map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveContentTab(tab.id)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all cursor-pointer ${
-                activeContentTab === tab.id ? 'bg-amber-500 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-              }`}
-            >
-              {tab.icon}
-              {tab.label}
-            </button>
-          ))}
-        </div>
-        {activeContentTab === 'services' && <ServicesEditor />}
-        {activeContentTab === 'gallery' && <GalleryEditor />}
-        {activeContentTab === 'social' && <SocialLinksEditor />}
-        {activeContentTab === 'hero' && <HeroEditor />}
-        {activeContentTab === 'features' && <FeaturesEditor />}
-      </div>
-    );
-  };
-
-  const ServicesEditor = () => {
-    const [items, setItems] = useState<Service[]>(() => getServices());
-    const [editing, setEditing] = useState<Service | null>(null);
-    const [showForm, setShowForm] = useState(false);
-    const [form, setForm] = useState<Partial<Service>>({ name: '', description: '', price: 0, category: 'iPhone', iconName: 'Smartphone', duration: '1 hour', popular: false });
-
-    const handleSave = () => {
-      if (editing) {
-        setItems(items.map(i => i.id === editing.id ? { ...i, ...form } as Service : i));
-      } else {
-        const newId = Math.max(...items.map(i => i.id), 0) + 1;
-        setItems([...items, { ...form, id: newId } as Service]);
-      }
-      setShowForm(false);
-      setEditing(null);
-      setForm({ name: '', description: '', price: 0, category: 'iPhone', iconName: 'Smartphone', duration: '1 hour', popular: false });
-    };
-
-    const handlePersist = () => {
-      saveServices(items);
-      alert('Services saved! Refresh the front-end to see changes.');
-    };
-
-    const handleDelete = (id: number) => {
-      if (confirm('Delete this service?')) setItems(items.filter(i => i.id !== id));
-    };
-
-    const startEdit = (item: Service) => {
-      setEditing(item);
-      setForm({ ...item });
-      setShowForm(true);
-    };
-
-    return (
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <p className="text-slate-500">{items.length} services</p>
-          <div className="flex gap-2">
-            {items !== getServices() && (
-              <button onClick={() => { setItems(getServices()); setShowForm(false); setEditing(null); }} className="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 cursor-pointer">Reset</button>
-            )}
-            <button onClick={handlePersist} className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2 cursor-pointer"><Save className="w-4 h-4" /> Save All</button>
-            <button onClick={() => { setShowForm(true); setEditing(null); setForm({ name: '', description: '', price: 0, category: 'iPhone', iconName: 'Smartphone', duration: '1 hour', popular: false }); }} className="px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 flex items-center gap-2 cursor-pointer"><Plus className="w-4 h-4" /> Add Service</button>
-          </div>
-        </div>
-        {showForm && (
-          <div className="bg-white rounded-xl p-4 border space-y-3">
-            <div className="grid md:grid-cols-2 gap-3">
-              <div><label className="text-sm font-medium text-slate-700">Name</label><input value={form.name || ''} onChange={e => setForm({...form, name: e.target.value})} className="w-full px-3 py-2 border rounded-lg" /></div>
-              <div><label className="text-sm font-medium text-slate-700">Price (KSh)</label><input type="number" value={form.price || 0} onChange={e => setForm({...form, price: Number(e.target.value)})} className="w-full px-3 py-2 border rounded-lg" /></div>
-              <div><label className="text-sm font-medium text-slate-700">Category</label><select value={form.category || 'iPhone'} onChange={e => setForm({...form, category: e.target.value})} className="w-full px-3 py-2 border rounded-lg">{SERVICE_CATEGORIES.filter(c => c !== 'All').map(c => <option key={c} value={c}>{c}</option>)}</select></div>
-              <div><label className="text-sm font-medium text-slate-700">Duration</label><input value={form.duration || ''} onChange={e => setForm({...form, duration: e.target.value})} className="w-full px-3 py-2 border rounded-lg" /></div>
-              <div><label className="text-sm font-medium text-slate-700">Icon</label><select value={form.iconName || 'Smartphone'} onChange={e => setForm({...form, iconName: e.target.value})} className="w-full px-3 py-2 border rounded-lg">{AVAILABLE_ICONS.map(ic => <option key={ic} value={ic}>{ic}</option>)}</select></div>
-              <div className="flex items-center gap-2 pt-6"><input type="checkbox" checked={form.popular || false} onChange={e => setForm({...form, popular: e.target.checked})} className="w-5 h-5" /><label className="text-sm font-medium text-slate-700">Popular</label></div>
-            </div>
-            <div><label className="text-sm font-medium text-slate-700">Description</label><textarea value={form.description || ''} onChange={e => setForm({...form, description: e.target.value})} className="w-full px-3 py-2 border rounded-lg" rows={2} /></div>
-            <div className="flex gap-2">
-              <button onClick={handleSave} className="px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 cursor-pointer">{editing ? 'Update' : 'Add'}</button>
-              <button onClick={() => { setShowForm(false); setEditing(null); }} className="px-4 py-2 bg-slate-200 rounded-lg hover:bg-slate-300 cursor-pointer">Cancel</button>
-            </div>
-          </div>
-        )}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {items.map(item => (
-            <div key={item.id} className="bg-white rounded-xl shadow-sm p-4 border">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-medium text-slate-400">{item.category}</span>
-                <div className="flex gap-1">
-                  <button onClick={() => startEdit(item)} className="p-1.5 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded cursor-pointer"><Edit className="w-4 h-4" /></button>
-                  <button onClick={() => handleDelete(item.id)} className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded cursor-pointer"><Trash2 className="w-4 h-4" /></button>
-                </div>
-              </div>
-              <h3 className="font-semibold text-slate-800">{item.name}</h3>
-              <p className="text-sm text-slate-500 mb-2">{item.description}</p>
-              <div className="flex items-center justify-between text-sm">
-                <span className="font-bold text-amber-600">KSh {item.price.toLocaleString()}</span>
-                <span className="text-slate-400">{item.duration}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  };
-
-  const GalleryEditor = () => {
-    const [items, setItems] = useState<GalleryItem[]>(() => getGallery());
-    const [showForm, setShowForm] = useState(false);
-    const [editing, setEditing] = useState<GalleryItem | null>(null);
-    const [form, setForm] = useState<Partial<GalleryItem>>({ title: '', description: '', image: '', category: 'Screen' });
-
-    const handleSave = () => {
-      if (editing) {
-        setItems(items.map(i => i.id === editing.id ? { ...i, ...form } as GalleryItem : i));
-      } else {
-        setItems([...items, { ...form, id: Math.max(...items.map(i => i.id), 0) + 1 } as GalleryItem]);
-      }
-      setShowForm(false); setEditing(null);
-      setForm({ title: '', description: '', image: '', category: 'Screen' });
-    };
-
-    const handleDelete = (id: number) => {
-      if (confirm('Delete this item?')) setItems(items.filter(i => i.id !== id));
-    };
-
-    const handlePersist = () => {
-      saveGallery(items);
-      alert('Gallery saved!');
-    };
-
-    return (
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <p className="text-slate-500">{items.length} items</p>
-          <div className="flex gap-2">
-            <button onClick={handlePersist} className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2 cursor-pointer"><Save className="w-4 h-4" /> Save All</button>
-            <button onClick={() => { setShowForm(true); setEditing(null); setForm({ title: '', description: '', image: '', category: 'Screen' }); }} className="px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 flex items-center gap-2 cursor-pointer"><Plus className="w-4 h-4" /> Add</button>
-          </div>
-        </div>
-        {showForm && (
-          <div className="bg-white rounded-xl p-4 border space-y-3">
-            <div className="grid md:grid-cols-2 gap-3">
-              <div><label className="text-sm font-medium text-slate-700">Title</label><input value={form.title || ''} onChange={e => setForm({...form, title: e.target.value})} className="w-full px-3 py-2 border rounded-lg" /></div>
-              <div><label className="text-sm font-medium text-slate-700">Category</label><input value={form.category || ''} onChange={e => setForm({...form, category: e.target.value})} className="w-full px-3 py-2 border rounded-lg" /></div>
-            </div>
-            <div><label className="text-sm font-medium text-slate-700">Description</label><input value={form.description || ''} onChange={e => setForm({...form, description: e.target.value})} className="w-full px-3 py-2 border rounded-lg" /></div>
-            <div><label className="text-sm font-medium text-slate-700">Image URL</label><input value={form.image || ''} onChange={e => setForm({...form, image: e.target.value})} className="w-full px-3 py-2 border rounded-lg" placeholder="/images/example.jpeg" /></div>
-            <div className="flex gap-2">
-              <button onClick={handleSave} className="px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 cursor-pointer">{editing ? 'Update' : 'Add'}</button>
-              <button onClick={() => { setShowForm(false); setEditing(null); }} className="px-4 py-2 bg-slate-200 rounded-lg hover:bg-slate-300 cursor-pointer">Cancel</button>
-            </div>
-          </div>
-        )}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {items.map(item => (
-            <div key={item.id} className="bg-white rounded-xl shadow-sm border overflow-hidden">
-              <div className="h-32 bg-slate-100 flex items-center justify-center text-slate-400 text-sm">{item.title}</div>
-              <div className="p-3">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-semibold text-slate-800">{item.title}</h3>
-                  <div className="flex gap-1">
-                    <button onClick={() => { setEditing(item); setForm({ ...item }); setShowForm(true); }} className="p-1.5 text-slate-400 hover:text-amber-600 rounded cursor-pointer"><Edit className="w-4 h-4" /></button>
-                    <button onClick={() => handleDelete(item.id)} className="p-1.5 text-slate-400 hover:text-red-600 rounded cursor-pointer"><Trash2 className="w-4 h-4" /></button>
-                  </div>
-                </div>
-                <p className="text-xs text-slate-500">{item.description}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  };
-
-  const SocialLinksEditor = () => {
-    const [links, setLinks] = useState<SocialLinks>(() => getSocialLinks());
-
-    const handleSave = () => {
-      saveSocialLinks(links);
-      alert('Social links saved!');
-    };
-
-    return (
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <p className="text-slate-500">Edit your social media URLs</p>
-          <button onClick={handleSave} className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2 cursor-pointer"><Save className="w-4 h-4" /> Save</button>
-        </div>
-        <div className="bg-white rounded-xl p-4 border space-y-3 max-w-lg">
-          {(['facebook', 'instagram', 'twitter', 'whatsapp'] as const).map(platform => (
-            <div key={platform}>
-              <label className="text-sm font-medium text-slate-700 capitalize">{platform} URL</label>
-              <input value={links[platform]} onChange={e => setLinks({...links, [platform]: e.target.value})} className="w-full px-3 py-2 border rounded-lg" />
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  };
-
-  const HeroEditor = () => {
-    const [slides, setSlides] = useState<HeroSlide[]>(() => getHeroSlides());
-    const [editingIndex, setEditingIndex] = useState<number | null>(null);
-    const [expanded, setExpanded] = useState<number | null>(null);
-
-    const handleSave = () => {
-      saveHeroSlides(slides);
-      alert('Hero slides saved!');
-    };
-
-    return (
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <p className="text-slate-500">{slides.length} slides</p>
-          <button onClick={handleSave} className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2 cursor-pointer"><Save className="w-4 h-4" /> Save</button>
-        </div>
-        {slides.map((slide, i) => (
-          <div key={i} className="bg-white rounded-xl border">
-            <button onClick={() => setExpanded(expanded === i ? null : i)} className="w-full flex items-center justify-between p-4 cursor-pointer">
-              <span className="font-semibold text-slate-800">Slide {i + 1}: {slide.title}</span>
-              {expanded === i ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-            </button>
-            {expanded === i && (
-              <div className="px-4 pb-4 space-y-3">
-                <div className="grid md:grid-cols-2 gap-3">
-                  <div><label className="text-sm font-medium text-slate-700">Title</label><input value={slide.title} onChange={e => { const s = [...slides]; s[i] = {...s[i], title: e.target.value}; setSlides(s); }} className="w-full px-3 py-2 border rounded-lg" /></div>
-                  <div><label className="text-sm font-medium text-slate-700">Subtitle</label><input value={slide.subtitle} onChange={e => { const s = [...slides]; s[i] = {...s[i], subtitle: e.target.value}; setSlides(s); }} className="w-full px-3 py-2 border rounded-lg" /></div>
-                </div>
-                <div><label className="text-sm font-medium text-slate-700">Description</label><textarea value={slide.description} onChange={e => { const s = [...slides]; s[i] = {...s[i], description: e.target.value}; setSlides(s); }} className="w-full px-3 py-2 border rounded-lg" rows={2} /></div>
-                <div className="grid md:grid-cols-2 gap-3">
-                  <div><label className="text-sm font-medium text-slate-700">CTA Text</label><input value={slide.cta} onChange={e => { const s = [...slides]; s[i] = {...s[i], cta: e.target.value}; setSlides(s); }} className="w-full px-3 py-2 border rounded-lg" /></div>
-                  <div><label className="text-sm font-medium text-slate-700">Image</label><input value={slide.image} onChange={e => { const s = [...slides]; s[i] = {...s[i], image: e.target.value}; setSlides(s); }} className="w-full px-3 py-2 border rounded-lg" /></div>
-                </div>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-    );
-  };
-
-  const FeaturesEditor = () => {
-    const [items, setItems] = useState<Feature[]>(() => getFeatures());
-    const [editing, setEditing] = useState<number | null>(null);
-    const [form, setForm] = useState<Partial<Feature>>({ iconName: 'Zap', title: '', description: '' });
-
-    const handleSave = () => {
-      saveFeatures(items);
-      alert('Features saved!');
-    };
-
-    return (
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <p className="text-slate-500">{items.length} features</p>
-          <button onClick={handleSave} className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2 cursor-pointer"><Save className="w-4 h-4" /> Save</button>
-        </div>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {items.map((item, i) => (
-            <div key={i} className="bg-white rounded-xl border p-4">
-              {editing === i ? (
-                <div className="space-y-2">
-                  <div><label className="text-xs font-medium text-slate-700">Icon</label><select value={form.iconName || 'Zap'} onChange={e => setForm({...form, iconName: e.target.value})} className="w-full px-3 py-2 border rounded-lg">{AVAILABLE_ICONS.map(ic => <option key={ic} value={ic}>{ic}</option>)}</select></div>
-                  <div><label className="text-xs font-medium text-slate-700">Title</label><input value={form.title || ''} onChange={e => setForm({...form, title: e.target.value})} className="w-full px-3 py-2 border rounded-lg" /></div>
-                  <div><label className="text-xs font-medium text-slate-700">Description</label><input value={form.description || ''} onChange={e => setForm({...form, description: e.target.value})} className="w-full px-3 py-2 border rounded-lg" /></div>
-                  <div className="flex gap-2">
-                    <button onClick={() => { const s = [...items]; s[i] = {...s[i], ...form} as Feature; setItems(s); setEditing(null); }} className="px-3 py-1.5 bg-amber-500 text-white rounded text-sm cursor-pointer">Save</button>
-                    <button onClick={() => setEditing(null)} className="px-3 py-1.5 bg-slate-200 rounded text-sm cursor-pointer">Cancel</button>
-                  </div>
-                </div>
-              ) : (
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="font-semibold text-slate-800">{item.title}</h3>
-                    <p className="text-sm text-slate-500">{item.description}</p>
-                  </div>
-                  <button onClick={() => { setEditing(i); setForm({ ...item }); }} className="p-1.5 text-slate-400 hover:text-amber-600 rounded cursor-pointer"><Edit className="w-4 h-4" /></button>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  };
-
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard': return <DashboardContent />;
@@ -1046,7 +733,6 @@ const AdminDashboard = () => {
       case 'bookings': return <BookingsContent />;
       case 'customers': return <CustomersContent />;
       case 'services': return <ServicesContent />;
-      case 'content': return <ContentEditor />;
       case 'analytics': return <AnalyticsContent />;
       case 'settings': return <SettingsContent />;
       default: return <DashboardContent />;

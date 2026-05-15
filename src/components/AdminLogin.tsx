@@ -117,7 +117,7 @@ const Login = ({ onLogin, onResetPassword, error }: LoginProps) => {
                     value={resetEmail}
                     onChange={(e) => setResetEmail(e.target.value)}
                     className="w-full pl-12 pr-4 py-3 border border-slate-200 rounded-lg focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all"
-                    placeholder="alphamobitech767@gmail.com"
+                    placeholder="admin@alphamobitech.com"
                   />
                 </div>
               </div>
@@ -140,7 +140,7 @@ const Login = ({ onLogin, onResetPassword, error }: LoginProps) => {
           </div>
         </div>
       </div>
-  );
+    );
   }
 
   return (
@@ -178,7 +178,7 @@ const Login = ({ onLogin, onResetPassword, error }: LoginProps) => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full pl-12 pr-4 py-3 border border-slate-200 rounded-lg focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all"
-                  placeholder="alphamobitech767@gmail.com"
+                  placeholder="admin@alphamobitech.com"
                 />
               </div>
             </div>

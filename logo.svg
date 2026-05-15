@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 140" width="500" height="140">
+  <defs>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#F1E5AC"/>
+      <stop offset="50%" style="stop-color:#D4AF37"/>
+      <stop offset="100%" style="stop-color:#B8860B"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="shadow">
+      <feDropShadow dx="2" dy="3" stdDeviation="4" flood-color="#000" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+  
+  <!-- Background badge -->
+  <rect x="5" y="5" width="90" height="90" rx="20" fill="#1a1a1a" stroke="url(#goldGrad)" stroke-width="2"/>
+  
+  <!-- Phone outline -->
+  <rect x="20" y="18" width="50" height="70" rx="6" fill="none" stroke="url(#goldGrad)" stroke-width="3"/>
+  
+  <!-- Screen -->
+  <rect x="24" y="25" width="42" height="52" rx="2" fill="url(#goldGrad)" opacity="0.9"/>
+  
+  <!-- Screen reflection -->
+  <rect x="26" y="27" width="12" height="8" rx="1" fill="#fff" opacity="0.4"/>
+  
+  <!-- Camera dot -->
+  <circle cx="45" cy="21" r="5" fill="#1a1a1a" stroke="url(#goldGrad)" stroke-width="2"/>
+  <circle cx="45" cy="21" r="2" fill="url(#goldGrad)"/>
+  
+  <!-- Home button -->
+  <circle cx="45" cy="82" r="4" fill="none" stroke="url(#goldGrad)" stroke-width="2"/>
+  
+  <!-- Wrench overlay -->
+  <g transform="translate(95, 35)" filter="url(#shadow)">
+    <path d="M8,0 L8,18 M0,18 L16,18" stroke="url(#goldGrad)" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="8" cy="5" r="4" fill="url(#goldGrad)"/>
+  </g>
+  
+  <!-- Company Name -->
+  <text x="110" y="52" font-family="Arial Black, sans-serif" font-size="28" font-weight="900" fill="url(#goldGrad)">
+    Alphamobitect
+  </text>
+  
+  <!-- Tagline -->
+  <text x="110" y="78" font-family="Arial, sans-serif" font-size="14" font-weight="500" fill="#F1E5AC">
+    Phones Solution Kenya
+  </text>
+  
+  <!-- Decorative Line -->
+  <line x1="110" y1="90" x2="380" y2="90" stroke="url(#goldGrad)" stroke-width="2" stroke-linecap="round" stroke-dasharray="8,4"/>
+  
+  <!-- Star bullets -->
+  <circle cx="400" cy="105" r="4" fill="url(#goldGrad)"/>
+  <circle cx="420" cy="105" r="4" fill="url(#goldGrad)" opacity="0.7"/>
+  <circle cx="440" cy="105" r="4" fill="url(#goldGrad)" opacity="0.4"/>
+</svg>
