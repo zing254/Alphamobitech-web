@@ -6,7 +6,7 @@ import {
   Send, CheckCircle, Menu, X, ChevronDown, Users,
   Award, Truck, CreditCard, Headphones, Moon, Sun,
   Check, ShoppingCart, Trash2, Plus, Minus, Laptop, Tablet,
-  Search, Heart, Scale
+  Search, Heart, Scale, ImageOff
 } from 'lucide-react';
 import AdminDashboard from './AdminDashboard';
 import { PageLoader } from './components/Loading';
@@ -521,10 +521,14 @@ const App = () => {
       <div className={`main-header bg-white transition-all duration-300 ${isScrolled ? 'py-2 shadow-sm' : 'py-4'}`}>
         <div className="max-w-7xl mx-auto px-4 flex justify-between items-center">
           <a href="#" onClick={(e) => { e.preventDefault(); setCurrentPage('home'); }} className="flex items-center gap-3 group">
-            <div>
-              <h1 className="text-xl font-bold text-slate-800 group-hover:text-amber-600 transition-colors cursor-pointer">Alphamobitech</h1>
-              <p className="text-xs text-slate-500">Phone Solutions</p>
-            </div>
+            <img 
+              src="/logo.svg" 
+              alt="Alphamobitech" 
+              className="h-9 w-auto object-contain"
+              onError={(e) => {
+                (e.target as HTMLImageElement).style.display = 'none';
+              }}
+            />
           </a>
 
           <nav className="hidden lg:flex items-center gap-8">
@@ -615,17 +619,13 @@ const App = () => {
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-3">
               <img 
-                src="/logo.png" 
-                alt="Alphamobitech Logo" 
-                className="w-10 h-10 rounded-lg object-contain"
+                src="/logo.svg" 
+                alt="Alphamobitech" 
+                className="w-10 h-10 object-contain"
                 onError={(e) => {
-                  (e.target as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40"%3E%3Crect fill="%23f59e0b" width="40" height="40" rx="8"/%3E%3Ctext fill="white" font-family="sans-serif" font-weight="bold" font-size="18" x="50%25" y="55%25" text-anchor="middle" dy=".1em"%3EA%3C/text%3E%3C/svg%3E';
+                  (e.target as HTMLImageElement).style.display = 'none';
                 }}
               />
-              <div>
-                <h3 className="font-bold text-slate-800">Alphamobitech</h3>
-                <p className="text-xs text-slate-500">Phone Solutions</p>
-              </div>
             </div>
             <button onClick={() => setIsMenuOpen(false)} className="p-2 text-slate-500 hover:text-slate-700">
               <X className="w-6 h-6" />
@@ -1332,17 +1332,13 @@ const App = () => {
           <div>
             <div className="flex items-center gap-3 mb-6">
               <img 
-                src="/logo.png" 
-                alt="Alphamobitech Logo" 
-                className="w-12 h-12 rounded-lg object-contain"
+                src="/logo.svg" 
+                alt="Alphamobitech" 
+                className="h-12 w-auto object-contain"
                 onError={(e) => {
-                  (e.target as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"%3E%3Crect fill="%23f59e0b" width="48" height="48" rx="8"/%3E%3Ctext fill="white" font-family="sans-serif" font-weight="bold" font-size="22" x="50%25" y="55%25" text-anchor="middle" dy=".1em"%3EA%3C/text%3E%3C/svg%3E';
+                  (e.target as HTMLImageElement).style.display = 'none';
                 }}
               />
-              <div>
-                <h3 className="text-xl font-bold">Alphamobitech</h3>
-                <p className="text-xs text-slate-400">Phone Solutions</p>
-              </div>
             </div>
             <p className="text-slate-400 mb-6">
               Professional phone repair services in Nairobi, Kenya. Expert technicians with warranty on all repairs.
