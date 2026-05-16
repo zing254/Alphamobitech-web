@@ -58,8 +58,8 @@ const Login = ({ onLogin, onResetPassword, error }: LoginProps) => {
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 mb-4">
               <CheckCircle className="w-8 h-8 text-green-600" />
             </div>
-            <h1 className="text-2xl font-bold text-slate-800 mb-2">Check Your Email</h1>
-            <p className="text-slate-500 mb-6">
+            <h1 className="text-2xl font-bold text-white mb-2">Check Your Email</h1>
+            <p className="text-slate-400 mb-6">
               We've sent password reset instructions to <strong>{resetEmail}</strong>
             </p>
             <button
@@ -87,10 +87,10 @@ const Login = ({ onLogin, onResetPassword, error }: LoginProps) => {
         </div>
         
         <div className="relative w-full max-w-md">
-          <div className="bg-white rounded-2xl shadow-2xl p-8">
+        <div className="bg-slate-800 rounded-2xl shadow-2xl border border-slate-700/50 p-8">
             <button
               onClick={() => setView('login')}
-              className="flex items-center gap-2 text-slate-500 hover:text-slate-700 mb-6 cursor-pointer"
+              className="flex items-center gap-2 text-slate-400 hover:text-slate-200 mb-6 cursor-pointer"
             >
               <ArrowLeft className="w-4 h-4" />
               Back to Login
@@ -100,15 +100,15 @@ const Login = ({ onLogin, onResetPassword, error }: LoginProps) => {
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-amber-500 mb-4">
                 <KeyRound className="w-8 h-8 text-white" />
               </div>
-              <h1 className="text-2xl font-bold text-slate-800">Forgot Password?</h1>
-              <p className="text-slate-500 text-sm mt-1">
+              <h1 className="text-2xl font-bold text-white">Forgot Password?</h1>
+              <p className="text-slate-400 text-sm mt-1">
                 Enter your email and we'll send you reset instructions
               </p>
             </div>
 
             <form onSubmit={handleForgotPassword} className="space-y-5">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Email Address</label>
+                <label className="block text-sm font-medium text-slate-200 mb-2">Email Address</label>
                 <div className="relative">
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                   <input
@@ -116,7 +116,7 @@ const Login = ({ onLogin, onResetPassword, error }: LoginProps) => {
                     required
                     value={resetEmail}
                     onChange={(e) => setResetEmail(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3 border border-slate-200 rounded-lg focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all"
+                    className="w-full pl-12 pr-4 py-3 bg-slate-700 text-white border border-slate-700/50 rounded-lg focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none transition-all placeholder-slate-400"
                     placeholder="admin@alphamobitech.com"
                   />
                 </div>
@@ -156,20 +156,20 @@ const Login = ({ onLogin, onResetPassword, error }: LoginProps) => {
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-amber-500 mb-4">
               <Lock className="w-8 h-8 text-white" />
             </div>
-            <h1 className="text-2xl font-bold text-slate-800">Alphamobitech</h1>
-            <p className="text-slate-500 text-sm mt-1">Admin Portal Login</p>
+            <h1 className="text-2xl font-bold text-white">Alphamobitech</h1>
+            <p className="text-slate-400 text-sm mt-1">Admin Portal Login</p>
           </div>
 
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-3">
-              <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
-              <p className="text-sm text-red-600">{error}</p>
+            <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-lg flex items-center gap-3">
+              <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
+              <p className="text-sm text-red-400">{error}</p>
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">Email Address</label>
+              <label className="block text-sm font-medium text-slate-200 mb-2">Email Address</label>
               <div className="relative">
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                 <input
@@ -177,14 +177,14 @@ const Login = ({ onLogin, onResetPassword, error }: LoginProps) => {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3 border border-slate-200 rounded-lg focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all"
+                  className="w-full pl-12 pr-4 py-3 bg-slate-700 text-white border border-slate-700/50 rounded-lg focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none transition-all placeholder-slate-400"
                   placeholder="admin@alphamobitech.com"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">Password</label>
+              <label className="block text-sm font-medium text-slate-200 mb-2">Password</label>
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                 <input
@@ -192,13 +192,13 @@ const Login = ({ onLogin, onResetPassword, error }: LoginProps) => {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-12 pr-12 py-3 border border-slate-200 rounded-lg focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all"
+                  className="w-full pl-12 pr-12 py-3 bg-slate-700 text-white border border-slate-700/50 rounded-lg focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none transition-all placeholder-slate-400"
                   placeholder="Enter your password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-300 cursor-pointer"
                 >
                   {showPassword ? (
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -222,7 +222,7 @@ const Login = ({ onLogin, onResetPassword, error }: LoginProps) => {
                   onChange={(e) => setRememberMe(e.target.checked)}
                   className="w-4 h-4 rounded border-slate-300 text-amber-500 focus:ring-amber-500 cursor-pointer"
                 />
-                <span className="text-sm text-slate-600">Remember me</span>
+                <span className="text-sm text-slate-300">Remember me</span>
               </label>
               <button
                 type="button"
@@ -250,7 +250,7 @@ const Login = ({ onLogin, onResetPassword, error }: LoginProps) => {
           </form>
 
           <div className="mt-8 text-center">
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-slate-400">
               Need access?{' '}
               <a href="https://wa.me/254703555449" target="_blank" rel="noopener noreferrer" className="text-amber-600 hover:text-amber-700 hover:underline">
                 Contact administrator

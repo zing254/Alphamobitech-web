@@ -170,10 +170,10 @@ const AdminDashboard = () => {
   );
 
   const Sidebar = () => (
-    <aside className="w-64 bg-slate-900 text-white min-h-screen p-4 relative">
+    <aside className="w-64 bg-slate-800 border-r border-slate-700/50 text-white min-h-screen p-4 relative">
       <div className="mb-8">
         <h1 className="text-xl font-bold text-amber-500">Alphamobitech</h1>
-        <p className="text-xs text-slate-400">Admin Portal</p>
+        <p className="text-xs text-slate-500">Admin Portal</p>
       </div>
       
       <nav className="space-y-2">
@@ -192,7 +192,7 @@ const AdminDashboard = () => {
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all cursor-pointer ${
               activeTab === item.id 
                 ? 'bg-amber-600 text-white' 
-                : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                : 'text-slate-300 hover:bg-slate-700 hover:text-white'
             }`}
           >
             {item.icon}
@@ -202,7 +202,7 @@ const AdminDashboard = () => {
       </nav>
       
       <div className="absolute bottom-4 left-4 right-4">
-        <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-800 transition-colors rounded-lg cursor-pointer">
+        <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-white hover:bg-slate-700 transition-colors rounded-lg cursor-pointer">
           <LogOut className="w-5 h-5" />
           <span>Logout</span>
         </button>
@@ -213,7 +213,7 @@ const AdminDashboard = () => {
   const StatsGrid = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
       {stats.map((stat, i) => (
-        <div key={i} className="bg-white rounded-xl p-6 shadow-sm">
+        <div key={i} className="bg-slate-800 rounded-xl p-6 shadow-sm">
           <div className="flex items-center justify-between mb-4">
             <div className={`p-3 rounded-lg ${stat.color}`}>
               <div className="text-white">{stat.icon}</div>
@@ -223,30 +223,30 @@ const AdminDashboard = () => {
               <span>{Math.abs(stat.change)}%</span>
             </div>
           </div>
-          <div className="text-3xl font-bold text-slate-800 mb-1">{stat.value}</div>
-          <div className="text-sm text-slate-500">{stat.title}</div>
+          <div className="text-3xl font-bold text-white mb-1">{stat.value}</div>
+          <div className="text-sm text-slate-400">{stat.title}</div>
         </div>
       ))}
     </div>
   );
 
   const BookingsTable = () => (
-    <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-      <div className="p-6 border-b border-slate-100">
+    <div className="bg-slate-800 rounded-xl shadow-sm overflow-hidden">
+      <div className="p-6 border-b border-slate-700/30">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <h2 className="text-lg font-semibold text-slate-800">Recent Bookings</h2>
+          <h2 className="text-lg font-semibold text-white">Recent Bookings</h2>
           <div className="flex items-center gap-4">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
               <input
                 type="text"
                 placeholder="Search bookings..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:border-amber-500 focus:outline-none"
+                className="pl-10 pr-4 py-2 bg-slate-700 border-slate-600 rounded-lg focus:border-amber-500 focus:outline-none"
               />
             </div>
-            <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="px-4 py-2 border border-slate-200 rounded-lg focus:border-amber-500 focus:outline-none">
+            <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="px-4 py-2 bg-slate-700 border-slate-600 rounded-lg focus:border-amber-500 focus:outline-none">
               <option>All Status</option>
               <option>Pending</option>
               <option>In Progress</option>
@@ -259,33 +259,33 @@ const AdminDashboard = () => {
       
       <div className="overflow-x-auto">
         <table className="w-full">
-          <thead className="bg-slate-50">
+          <thead className="bg-slate-800/50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">ID</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Customer</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Device</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Service</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Status</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Amount</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Actions</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">ID</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Customer</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Device</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Service</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Status</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Amount</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-slate-700/30">
             {filteredBookings.map((booking) => (
-              <tr key={booking.id} className="hover:bg-slate-50 transition-colors">
-                <td className="px-6 py-4 text-sm font-medium text-amber-600">{booking.id}</td>
+              <tr key={booking.id} className="hover:bg-slate-700/50 transition-colors">
+                <td className="px-6 py-4 text-sm font-medium text-amber-400">{booking.id}</td>
                 <td className="px-6 py-4">
-                  <div className="font-medium text-slate-800">{booking.customerName}</div>
-                  <div className="text-sm text-slate-500">{booking.phone}</div>
+                  <div className="font-medium text-white">{booking.customerName}</div>
+                  <div className="text-sm text-slate-400">{booking.phone}</div>
                 </td>
-                <td className="px-6 py-4 text-sm text-slate-600">{booking.device}</td>
-                <td className="px-6 py-4 text-sm text-slate-600">{booking.service}</td>
+                <td className="px-6 py-4 text-sm text-slate-300">{booking.device}</td>
+                <td className="px-6 py-4 text-sm text-slate-300">{booking.service}</td>
                 <td className="px-6 py-4">
                   <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium ${
-                    booking.status === 'completed' ? 'bg-green-100 text-green-700' :
-                    booking.status === 'in-progress' ? 'bg-amber-100 text-amber-700' :
-                    booking.status === 'pending' ? 'bg-blue-100 text-blue-700' :
-                    'bg-red-100 text-red-700'
+                    booking.status === 'completed' ? 'bg-green-500/10 text-green-400' :
+                    booking.status === 'in-progress' ? 'bg-amber-500/10 text-amber-400' :
+                    booking.status === 'pending' ? 'bg-blue-500/10 text-blue-400' :
+                    'bg-red-500/10 text-red-400'
                   }`}>
                     {booking.status === 'completed' && <CheckCircle className="w-3 h-3" />}
                     {booking.status === 'pending' && <Clock className="w-3 h-3" />}
@@ -293,16 +293,16 @@ const AdminDashboard = () => {
                     {booking.status.replace('-', ' ')}
                   </span>
                 </td>
-                <td className="px-6 py-4 text-sm font-semibold text-slate-800">KSh {booking.amount.toLocaleString()}</td>
+                <td className="px-6 py-4 text-sm font-semibold text-white">KSh {booking.amount.toLocaleString()}</td>
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-2">
-                    <button onClick={() => setViewingBooking(booking)} className="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors cursor-pointer">
+                    <button onClick={() => setViewingBooking(booking)} className="p-2 text-slate-500 hover:text-amber-400 hover:bg-amber-500/10 rounded-lg transition-colors cursor-pointer">
                       <Eye className="w-4 h-4" />
                     </button>
-                    <button onClick={() => setEditingBooking({...booking})} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer">
+                    <button onClick={() => setEditingBooking({...booking})} className="p-2 text-slate-500 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors cursor-pointer">
                       <Edit className="w-4 h-4" />
                     </button>
-                    <button onClick={() => deleteBooking(booking.id)} className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer">
+                    <button onClick={() => deleteBooking(booking.id)} className="p-2 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors cursor-pointer">
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
@@ -317,16 +317,16 @@ const AdminDashboard = () => {
 
   const ServicesChart = () => (
     <div className="grid lg:grid-cols-2 gap-6">
-      <div className="bg-white rounded-xl shadow-sm p-6">
-        <h2 className="text-lg font-semibold text-slate-800 mb-6">Services Breakdown</h2>
+      <div className="bg-slate-800 rounded-xl shadow-sm p-6">
+        <h2 className="text-lg font-semibold text-white mb-6">Services Breakdown</h2>
         <div className="space-y-4">
           {services.map((service, i) => (
             <div key={i}>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-slate-700">{service.name}</span>
-                <span className="text-sm text-slate-500">{service.count} repairs</span>
+                <span className="text-sm font-medium text-slate-200">{service.name}</span>
+                <span className="text-sm text-slate-400">{service.count} repairs</span>
               </div>
-              <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+              <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
                 <div 
                   className="h-full bg-gradient-to-r from-amber-500 to-amber-600 rounded-full"
                   style={{ width: `${(service.count / 50) * 100}%` }}
@@ -337,23 +337,23 @@ const AdminDashboard = () => {
         </div>
       </div>
       
-      <div className="bg-white rounded-xl shadow-sm p-6">
-        <h2 className="text-lg font-semibold text-slate-800 mb-6">Revenue by Service</h2>
+      <div className="bg-slate-800 rounded-xl shadow-sm p-6">
+        <h2 className="text-lg font-semibold text-white mb-6">Revenue by Service</h2>
         <div className="space-y-4">
           {services.map((service, i) => (
-            <div key={i} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+            <div key={i} className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center">
-                  <Wrench className="w-5 h-5 text-amber-600" />
+                <div className="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center">
+                  <Wrench className="w-5 h-5 text-amber-400" />
                 </div>
                 <div>
-                  <div className="font-medium text-slate-800">{service.name}</div>
-                  <div className="text-sm text-slate-500">{service.count} repairs</div>
+                  <div className="font-medium text-white">{service.name}</div>
+                  <div className="text-sm text-slate-400">{service.count} repairs</div>
                 </div>
               </div>
               <div className="text-right">
-                <div className="font-semibold text-slate-800">KSh {service.revenue.toLocaleString()}</div>
-                <div className="text-sm text-green-600">+{Math.round((service.revenue / 350000) * 100)}%</div>
+                <div className="font-semibold text-white">KSh {service.revenue.toLocaleString()}</div>
+                <div className="text-sm text-green-400">+{Math.round((service.revenue / 350000) * 100)}%</div>
               </div>
             </div>
           ))}
@@ -363,8 +363,8 @@ const AdminDashboard = () => {
   );
 
   const QuickActions = () => (
-    <div className="bg-white rounded-xl shadow-sm p-6">
-      <h2 className="text-lg font-semibold text-slate-800 mb-6">Quick Actions</h2>
+    <div className="bg-slate-800 rounded-xl shadow-sm p-6">
+      <h2 className="text-lg font-semibold text-white mb-6">Quick Actions</h2>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
           { icon: <Plus className="w-5 h-5" />, label: 'New Booking', color: 'bg-amber-500' },
@@ -372,11 +372,11 @@ const AdminDashboard = () => {
           { icon: <Phone className="w-5 h-5" />, label: 'Call Customer', color: 'bg-green-500' },
           { icon: <BarChart3 className="w-5 h-5" />, label: 'Generate Report', color: 'bg-purple-500' },
         ].map((action, i) => (
-          <button key={i} className="flex flex-col items-center gap-3 p-4 rounded-xl border-2 border-dashed border-slate-200 hover:border-amber-500 hover:bg-amber-50 transition-all cursor-pointer">
+          <button key={i} className="flex flex-col items-center gap-3 p-4 rounded-xl border-2 border-dashed border-slate-700/50 hover:border-amber-500 hover:bg-amber-500/10 transition-all cursor-pointer">
             <div className={`w-12 h-12 rounded-xl ${action.color} flex items-center justify-center text-white`}>
               {action.icon}
             </div>
-            <span className="text-sm font-medium text-slate-700">{action.label}</span>
+            <span className="text-sm font-medium text-slate-200">{action.label}</span>
           </button>
         ))}
       </div>
@@ -395,7 +395,7 @@ const AdminDashboard = () => {
   const BookingsContent = () => (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-slate-800">Bookings Management</h1>
+        <h1 className="text-2xl font-bold text-white">Bookings Management</h1>
         <button className="flex items-center gap-2 bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600 transition-colors cursor-pointer">
           <Plus className="w-5 h-5" />
           <span>New Booking</span>
@@ -408,62 +408,62 @@ const AdminDashboard = () => {
   const OrdersContent = () => (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-slate-800">Store Orders</h1>
+        <h1 className="text-2xl font-bold text-white">Store Orders</h1>
         <button className="flex items-center gap-2 bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600 cursor-pointer">
           <Plus className="w-5 h-5" />
           <span>Export</span>
         </button>
       </div>
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-        <div className="p-4 border-b">
-          <input type="text" placeholder="Search orders..." value={orderSearch} onChange={(e) => setOrderSearch(e.target.value)} className="px-4 py-2 border rounded-lg w-full max-w-md" />
+      <div className="bg-slate-800 rounded-xl shadow-sm overflow-hidden">
+        <div className="p-4 border-b border-slate-700/30">
+          <input type="text" placeholder="Search orders..." value={orderSearch} onChange={(e) => setOrderSearch(e.target.value)} className="px-4 py-2 bg-slate-700 border-slate-600 rounded-lg w-full max-w-md" />
         </div>
         <table className="w-full">
-          <thead className="bg-slate-50">
+          <thead className="bg-slate-800/50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Order ID</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Customer</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Items</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Total</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Status</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Date</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Actions</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Order ID</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Customer</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Items</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Total</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Status</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Date</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-slate-700/30">
             {filteredOrders.map((order) => (
-              <tr key={order.id} className="hover:bg-slate-50">
-                <td className="px-6 py-4 font-medium text-amber-600">{order.id}</td>
+              <tr key={order.id} className="hover:bg-slate-700/50">
+                <td className="px-6 py-4 font-medium text-amber-400">{order.id}</td>
                 <td className="px-6 py-4">
-                  <div className="font-medium text-slate-800">{order.customer}</div>
-                  <div className="text-sm text-slate-500">{order.phone}</div>
+                  <div className="font-medium text-white">{order.customer}</div>
+                  <div className="text-sm text-slate-400">{order.phone}</div>
                 </td>
                 <td className="px-6 py-4 text-sm">
                   {order.items.map((item, i) => (
                     <div key={i}>{item.name} x{item.qty}</div>
                   ))}
                 </td>
-                <td className="px-6 py-4 font-bold text-slate-800">KSh {order.total.toLocaleString()}</td>
+                <td className="px-6 py-4 font-bold text-white">KSh {order.total.toLocaleString()}</td>
                 <td className="px-6 py-4">
                   <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                    order.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-                    order.status === 'confirmed' ? 'bg-blue-100 text-blue-700' :
-                    order.status === 'shipped' ? 'bg-purple-100 text-purple-700' :
-                    'bg-green-100 text-green-700'
+                    order.status === 'pending' ? 'bg-yellow-500/10 text-yellow-400' :
+                    order.status === 'confirmed' ? 'bg-blue-500/10 text-blue-400' :
+                    order.status === 'shipped' ? 'bg-purple-500/10 text-purple-400' :
+                    'bg-green-500/10 text-green-400'
                   }`}>
                     {order.status}
                   </span>
                 </td>
-                <td className="px-6 py-4 text-sm text-slate-500">{order.date}</td>
+                <td className="px-6 py-4 text-sm text-slate-400">{order.date}</td>
                 <td className="px-6 py-4">
                   <div className="flex gap-2">
-                    <select value={order.status} onChange={(e) => updateOrderStatus(order.id, e.target.value as Order['status'])} className="text-sm border rounded px-2 py-1">
+                    <select value={order.status} onChange={(e) => updateOrderStatus(order.id, e.target.value as Order['status'])} className="text-sm bg-slate-700 border-slate-600 rounded px-2 py-1">
                       <option value="pending">Pending</option>
                       <option value="confirmed">Confirmed</option>
                       <option value="shipped">Shipped</option>
                       <option value="delivered">Delivered</option>
                     </select>
-                    <button className="p-1 text-amber-600 hover:bg-amber-50 rounded">
+                    <button className="p-1 text-amber-400 hover:bg-amber-500/10 rounded">
                       <Eye className="w-4 h-4" />
                     </button>
                   </div>
@@ -479,7 +479,7 @@ const AdminDashboard = () => {
   const ServicesContent = () => (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-slate-800">Services Management</h1>
+        <h1 className="text-2xl font-bold text-white">Services Management</h1>
         <button className="flex items-center gap-2 bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600 transition-colors cursor-pointer">
           <Plus className="w-5 h-5" />
           <span>Add Service</span>
@@ -487,19 +487,19 @@ const AdminDashboard = () => {
       </div>
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {services.map((service, i) => (
-          <div key={i} className="bg-white rounded-xl shadow-sm p-6">
+          <div key={i} className="bg-slate-800 rounded-xl shadow-sm p-6">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center">
-                <Wrench className="w-6 h-6 text-amber-600" />
+              <div className="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center">
+                <Wrench className="w-6 h-6 text-amber-400" />
               </div>
-              <button className="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors cursor-pointer">
+              <button className="p-2 text-slate-500 hover:text-amber-400 hover:bg-amber-500/10 rounded-lg transition-colors cursor-pointer">
                 <Edit className="w-4 h-4" />
               </button>
             </div>
-            <h3 className="font-semibold text-slate-800 mb-2">{service.name}</h3>
-            <div className="flex items-center justify-between text-sm text-slate-500">
+            <h3 className="font-semibold text-white mb-2">{service.name}</h3>
+            <div className="flex items-center justify-between text-sm text-slate-400">
               <span>{service.count} repairs</span>
-              <span className="font-semibold text-amber-600">KSh {service.revenue.toLocaleString()}</span>
+              <span className="font-semibold text-amber-400">KSh {service.revenue.toLocaleString()}</span>
             </div>
           </div>
         ))}
@@ -509,33 +509,33 @@ const AdminDashboard = () => {
 
   const AnalyticsContent = () => (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-slate-800">Analytics & Reports</h1>
+      <h1 className="text-2xl font-bold text-white">Analytics & Reports</h1>
       <div className="grid lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <h2 className="text-lg font-semibold text-slate-800 mb-6">Monthly Revenue</h2>
+        <div className="bg-slate-800 rounded-xl shadow-sm p-6">
+          <h2 className="text-lg font-semibold text-white mb-6">Monthly Revenue</h2>
           <div className="h-64 flex items-end justify-around gap-2">
             {[65, 45, 78, 52, 88, 70, 95, 60, 85, 72, 90, 80].map((h, i) => (
               <div key={i} className="w-full bg-gradient-to-t from-amber-500 to-amber-300 rounded-t" style={{ height: `${h}%` }}></div>
             ))}
           </div>
-          <div className="flex justify-around mt-4 text-xs text-slate-500">
+          <div className="flex justify-around mt-4 text-xs text-slate-400">
             <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span>
             <span>May</span><span>Jun</span><span>Jul</span><span>Aug</span>
             <span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span>
           </div>
         </div>
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <h2 className="text-lg font-semibold text-slate-800 mb-6">Services Distribution</h2>
+        <div className="bg-slate-800 rounded-xl shadow-sm p-6">
+          <h2 className="text-lg font-semibold text-white mb-6">Services Distribution</h2>
           <div className="flex items-center justify-center">
             <div className="relative w-48 h-48">
               <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                <circle cx="18" cy="18" r="15.915" fill="none" stroke="#f3f4f6" strokeWidth="3" />
+                <circle cx="18" cy="18" r="15.915" fill="none" stroke="#334155" strokeWidth="3" />
                 <circle cx="18" cy="18" r="15.915" fill="none" stroke="#f59e0b" strokeWidth="3" strokeDasharray="35 65" />
                 <circle cx="18" cy="18" r="15.915" fill="none" stroke="#d97706" strokeWidth="3" strokeDasharray="25 75" strokeDashoffset="-35" />
                 <circle cx="18" cy="18" r="15.915" fill="none" stroke="#92400e" strokeWidth="3" strokeDasharray="18 82" strokeDashoffset="-60" />
               </svg>
               <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-2xl font-bold text-slate-800">127</span>
+                <span className="text-2xl font-bold text-white">127</span>
               </div>
             </div>
           </div>
@@ -544,11 +544,11 @@ const AdminDashboard = () => {
               { label: 'Screen Replacement', color: 'bg-amber-500' },
               { label: 'Battery', color: 'bg-amber-700' },
               { label: 'Charging Port', color: 'bg-amber-900' },
-              { label: 'Other', color: 'bg-slate-300' },
+              { label: 'Other', color: 'bg-slate-600' },
             ].map((item, i) => (
               <div key={i} className="flex items-center gap-3">
                 <div className={`w-4 h-4 rounded ${item.color}`}></div>
-                <span className="text-sm text-slate-600">{item.label}</span>
+                <span className="text-sm text-slate-300">{item.label}</span>
               </div>
             ))}
           </div>
@@ -573,93 +573,93 @@ const AdminDashboard = () => {
 
     return (
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold text-slate-800">Settings</h1>
+        <h1 className="text-2xl font-bold text-white">Settings</h1>
         
         <div className="grid lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <h2 className="text-lg font-semibold text-slate-800 mb-6">Profile Settings</h2>
+            <div className="bg-slate-800 rounded-xl shadow-sm p-6">
+              <h2 className="text-lg font-semibold text-white mb-6">Profile Settings</h2>
               <div className="space-y-4">
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">First Name</label>
-                    <input type="text" defaultValue="Admin" className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:border-amber-500 focus:outline-none" />
+                    <label className="block text-sm font-medium text-slate-200 mb-2">First Name</label>
+                    <input type="text" defaultValue="Admin" className="w-full px-4 py-2 bg-slate-700 border-slate-600 rounded-lg focus:border-amber-500 focus:outline-none" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Last Name</label>
-                    <input type="text" defaultValue="User" className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:border-amber-500 focus:outline-none" />
+                    <label className="block text-sm font-medium text-slate-200 mb-2">Last Name</label>
+                    <input type="text" defaultValue="User" className="w-full px-4 py-2 bg-slate-700 border-slate-600 rounded-lg focus:border-amber-500 focus:outline-none" />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Email</label>
-                  <input type="email" defaultValue="admin@alphamobitech.com" className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:border-amber-500 focus:outline-none" />
+                  <label className="block text-sm font-medium text-slate-200 mb-2">Email</label>
+                  <input type="email" defaultValue="admin@alphamobitech.com" className="w-full px-4 py-2 bg-slate-700 border-slate-600 rounded-lg focus:border-amber-500 focus:outline-none" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Phone</label>
-                  <input type="tel" defaultValue="0703555449" className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:border-amber-500 focus:outline-none" />
+                  <label className="block text-sm font-medium text-slate-200 mb-2">Phone</label>
+                  <input type="tel" defaultValue="0703555449" className="w-full px-4 py-2 bg-slate-700 border-slate-600 rounded-lg focus:border-amber-500 focus:outline-none" />
                 </div>
                 <button onClick={handleSaveProfile} className="px-6 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors cursor-pointer">
                   {profileSaved ? 'Saved!' : 'Save Changes'}
                 </button>
-                {profileSaved && <p className="text-green-600 text-sm">Profile saved successfully!</p>}
+                {profileSaved && <p className="text-green-400 text-sm">Profile saved successfully!</p>}
               </div>
             </div>
 
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <h2 className="text-lg font-semibold text-slate-800 mb-6">Change Password</h2>
+            <div className="bg-slate-800 rounded-xl shadow-sm p-6">
+              <h2 className="text-lg font-semibold text-white mb-6">Change Password</h2>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Current Password</label>
-                  <input type="password" className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:border-amber-500 focus:outline-none" />
+                  <label className="block text-sm font-medium text-slate-200 mb-2">Current Password</label>
+                  <input type="password" className="w-full px-4 py-2 bg-slate-700 border-slate-600 rounded-lg focus:border-amber-500 focus:outline-none" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">New Password</label>
-                  <input type="password" className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:border-amber-500 focus:outline-none" />
+                  <label className="block text-sm font-medium text-slate-200 mb-2">New Password</label>
+                  <input type="password" className="w-full px-4 py-2 bg-slate-700 border-slate-600 rounded-lg focus:border-amber-500 focus:outline-none" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Confirm New Password</label>
-                  <input type="password" className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:border-amber-500 focus:outline-none" />
+                  <label className="block text-sm font-medium text-slate-200 mb-2">Confirm New Password</label>
+                  <input type="password" className="w-full px-4 py-2 bg-slate-700 border-slate-600 rounded-lg focus:border-amber-500 focus:outline-none" />
                 </div>
                 <button onClick={handleUpdatePassword} className="px-6 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors cursor-pointer">
                   {passwordUpdated ? 'Updated!' : 'Update Password'}
                 </button>
-                {passwordUpdated && <p className="text-green-600 text-sm">Password updated successfully!</p>}
+                {passwordUpdated && <p className="text-green-400 text-sm">Password updated successfully!</p>}
               </div>
             </div>
           </div>
 
           <div className="space-y-6">
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <h2 className="text-lg font-semibold text-slate-800 mb-6">Business Information</h2>
+            <div className="bg-slate-800 rounded-xl shadow-sm p-6">
+              <h2 className="text-lg font-semibold text-white mb-6">Business Information</h2>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Business Name</label>
-                  <input type="text" defaultValue="Alphamobitech" className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:border-amber-500 focus:outline-none" />
+                  <label className="block text-sm font-medium text-slate-200 mb-2">Business Name</label>
+                  <input type="text" defaultValue="Alphamobitech" className="w-full px-4 py-2 bg-slate-700 border-slate-600 rounded-lg focus:border-amber-500 focus:outline-none" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Address</label>
-                  <input type="text" defaultValue="Nairobi CBD, Kenya" className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:border-amber-500 focus:outline-none" />
+                  <label className="block text-sm font-medium text-slate-200 mb-2">Address</label>
+                  <input type="text" defaultValue="Nairobi CBD, Kenya" className="w-full px-4 py-2 bg-slate-700 border-slate-600 rounded-lg focus:border-amber-500 focus:outline-none" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Working Hours</label>
-                  <input type="text" defaultValue="Mon-Sat: 8AM - 6PM" className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:border-amber-500 focus:outline-none" />
+                  <label className="block text-sm font-medium text-slate-200 mb-2">Working Hours</label>
+                  <input type="text" defaultValue="Mon-Sat: 8AM - 6PM" className="w-full px-4 py-2 bg-slate-700 border-slate-600 rounded-lg focus:border-amber-500 focus:outline-none" />
                 </div>
               </div>
             </div>
 
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <h2 className="text-lg font-semibold text-slate-800 mb-6">Notifications</h2>
+            <div className="bg-slate-800 rounded-xl shadow-sm p-6">
+              <h2 className="text-lg font-semibold text-white mb-6">Notifications</h2>
               <div className="space-y-4">
                 <label className="flex items-center justify-between cursor-pointer">
-                  <span className="text-sm text-slate-700">Email notifications for new bookings</span>
+                  <span className="text-sm text-slate-200">Email notifications for new bookings</span>
                   <input type="checkbox" defaultChecked className="w-5 h-5 text-amber-500 rounded cursor-pointer" />
                 </label>
                 <label className="flex items-center justify-between cursor-pointer">
-                  <span className="text-sm text-slate-700">WhatsApp notifications</span>
+                  <span className="text-sm text-slate-200">WhatsApp notifications</span>
                   <input type="checkbox" defaultChecked className="w-5 h-5 text-amber-500 rounded cursor-pointer" />
                 </label>
                 <label className="flex items-center justify-between cursor-pointer">
-                  <span className="text-sm text-slate-700">Daily reports</span>
+                  <span className="text-sm text-slate-200">Daily reports</span>
                   <input type="checkbox" className="w-5 h-5 text-amber-500 rounded cursor-pointer" />
                 </label>
               </div>
@@ -682,39 +682,39 @@ const AdminDashboard = () => {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-slate-800">Customers</h1>
+          <h1 className="text-2xl font-bold text-white">Customers</h1>
           <button className="flex items-center gap-2 bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600 transition-colors cursor-pointer">
             <Plus className="w-5 h-5" />
             <span>Export</span>
           </button>
         </div>
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div className="bg-slate-800 rounded-xl shadow-sm overflow-hidden">
           <table className="w-full">
-            <thead className="bg-slate-50">
+            <thead className="bg-slate-800/50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Customer</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Phone</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Bookings</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Total Spent</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Actions</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Customer</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Phone</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Bookings</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Total Spent</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-slate-700/30">
               {customers.map((customer) => (
-                <tr key={customer.id} className="hover:bg-slate-50 transition-colors">
+                <tr key={customer.id} className="hover:bg-slate-700/50 transition-colors">
                   <td className="px-6 py-4">
                     <div>
-                      <div className="font-medium text-slate-800">{customer.name}</div>
-                      <div className="text-sm text-slate-500">{customer.email}</div>
+                      <div className="font-medium text-white">{customer.name}</div>
+                      <div className="text-sm text-slate-400">{customer.email}</div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-sm text-slate-600">{customer.phone}</td>
-                  <td className="px-6 py-4 text-sm text-slate-600">{customer.totalBookings}</td>
-                  <td className="px-6 py-4 text-sm font-semibold text-amber-600">KSh {customer.spent.toLocaleString()}</td>
+                  <td className="px-6 py-4 text-sm text-slate-300">{customer.phone}</td>
+                  <td className="px-6 py-4 text-sm text-slate-300">{customer.totalBookings}</td>
+                  <td className="px-6 py-4 text-sm font-semibold text-amber-400">KSh {customer.spent.toLocaleString()}</td>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2">
-                      <button className="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors cursor-pointer"><Eye className="w-4 h-4" /></button>
-                      <button className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer"><Phone className="w-4 h-4" /></button>
+                      <button className="p-2 text-slate-500 hover:text-amber-400 hover:bg-amber-500/10 rounded-lg transition-colors cursor-pointer"><Eye className="w-4 h-4" /></button>
+                      <button className="p-2 text-slate-500 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors cursor-pointer"><Phone className="w-4 h-4" /></button>
                     </div>
                   </td>
                 </tr>
@@ -743,28 +743,28 @@ const AdminDashboard = () => {
     if (!viewingBooking) return null;
     return (
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setViewingBooking(null)}>
-        <div className="bg-white rounded-2xl p-6 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+        <div className="bg-slate-800 rounded-2xl p-6 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-xl font-bold text-slate-800">Booking Details</h3>
-            <button onClick={() => setViewingBooking(null)} className="p-2 hover:bg-slate-100 rounded-lg">
+            <h3 className="text-xl font-bold text-white">Booking Details</h3>
+            <button onClick={() => setViewingBooking(null)} className="p-2 hover:bg-slate-700 rounded-lg">
               <XCircle className="w-5 h-5" />
             </button>
           </div>
           <div className="space-y-3">
-            <div><span className="text-sm text-slate-500">ID:</span> <span className="font-medium">{viewingBooking.id}</span></div>
-            <div><span className="text-sm text-slate-500">Customer:</span> <span className="font-medium">{viewingBooking.customerName}</span></div>
-            <div><span className="text-sm text-slate-500">Phone:</span> <span className="font-medium">{viewingBooking.phone}</span></div>
-            <div><span className="text-sm text-slate-500">Device:</span> <span className="font-medium">{viewingBooking.device}</span></div>
-            <div><span className="text-sm text-slate-500">Service:</span> <span className="font-medium">{viewingBooking.service}</span></div>
-            <div><span className="text-sm text-slate-500">Status:</span> <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-              viewingBooking.status === 'completed' ? 'bg-green-100 text-green-700' :
-              viewingBooking.status === 'in-progress' ? 'bg-amber-100 text-amber-700' :
-              viewingBooking.status === 'pending' ? 'bg-blue-100 text-blue-700' :
-              'bg-red-100 text-red-700'
+            <div><span className="text-sm text-slate-400">ID:</span> <span className="font-medium">{viewingBooking.id}</span></div>
+            <div><span className="text-sm text-slate-400">Customer:</span> <span className="font-medium">{viewingBooking.customerName}</span></div>
+            <div><span className="text-sm text-slate-400">Phone:</span> <span className="font-medium">{viewingBooking.phone}</span></div>
+            <div><span className="text-sm text-slate-400">Device:</span> <span className="font-medium">{viewingBooking.device}</span></div>
+            <div><span className="text-sm text-slate-400">Service:</span> <span className="font-medium">{viewingBooking.service}</span></div>
+            <div><span className="text-sm text-slate-400">Status:</span> <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+              viewingBooking.status === 'completed' ? 'bg-green-500/10 text-green-400' :
+              viewingBooking.status === 'in-progress' ? 'bg-amber-500/10 text-amber-400' :
+              viewingBooking.status === 'pending' ? 'bg-blue-500/10 text-blue-400' :
+              'bg-red-500/10 text-red-400'
             }`}>{viewingBooking.status}</span></div>
-            <div><span className="text-sm text-slate-500">Date:</span> <span className="font-medium">{viewingBooking.date}</span></div>
-            <div><span className="text-sm text-slate-500">Amount:</span> <span className="font-bold text-amber-600">KSh {viewingBooking.amount.toLocaleString()}</span></div>
-            {viewingBooking.notes && <div><span className="text-sm text-slate-500">Notes:</span> <p className="text-sm mt-1">{viewingBooking.notes}</p></div>}
+            <div><span className="text-sm text-slate-400">Date:</span> <span className="font-medium">{viewingBooking.date}</span></div>
+            <div><span className="text-sm text-slate-400">Amount:</span> <span className="font-bold text-amber-400">KSh {viewingBooking.amount.toLocaleString()}</span></div>
+            {viewingBooking.notes && <div><span className="text-sm text-slate-400">Notes:</span> <p className="text-sm mt-1">{viewingBooking.notes}</p></div>}
           </div>
         </div>
       </div>
@@ -786,17 +786,17 @@ const EditBookingModal: React.FC<EditBookingModalProps> = ({ booking, onClose, o
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={onClose}>
-      <div className="bg-white rounded-2xl p-6 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-slate-800 rounded-2xl p-6 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-xl font-bold text-slate-800">Edit Booking</h3>
-          <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-lg">
+          <h3 className="text-xl font-bold text-white">Edit Booking</h3>
+          <button onClick={onClose} className="p-2 hover:bg-slate-700 rounded-lg">
             <XCircle className="w-5 h-5" />
           </button>
         </div>
         <div className="space-y-3">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Status</label>
-            <select value={editForm.status} onChange={(e) => setEditForm({...editForm, status: e.target.value as Booking['status']})} className="w-full px-3 py-2 border rounded-lg">
+            <label className="block text-sm font-medium text-slate-200 mb-1">Status</label>
+            <select value={editForm.status} onChange={(e) => setEditForm({...editForm, status: e.target.value as Booking['status']})} className="w-full px-3 py-2 bg-slate-700 border-slate-600 rounded-lg">
               <option value="pending">Pending</option>
               <option value="in-progress">In Progress</option>
               <option value="completed">Completed</option>
@@ -804,16 +804,16 @@ const EditBookingModal: React.FC<EditBookingModalProps> = ({ booking, onClose, o
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Amount (KSh)</label>
-            <input type="number" value={editForm.amount} onChange={(e) => setEditForm({...editForm, amount: parseInt(e.target.value) || 0})} className="w-full px-3 py-2 border rounded-lg" />
+            <label className="block text-sm font-medium text-slate-200 mb-1">Amount (KSh)</label>
+            <input type="number" value={editForm.amount} onChange={(e) => setEditForm({...editForm, amount: parseInt(e.target.value) || 0})} className="w-full px-3 py-2 bg-slate-700 border-slate-600 rounded-lg" />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Notes</label>
-            <textarea value={editForm.notes || ''} onChange={(e) => setEditForm({...editForm, notes: e.target.value})} className="w-full px-3 py-2 border rounded-lg" rows={3} />
+            <label className="block text-sm font-medium text-slate-200 mb-1">Notes</label>
+            <textarea value={editForm.notes || ''} onChange={(e) => setEditForm({...editForm, notes: e.target.value})} className="w-full px-3 py-2 bg-slate-700 border-slate-600 rounded-lg" rows={3} />
           </div>
           <div className="flex gap-3 pt-2">
             <button onClick={handleSave} className="flex-1 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600">Save</button>
-            <button onClick={onClose} className="flex-1 py-2 bg-slate-200 rounded-lg hover:bg-slate-300">Cancel</button>
+            <button onClick={onClose} className="flex-1 py-2 bg-slate-600 rounded-lg hover:bg-slate-500">Cancel</button>
           </div>
         </div>
       </div>
@@ -823,7 +823,7 @@ const EditBookingModal: React.FC<EditBookingModalProps> = ({ booking, onClose, o
 
   if (isAuthenticated === null) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-100">
+      <div className="min-h-screen flex items-center justify-center bg-slate-900">
         <Loader className="w-8 h-8 animate-spin text-amber-500" />
       </div>
     );
@@ -834,12 +834,12 @@ const EditBookingModal: React.FC<EditBookingModalProps> = ({ booking, onClose, o
   }
 
   return (
-    <div className="flex min-h-screen bg-slate-100">
+    <div className="flex min-h-screen bg-slate-900 text-slate-100">
       <Sidebar />
       <main className="flex-1 p-8">
-        <header className="mb-8">
-          <h1 className="text-2xl font-bold text-slate-800 capitalize">{activeTab === 'dashboard' ? 'Dashboard Overview' : activeTab}</h1>
-          <p className="text-slate-500">Welcome back! Here's what's happening today.</p>
+        <header className="bg-slate-800/80 backdrop-blur-sm border-b border-slate-700/50 -mx-8 -mt-8 px-8 pt-8 pb-6 mb-8">
+          <h1 className="text-2xl font-bold text-white capitalize">{activeTab === 'dashboard' ? 'Dashboard Overview' : activeTab}</h1>
+          <p className="text-slate-400">Welcome back! Here's what's happening today.</p>
         </header>
         {renderContent()}
       </main>

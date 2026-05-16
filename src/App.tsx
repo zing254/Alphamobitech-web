@@ -106,7 +106,6 @@ const App = () => {
   const [contactFormData, setContactFormData] = useState({ name: '', email: '', phone: '', message: '' });
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [contactSuccess, setContactSuccess] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [cart, setCart] = useState<CartItem[]>(() => {
     try {
@@ -131,11 +130,6 @@ const App = () => {
   const [contactErrors, setContactErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem('darkMode');
-    if (savedTheme === 'true') {
-      setIsDarkMode(true);
-      document.documentElement.classList.add('dark');
-    }
     const timer = setTimeout(() => setIsLoading(false), 800);
     return () => clearTimeout(timer);
   }, []);
@@ -165,17 +159,6 @@ const App = () => {
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
-
-  const toggleDarkMode = () => {
-    const newMode = !isDarkMode;
-    setIsDarkMode(newMode);
-    localStorage.setItem('darkMode', String(newMode));
-    if (newMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  };
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
@@ -546,13 +529,6 @@ const App = () => {
               <Phone className="w-4 h-4" />
               <span>0703555449</span>
             </a>
-            <button
-              onClick={toggleDarkMode}
-              className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
-              title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-            >
-              {isDarkMode ? <Sun className="w-5 h-5 text-amber-500" /> : <Moon className="w-5 h-5 text-slate-200" />}
-            </button>
             <button 
               onClick={() => { setCurrentPage('cart'); window.scrollTo(0, 0); }}
               className="relative p-2 rounded-lg bg-slate-100 hover:bg-slate-200 transition-colors"
@@ -1080,7 +1056,7 @@ const App = () => {
                     required
                     value={bookingForm.name}
                     onChange={(e) => { setBookingForm({...bookingForm, name: e.target.value}); setBookingErrors(prev => ({...prev, name: ''})); }}
-                    className={`w-full px-4 py-3 rounded-xl border ${bookingErrors.name ? 'border-red-500' : 'border-slate-700/50'} focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all`}
+                    className={`w-full px-4 py-3 bg-slate-700 text-white rounded-xl border ${bookingErrors.name ? 'border-red-500' : 'border-slate-700/50'} focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none transition-all`}
                     placeholder="John Doe"
                   />
                   {bookingErrors.name && <p className="text-red-500 text-sm mt-1">{bookingErrors.name}</p>}
@@ -1092,7 +1068,7 @@ const App = () => {
                     required
                     value={bookingForm.phone}
                     onChange={(e) => { setBookingForm({...bookingForm, phone: e.target.value}); setBookingErrors(prev => ({...prev, phone: ''})); }}
-                    className={`w-full px-4 py-3 rounded-xl border ${bookingErrors.phone ? 'border-red-500' : 'border-slate-700/50'} focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all`}
+                    className={`w-full px-4 py-3 bg-slate-700 text-white rounded-xl border ${bookingErrors.phone ? 'border-red-500' : 'border-slate-700/50'} focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none transition-all`}
                     placeholder="0700000000"
                   />
                   {bookingErrors.phone && <p className="text-red-500 text-sm mt-1">{bookingErrors.phone}</p>}
@@ -1105,7 +1081,7 @@ const App = () => {
                     required
                     value={bookingForm.device}
                     onChange={(e) => { setBookingForm({...bookingForm, device: e.target.value}); setBookingErrors(prev => ({...prev, device: ''})); }}
-                    className={`w-full px-4 py-3 rounded-xl border ${bookingErrors.device ? 'border-red-500' : 'border-slate-700/50'} focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all`}
+                    className={`w-full px-4 py-3 bg-slate-700 text-white rounded-xl border ${bookingErrors.device ? 'border-red-500' : 'border-slate-700/50'} focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none transition-all`}
                   >
                     <option value="">Select Brand</option>
                     <option value="iphone">iPhone</option>
@@ -1124,7 +1100,7 @@ const App = () => {
                     required
                     value={bookingForm.service}
                     onChange={(e) => { setBookingForm({...bookingForm, service: e.target.value}); setBookingErrors(prev => ({...prev, service: ''})); }}
-                    className={`w-full px-4 py-3 rounded-xl border ${bookingErrors.service ? 'border-red-500' : 'border-slate-700/50'} focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all`}
+                    className={`w-full px-4 py-3 bg-slate-700 text-white rounded-xl border ${bookingErrors.service ? 'border-red-500' : 'border-slate-700/50'} focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none transition-all`}
                   >
                     <option value="">Select Service</option>
                     <option value="screen">Screen Replacement</option>
@@ -1146,7 +1122,7 @@ const App = () => {
                   rows={4}
                   value={bookingForm.notes}
                   onChange={(e) => setBookingForm({...bookingForm, notes: e.target.value})}
-                  className="w-full px-4 py-3 rounded-xl border border-slate-700/50 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all resize-none"
+                  className="w-full px-4 py-3 bg-slate-700 text-white placeholder-slate-400 rounded-xl border border-slate-700/50 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none transition-all resize-none"
                   placeholder="Describe your issue..."
                 />
               </div>
@@ -1261,7 +1237,7 @@ const App = () => {
                         required
                         value={contactFormData.name}
                         onChange={(e) => { setContactFormData({...contactFormData, name: e.target.value}); setContactErrors(prev => ({...prev, name: ''})); }}
-                        className={`w-full px-4 py-3 rounded-xl border ${contactErrors.name ? 'border-red-500' : 'border-slate-700/50'} focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all`}
+                        className={`w-full px-4 py-3 bg-slate-700 text-white rounded-xl border ${contactErrors.name ? 'border-red-500' : 'border-slate-700/50'} focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none transition-all`}
                         placeholder="Your Name"
                       />
                       {contactErrors.name && <p className="text-red-500 text-sm mt-1">{contactErrors.name}</p>}
@@ -1273,7 +1249,7 @@ const App = () => {
                         required
                         value={contactFormData.email}
                         onChange={(e) => { setContactFormData({...contactFormData, email: e.target.value}); setContactErrors(prev => ({...prev, email: ''})); }}
-                        className={`w-full px-4 py-3 rounded-xl border ${contactErrors.email ? 'border-red-500' : 'border-slate-700/50'} focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all`}
+                        className={`w-full px-4 py-3 bg-slate-700 text-white rounded-xl border ${contactErrors.email ? 'border-red-500' : 'border-slate-700/50'} focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none transition-all`}
                         placeholder="your@email.com"
                       />
                       {contactErrors.email && <p className="text-red-500 text-sm mt-1">{contactErrors.email}</p>}
@@ -1286,7 +1262,7 @@ const App = () => {
                       required
                       value={contactFormData.phone}
                       onChange={(e) => { setContactFormData({...contactFormData, phone: e.target.value}); setContactErrors(prev => ({...prev, phone: ''})); }}
-                      className={`w-full px-4 py-3 rounded-xl border ${contactErrors.phone ? 'border-red-500' : 'border-slate-700/50'} focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all`}
+                      className={`w-full px-4 py-3 bg-slate-700 text-white rounded-xl border ${contactErrors.phone ? 'border-red-500' : 'border-slate-700/50'} focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none transition-all`}
                       placeholder="0700000000"
                     />
                     {contactErrors.phone && <p className="text-red-500 text-sm mt-1">{contactErrors.phone}</p>}
@@ -1298,7 +1274,7 @@ const App = () => {
                       required
                       value={contactFormData.message}
                       onChange={(e) => { setContactFormData({...contactFormData, message: e.target.value}); setContactErrors(prev => ({...prev, message: ''})); }}
-                      className={`w-full px-4 py-3 rounded-xl border ${contactErrors.message ? 'border-red-500' : 'border-slate-700/50'} focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all resize-none`}
+                      className={`w-full px-4 py-3 bg-slate-700 text-white rounded-xl border ${contactErrors.message ? 'border-red-500' : 'border-slate-700/50'} focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none transition-all resize-none`}
                       placeholder="Your message..."
                     />
                     {contactErrors.message && <p className="text-red-500 text-sm mt-1">{contactErrors.message}</p>}
@@ -1511,7 +1487,7 @@ const App = () => {
                 placeholder="Search phones, tablets..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-slate-700/50 rounded-xl focus:border-amber-500 focus:ring-2 focus:ring-amber-200 bg-slate-800"
+                className="w-full pl-10 pr-4 py-3 border border-slate-700/50 rounded-xl focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 bg-slate-700 text-white placeholder-slate-400"
               />
             </div>
             <div className="flex items-center gap-3">
@@ -1904,7 +1880,7 @@ const App = () => {
               placeholder="Enter order ID (e.g., ORD001)"
               value={trackOrderId}
               onChange={(e) => setTrackOrderId(e.target.value)}
-              className="flex-1 px-4 py-3 border border-slate-700/50 rounded-xl focus:border-amber-500 focus:ring-2"
+              className="flex-1 px-4 py-3 bg-slate-700 text-white placeholder-slate-400 border border-slate-700/50 rounded-xl focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20"
             />
             <button onClick={handleTrackOrder} className="px-6 py-3 bg-amber-600 text-white rounded-xl font-medium hover:bg-amber-700">
               Track
@@ -1950,23 +1926,23 @@ const App = () => {
               <form onSubmit={handleCheckoutSubmit} className="bg-slate-800 rounded-xl p-6 shadow-lg space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-slate-200 mb-2">Full Name</label>
-                  <input type="text" required value={checkoutData.name} onChange={e => setCheckoutData({...checkoutData, name: e.target.value})} className="w-full px-4 py-3 border border-slate-700/50 rounded-xl focus:border-amber-500 focus:ring-2 focus:ring-amber-200" placeholder="John Doe" />
+                  <input type="text" required value={checkoutData.name} onChange={e => setCheckoutData({...checkoutData, name: e.target.value})} className="w-full px-4 py-3 bg-slate-700 text-white placeholder-slate-400 border border-slate-700/50 rounded-xl focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20" placeholder="John Doe" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-200 mb-2">Email</label>
-                  <input type="email" required value={checkoutData.email} onChange={e => setCheckoutData({...checkoutData, email: e.target.value})} className="w-full px-4 py-3 border border-slate-700/50 rounded-xl focus:border-amber-500 focus:ring-2 focus:ring-amber-200" placeholder="john@email.com" />
+                  <input type="email" required value={checkoutData.email} onChange={e => setCheckoutData({...checkoutData, email: e.target.value})} className="w-full px-4 py-3 bg-slate-700 text-white placeholder-slate-400 border border-slate-700/50 rounded-xl focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20" placeholder="john@email.com" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-200 mb-2">Phone</label>
-                  <input type="tel" required value={checkoutData.phone} onChange={e => setCheckoutData({...checkoutData, phone: e.target.value})} className="w-full px-4 py-3 border border-slate-700/50 rounded-xl focus:border-amber-500 focus:ring-2 focus:ring-amber-200" placeholder="0700000000" />
+                  <input type="tel" required value={checkoutData.phone} onChange={e => setCheckoutData({...checkoutData, phone: e.target.value})} className="w-full px-4 py-3 bg-slate-700 text-white placeholder-slate-400 border border-slate-700/50 rounded-xl focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20" placeholder="0700000000" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-200 mb-2">Delivery Address</label>
-                  <input type="text" required value={checkoutData.address} onChange={e => setCheckoutData({...checkoutData, address: e.target.value})} className="w-full px-4 py-3 border border-slate-700/50 rounded-xl focus:border-amber-500 focus:ring-2 focus:ring-amber-200" placeholder="Street address" />
+                  <input type="text" required value={checkoutData.address} onChange={e => setCheckoutData({...checkoutData, address: e.target.value})} className="w-full px-4 py-3 bg-slate-700 text-white placeholder-slate-400 border border-slate-700/50 rounded-xl focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20" placeholder="Street address" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-200 mb-2">City</label>
-                  <select value={checkoutData.city} onChange={e => setCheckoutData({...checkoutData, city: e.target.value})} className="w-full px-4 py-3 border border-slate-700/50 rounded-xl focus:border-amber-500 focus:ring-2 focus:ring-amber-200">
+                  <select value={checkoutData.city} onChange={e => setCheckoutData({...checkoutData, city: e.target.value})} className="w-full px-4 py-3 bg-slate-700 text-white border border-slate-700/50 rounded-xl focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20">
                     <option>Nairobi</option>
                     <option>Mombasa</option>
                     <option>Kisumu</option>
