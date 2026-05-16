@@ -28,13 +28,13 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boole
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
-          <div className="bg-white rounded-2xl p-8 shadow-lg max-w-md text-center">
+        <div className="min-h-screen flex items-center justify-center bg-slate-800/30 p-4">
+          <div className="bg-slate-800 rounded-2xl p-8 shadow-lg max-w-md text-center">
             <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <X className="w-8 h-8 text-red-600" />
             </div>
-            <h2 className="text-xl font-bold text-slate-800 mb-2">Something went wrong</h2>
-            <p className="text-slate-600 mb-4">An unexpected error occurred. Please refresh the page.</p>
+            <h2 className="text-xl font-bold text-white mb-2">Something went wrong</h2>
+            <p className="text-slate-300 mb-4">An unexpected error occurred. Please refresh the page.</p>
             <button onClick={() => window.location.reload()} className="px-6 py-3 bg-amber-600 text-white rounded-xl font-medium hover:bg-amber-700">
               Refresh Page
             </button>
@@ -186,6 +186,23 @@ const App = () => {
   useEffect(() => {
     const timer = setInterval(() => setCurrentSlide((prev) => (prev + 1) % 3), 6000);
     return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('animate-fade-in-up');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
   }, []);
 
   const handleContactSubmit = (e: React.FormEvent) => {
@@ -491,34 +508,8 @@ const App = () => {
   ];
 
   const Header = () => (
-    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-white shadow-lg' : 'bg-transparent'}`}>
-      <div className="top-bar bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white py-2 px-4 hidden lg:block">
-        <div className="max-w-7xl mx-auto flex justify-between items-center text-sm">
-          <div className="flex items-center gap-4">
-            <span className="flex items-center gap-2"><MapPin className="w-4 h-4 text-amber-500" /> Nairobi CBD, Kenya</span>
-            <span className="flex items-center gap-2"><Phone className="w-4 h-4 text-amber-500" /> 0703555449</span>
-          </div>
-          <div className="flex items-center gap-4">
-            <span className="text-amber-500 font-medium">Premium Phone Repair Services in Kenya</span>
-            <div className="flex gap-3">
-              <a href="#" className="p-2 rounded-full bg-white/10 hover:bg-white/30 hover:scale-110 transition-all duration-300 cursor-pointer">
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-              </a>
-              <a href="#" className="p-2 rounded-full bg-white/10 hover:bg-white/30 hover:scale-110 transition-all duration-300 cursor-pointer">
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-              </a>
-              <a href="#" className="p-2 rounded-full bg-white/10 hover:bg-white/30 hover:scale-110 transition-all duration-300 cursor-pointer">
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-              </a>
-              <a href="https://wa.me/254703555449" className="p-2 rounded-full bg-green-600 hover:bg-green-500 hover:scale-110 transition-all duration-300 cursor-pointer">
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <div className={`main-header bg-white transition-all duration-300 ${isScrolled ? 'py-2 shadow-sm' : 'py-4'}`}>
+    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-slate-800 shadow-lg' : 'bg-transparent'}`}>
+      <div className={`main-header bg-slate-900/95 backdrop-blur-md transition-all duration-300 ${isScrolled ? 'py-2 shadow-sm' : 'py-4'}`}>
         <div className="max-w-7xl mx-auto px-4 flex justify-between items-center">
           <a href="#" onClick={(e) => { e.preventDefault(); setCurrentPage('home'); }} className="flex items-center gap-3 group">
             <img 
@@ -538,7 +529,7 @@ const App = () => {
                 href="#"
                 onClick={(e) => { e.preventDefault(); setCurrentPage(item.id); }}
                 className={`relative font-medium transition-all duration-300 cursor-pointer ${
-                  currentPage === item.id ? 'text-amber-600' : 'text-slate-700 hover:text-amber-600'
+                  currentPage === item.id ? 'text-amber-600' : 'text-slate-200 hover:text-amber-600'
                 }`}
               >
                 {item.name}
@@ -560,14 +551,14 @@ const App = () => {
               className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
               title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
             >
-              {isDarkMode ? <Sun className="w-5 h-5 text-amber-500" /> : <Moon className="w-5 h-5 text-slate-700" />}
+              {isDarkMode ? <Sun className="w-5 h-5 text-amber-500" /> : <Moon className="w-5 h-5 text-slate-200" />}
             </button>
             <button 
               onClick={() => { setCurrentPage('cart'); window.scrollTo(0, 0); }}
               className="relative p-2 rounded-lg bg-slate-100 hover:bg-slate-200 transition-colors"
               title="Shopping Cart"
             >
-              <ShoppingCart className="w-5 h-5 text-slate-700" />
+              <ShoppingCart className="w-5 h-5 text-slate-200" />
               {cartCount > 0 && (
                 <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
                   {cartCount}
@@ -576,7 +567,7 @@ const App = () => {
             </button>
             <button 
               onClick={() => setIsMenuOpen(true)}
-              className="lg:hidden p-2 text-slate-700 hover:text-amber-600 transition-colors"
+              className="lg:hidden p-2 text-slate-200 hover:text-amber-600 transition-colors"
             >
               <Menu className="w-6 h-6" />
             </button>
@@ -584,7 +575,7 @@ const App = () => {
         </div>
       </div>
 
-      <div className="nav-bar bg-gradient-to-r from-amber-600 to-amber-700 hidden lg:block">
+      <div className="nav-bar bg-gradient-to-r from-amber-600/90 to-amber-700/90 backdrop-blur-sm hidden lg:block">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex justify-between items-center">
             <nav className="flex gap-8 py-3">
@@ -614,8 +605,8 @@ const App = () => {
   const MobileMenu = () => (
     <div className={`mobile-menu fixed inset-0 z-[100] transition-all duration-300 ${isMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
       <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setIsMenuOpen(false)}></div>
-      <div className={`absolute right-0 top-0 h-full w-80 bg-white shadow-2xl transform transition-transform duration-300 ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-        <div className="p-6 border-b border-slate-100">
+      <div className={`absolute right-0 top-0 h-full w-80 bg-slate-800 shadow-2xl transform transition-transform duration-300 ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+        <div className="p-6 border-b border-slate-700/30">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-3">
               <img 
@@ -627,7 +618,7 @@ const App = () => {
                 }}
               />
             </div>
-            <button onClick={() => setIsMenuOpen(false)} className="p-2 text-slate-500 hover:text-slate-700">
+            <button onClick={() => setIsMenuOpen(false)} className="p-2 text-slate-400 hover:text-slate-200">
               <X className="w-6 h-6" />
             </button>
           </div>
@@ -642,7 +633,7 @@ const App = () => {
               className={`block py-3 px-4 rounded-lg font-medium transition-all ${
                 currentPage === item.id 
                   ? 'bg-amber-50 text-amber-600' 
-                  : 'text-slate-700 hover:bg-slate-50'
+                  : 'text-slate-200 hover:bg-slate-800/30'
               }`}
             >
               {item.name}
@@ -650,7 +641,7 @@ const App = () => {
           ))}
         </nav>
 
-        <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-slate-100">
+        <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-slate-700/30">
           <a 
             href="tel:0703555449"
             className="flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 text-white py-3 rounded-lg font-medium"
@@ -664,10 +655,13 @@ const App = () => {
   );
 
   const HeroSection = () => (
-    <section className="relative min-h-[90vh] flex items-center pt-20 overflow-hidden bg-gradient-to-br from-slate-50 via-white to-amber-50">
+    <section className="relative min-h-[90vh] flex items-center pt-20 overflow-hidden bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800">
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-20 right-10 w-96 h-96 bg-amber-200/30 rounded-full blur-3xl"></div>
         <div className="absolute bottom-20 left-10 w-80 h-80 bg-blue-100/30 rounded-full blur-3xl"></div>
+        <div className="absolute top-40 left-20 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl animate-float"></div>
+        <div className="absolute bottom-40 right-20 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-float-delayed"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-amber-600/5 rounded-full blur-3xl animate-ping-slow"></div>
       </div>
       
       <div className="max-w-7xl mx-auto px-4 py-12 grid lg:grid-cols-2 gap-12 items-center relative z-10">
@@ -676,13 +670,13 @@ const App = () => {
             <span className="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></span>
             {heroSlides[currentSlide].subtitle}
           </div>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-800 leading-tight mb-6">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6">
             {heroSlides[currentSlide].title}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-amber-700 block mt-2">
               Professional Service
             </span>
           </h1>
-          <p className="text-lg text-slate-600 mb-8 max-w-xl">
+          <p className="text-lg text-slate-300 mb-8 max-w-xl">
             {heroSlides[currentSlide].description}
           </p>
           <div className="flex flex-wrap gap-4">
@@ -697,17 +691,17 @@ const App = () => {
               href="https://wa.me/254703555449"
               target="_blank"
               rel="noopener noreferrer"
-              className="group flex items-center gap-2 bg-white text-slate-700 px-8 py-4 rounded-xl font-semibold border-2 border-slate-200 hover:border-green-500 hover:text-green-600 hover:shadow-lg transition-all duration-300"
+              className="group flex items-center gap-2 bg-slate-800 text-slate-200 px-8 py-4 rounded-xl font-semibold border-2 border-slate-700/50 hover:border-green-500 hover:text-green-600 hover:shadow-lg transition-all duration-300"
             >
               <span className="text-green-500 group-hover:scale-110 transition-transform duration-300">WhatsApp</span>
             </a>
           </div>
 
-          <div className="flex items-center gap-8 mt-10 pt-10 border-t border-slate-200">
+          <div className="flex items-center gap-8 mt-10 pt-10 border-t border-slate-700/50 reveal">
             {stats.slice(0, 3).map((stat, i) => (
               <div key={i} className="text-center">
                 <div className="text-2xl font-bold text-amber-600">{stat.number}</div>
-                <div className="text-sm text-slate-500">{stat.label}</div>
+                <div className="text-sm text-slate-400">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -718,25 +712,25 @@ const App = () => {
             <div className="absolute inset-0 bg-gradient-to-r from-amber-400 to-orange-500 rounded-3xl rotate-6"></div>
             <div className="relative bg-gradient-to-br from-slate-800 to-slate-900 rounded-3xl p-8 shadow-2xl">
               <div className="grid grid-cols-2 gap-4">
-                <div className="bg-white/10 backdrop-blur rounded-2xl p-6 text-center">
+                <div className="bg-slate-800/10 backdrop-blur rounded-2xl p-6 text-center">
                   <Smartphone className="w-12 h-12 text-amber-400 mx-auto mb-3" />
                   <div className="text-white font-bold text-xl">Screen</div>
-                  <div className="text-slate-400 text-sm">Repair</div>
+                  <div className="text-slate-500 text-sm">Repair</div>
                 </div>
-                <div className="bg-white/10 backdrop-blur rounded-2xl p-6 text-center">
+                <div className="bg-slate-800/10 backdrop-blur rounded-2xl p-6 text-center">
                   <Battery className="w-12 h-12 text-green-400 mx-auto mb-3" />
                   <div className="text-white font-bold text-xl">Battery</div>
-                  <div className="text-slate-400 text-sm">Replacement</div>
+                  <div className="text-slate-500 text-sm">Replacement</div>
                 </div>
-                <div className="bg-white/10 backdrop-blur rounded-2xl p-6 text-center">
+                <div className="bg-slate-800/10 backdrop-blur rounded-2xl p-6 text-center">
                   <Shield className="w-12 h-12 text-blue-400 mx-auto mb-3" />
                   <div className="text-white font-bold text-xl">Back Glass</div>
-                  <div className="text-slate-400 text-sm">Replacement</div>
+                  <div className="text-slate-500 text-sm">Replacement</div>
                 </div>
-                <div className="bg-white/10 backdrop-blur rounded-2xl p-6 text-center">
+                <div className="bg-slate-800/10 backdrop-blur rounded-2xl p-6 text-center">
                   <Zap className="w-12 h-12 text-purple-400 mx-auto mb-3" />
                   <div className="text-white font-bold text-xl">Charging</div>
-                  <div className="text-slate-400 text-sm">Port</div>
+                  <div className="text-slate-500 text-sm">Port</div>
                 </div>
               </div>
               <div className="mt-6 text-center">
@@ -765,20 +759,20 @@ const App = () => {
   );
 
   const FeatureBanner = () => (
-    <section className="py-12 bg-white">
+    <section className="py-12 bg-slate-800">
       <div className="max-w-7xl mx-auto px-4">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
           {features.map((feature, i) => (
             <div 
               key={i} 
-              className="group text-center p-6 rounded-2xl hover:bg-gradient-to-br hover:from-amber-50 hover:to-white transition-all duration-300 cursor-pointer animate-fade-in-up"
+              className="group text-center p-6 rounded-2xl hover:bg-gradient-to-br hover:from-amber-950/30 hover:to-slate-800 transition-all duration-300 cursor-pointer animate-fade-in-up"
               style={{ animationDelay: `${i * 100}ms` }}
             >
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-100 to-amber-200 text-amber-600 mb-4 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
                 {feature.icon}
               </div>
-              <h3 className="font-semibold text-slate-800 mb-1 group-hover:text-amber-600 transition-colors">{feature.title}</h3>
-              <p className="text-sm text-slate-500">{feature.description}</p>
+              <h3 className="font-semibold text-white mb-1 group-hover:text-amber-600 transition-colors">{feature.title}</h3>
+              <p className="text-sm text-slate-400">{feature.description}</p>
             </div>
           ))}
         </div>
@@ -787,14 +781,14 @@ const App = () => {
   );
 
   const ServicesSection = () => (
-    <section id="services" className="py-20 bg-gradient-to-br from-slate-50 to-white">
+    <section id="services" className="py-20 bg-gradient-to-br from-slate-800/50 to-slate-900 reveal">
       <div className="max-w-7xl mx-auto px-4">
         <div className="text-center mb-12">
           <span className="inline-block text-amber-600 font-semibold mb-2">Our Services</span>
-          <h2 className="text-3xl md:text-4xl font-bold text-slate-800 mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             Professional Repair Services
           </h2>
-          <p className="text-slate-600 max-w-2xl mx-auto">
+          <p className="text-slate-300 max-w-2xl mx-auto">
             Expert technicians with years of experience handling all mobile brands
           </p>
         </div>
@@ -807,7 +801,7 @@ const App = () => {
               className={`px-6 py-3 rounded-full font-medium transition-all ${
                 activeTab === cat 
                   ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-lg' 
-                  : 'bg-white text-slate-600 hover:bg-amber-50 hover:text-amber-600 border border-slate-200'
+                  : 'bg-slate-800 text-slate-300 hover:bg-amber-50 hover:text-amber-600 border border-slate-700/50'
               }`}
             >
               {cat}
@@ -819,7 +813,7 @@ const App = () => {
           {filteredServices.map((service, index) => (
             <div 
               key={service.id}
-              className={`group relative bg-white rounded-2xl p-6 shadow-md hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 cursor-pointer animate-fade-in-up ${
+              className={`group relative bg-slate-800 rounded-2xl p-6 shadow-md hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 cursor-pointer animate-fade-in-up ${
                 service.popular ? 'ring-2 ring-amber-500' : ''
               }`}
               style={{ animationDelay: `${index * 100}ms` }}
@@ -834,14 +828,14 @@ const App = () => {
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-100 to-amber-200 text-amber-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                 {service.icon}
               </div>
-              <div className="text-xs font-medium text-slate-400 mb-2">{service.category}</div>
-              <h3 className="font-bold text-slate-800 mb-2">{service.name}</h3>
-              <p className="text-sm text-slate-500 mb-4">{service.description}</p>
+              <div className="text-xs font-medium text-slate-500 mb-2">{service.category}</div>
+              <h3 className="font-bold text-white mb-2">{service.name}</h3>
+              <p className="text-sm text-slate-400 mb-4">{service.description}</p>
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <span className="text-2xl font-bold text-amber-600">KSh {service.price.toLocaleString()}</span>
                 </div>
-                <div className="flex items-center gap-1 text-slate-400 text-sm">
+                <div className="flex items-center gap-1 text-slate-500 text-sm">
                   <Clock className="w-4 h-4" />
                   {service.duration}
                 </div>
@@ -861,14 +855,14 @@ const App = () => {
   );
 
   const GallerySection = () => (
-    <section id="gallery" className="py-20 bg-slate-900">
+    <section id="gallery" className="py-20 bg-slate-900 reveal">
       <div className="max-w-7xl mx-auto px-4">
         <div className="text-center mb-12">
           <span className="inline-block text-amber-500 font-semibold mb-2">Our Work</span>
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             Repair <span className="text-amber-500">Gallery</span>
           </h2>
-          <p className="text-slate-400 max-w-2xl mx-auto">
+          <p className="text-slate-500 max-w-2xl mx-auto">
             See the quality of our work through these completed repairs
           </p>
         </div>
@@ -902,14 +896,14 @@ const App = () => {
   );
 
   const ReviewsSection = () => (
-    <section id="reviews" className="py-20 bg-gradient-to-br from-amber-50 to-white">
+    <section id="reviews" className="py-20 bg-gradient-to-br from-amber-950/20 to-slate-900 reveal">
       <div className="max-w-7xl mx-auto px-4">
         <div className="text-center mb-12">
           <span className="inline-block text-amber-600 font-semibold mb-2">Testimonials</span>
-          <h2 className="text-3xl md:text-4xl font-bold text-slate-800 mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             What Our <span className="text-amber-600">Clients Say</span>
           </h2>
-          <p className="text-slate-600 max-w-2xl mx-auto">
+          <p className="text-slate-300 max-w-2xl mx-auto">
             Real feedback from our valued customers
           </p>
         </div>
@@ -918,7 +912,7 @@ const App = () => {
           {testimonials.map((testimonial, i) => (
             <div 
               key={i}
-              className="group bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+              className="group bg-slate-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
               style={{ animationDelay: `${i * 100}ms` }}
             >
               <div className="flex items-center gap-1 mb-4">
@@ -926,14 +920,14 @@ const App = () => {
                   <Star key={j} className="w-5 h-5 fill-amber-400 text-amber-400" />
                 ))}
               </div>
-              <p className="text-slate-600 mb-6 italic">"{testimonial.text}"</p>
+              <p className="text-slate-300 mb-6 italic">"{testimonial.text}"</p>
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center text-white font-bold">
                   {testimonial.avatar}
                 </div>
                 <div>
-                  <div className="font-bold text-slate-800">{testimonial.name}</div>
-                  <div className="text-sm text-slate-500">{testimonial.role}</div>
+                  <div className="font-bold text-white">{testimonial.name}</div>
+                  <div className="text-sm text-slate-400">{testimonial.role}</div>
                 </div>
               </div>
             </div>
@@ -944,14 +938,14 @@ const App = () => {
   );
 
   const FAQSection = () => (
-    <section id="faq" className="py-20 bg-white">
+    <section id="faq" className="py-20 bg-slate-800 reveal">
       <div className="max-w-3xl mx-auto px-4">
         <div className="text-center mb-12">
           <span className="inline-block text-amber-600 font-semibold mb-2">Help & Support</span>
-          <h2 className="text-3xl md:text-4xl font-bold text-slate-800 mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             Frequently Asked <span className="text-amber-600">Questions</span>
           </h2>
-          <p className="text-slate-600">
+          <p className="text-slate-300">
             Find answers to common questions about our services
           </p>
         </div>
@@ -960,17 +954,17 @@ const App = () => {
           {faqs.map((faq, i) => (
             <div 
               key={i}
-              className={`border border-slate-200 rounded-xl overflow-hidden transition-all ${activeFaq === i ? 'border-amber-500 shadow-lg' : ''}`}
+              className={`border border-slate-700/50 rounded-xl overflow-hidden transition-all ${activeFaq === i ? 'border-amber-500 shadow-lg' : ''}`}
             >
               <button
                 onClick={() => setActiveFaq(activeFaq === i ? null : i)}
-                className="w-full flex items-center justify-between p-5 text-left bg-white hover:bg-slate-50 transition-colors"
+                className="w-full flex items-center justify-between p-5 text-left bg-slate-800 hover:bg-slate-800/30 transition-colors"
               >
-                <span className="font-semibold text-slate-800 pr-4">{faq.q}</span>
+                <span className="font-semibold text-white pr-4">{faq.q}</span>
                 <ChevronDown className={`w-5 h-5 text-amber-600 flex-shrink-0 transition-transform ${activeFaq === i ? 'rotate-180' : ''}`} />
               </button>
               <div className={`overflow-hidden transition-all ${activeFaq === i ? 'max-h-40' : 'max-h-0'}`}>
-                <p className="px-5 pb-5 text-slate-600">{faq.a}</p>
+                <p className="px-5 pb-5 text-slate-300">{faq.a}</p>
               </div>
             </div>
           ))}
@@ -980,20 +974,20 @@ const App = () => {
   );
 
   const AboutSection = () => (
-    <section id="about" className="py-20 bg-slate-50">
+    <section id="about" className="py-20 bg-slate-800/30 reveal">
       <div className="max-w-7xl mx-auto px-4">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div>
             <span className="inline-block text-amber-600 font-semibold mb-2">About Us</span>
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-800 mb-6">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
               Your Trusted Phone Repair Experts in Nairobi
             </h2>
-            <p className="text-slate-600 mb-6">
+            <p className="text-slate-300 mb-6">
               Alphamobitech Phones Solution is a leading mobile phone repair service provider in Kenya. 
               With over 5 years of experience, we've helped thousands of customers restore their devices 
               to perfect working condition.
             </p>
-            <p className="text-slate-600 mb-8">
+            <p className="text-slate-300 mb-8">
               Our team of certified technicians uses state-of-the-art equipment and premium quality parts 
               to ensure your device gets the best care possible. We pride ourselves on fast turnaround 
               times, affordable prices, and exceptional customer service.
@@ -1001,9 +995,9 @@ const App = () => {
 
             <div className="grid grid-cols-2 gap-6 mb-8">
               {stats.map((stat, i) => (
-                <div key={i} className="bg-white rounded-xl p-4 shadow-md">
+                <div key={i} className="bg-slate-800 rounded-xl p-4 shadow-md">
                   <div className="text-3xl font-bold text-amber-600">{stat.number}</div>
-                  <div className="text-sm text-slate-500">{stat.label}</div>
+                  <div className="text-sm text-slate-400">{stat.label}</div>
                 </div>
               ))}
             </div>
@@ -1020,25 +1014,25 @@ const App = () => {
             <div className="absolute inset-0 bg-gradient-to-r from-amber-400 to-orange-500 rounded-3xl rotate-3"></div>
             <div className="relative bg-slate-800 rounded-3xl p-8 shadow-2xl">
               <div className="grid grid-cols-2 gap-4">
-                <div className="bg-white/10 backdrop-blur rounded-2xl p-6 text-center">
+                <div className="bg-slate-800/10 backdrop-blur rounded-2xl p-6 text-center">
                   <Award className="w-12 h-12 text-amber-400 mx-auto mb-3" />
                   <div className="text-white font-bold">Certified</div>
-                  <div className="text-slate-400 text-sm">Technicians</div>
+                  <div className="text-slate-500 text-sm">Technicians</div>
                 </div>
-                <div className="bg-white/10 backdrop-blur rounded-2xl p-6 text-center">
+                <div className="bg-slate-800/10 backdrop-blur rounded-2xl p-6 text-center">
                   <Shield className="w-12 h-12 text-green-400 mx-auto mb-3" />
                   <div className="text-white font-bold">Warranty</div>
-                  <div className="text-slate-400 text-sm">Guaranteed</div>
+                  <div className="text-slate-500 text-sm">Guaranteed</div>
                 </div>
-                <div className="bg-white/10 backdrop-blur rounded-2xl p-6 text-center">
+                <div className="bg-slate-800/10 backdrop-blur rounded-2xl p-6 text-center">
                   <Zap className="w-12 h-12 text-blue-400 mx-auto mb-3" />
                   <div className="text-white font-bold">Fast</div>
-                  <div className="text-slate-400 text-sm">Service</div>
+                  <div className="text-slate-500 text-sm">Service</div>
                 </div>
-                <div className="bg-white/10 backdrop-blur rounded-2xl p-6 text-center">
+                <div className="bg-slate-800/10 backdrop-blur rounded-2xl p-6 text-center">
                   <Users className="w-12 h-12 text-purple-400 mx-auto mb-3" />
                   <div className="text-white font-bold">Expert</div>
-                  <div className="text-slate-400 text-sm">Support</div>
+                  <div className="text-slate-500 text-sm">Support</div>
                 </div>
               </div>
             </div>
@@ -1049,25 +1043,25 @@ const App = () => {
   );
 
   const BookingSection = () => (
-    <section id="booking" className="py-20 bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800">
+    <section id="booking" className="py-20 bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 reveal">
       <div className="max-w-4xl mx-auto px-4">
         <div className="text-center mb-12">
           <span className="inline-block text-amber-500 font-semibold mb-2">Get Started</span>
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             Book Your <span className="text-amber-500">Repair</span>
           </h2>
-          <p className="text-slate-400">
+          <p className="text-slate-500">
             Fill out the form below and we'll get back to you within minutes
           </p>
         </div>
 
         {formSubmitted ? (
-          <div className="bg-white rounded-2xl p-12 text-center">
+          <div className="bg-slate-800 rounded-2xl p-12 text-center">
             <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <CheckCircle className="w-10 h-10 text-green-600" />
             </div>
-            <h3 className="text-2xl font-bold text-slate-800 mb-2">Booking Submitted!</h3>
-            <p className="text-slate-600 mb-6">We'll contact you shortly to confirm your appointment.</p>
+            <h3 className="text-2xl font-bold text-white mb-2">Booking Submitted!</h3>
+            <p className="text-slate-300 mb-6">We'll contact you shortly to confirm your appointment.</p>
             <button 
               onClick={() => setFormSubmitted(false)}
               className="text-amber-600 font-medium hover:underline"
@@ -1076,29 +1070,29 @@ const App = () => {
             </button>
           </div>
         ) : (
-          <div className="bg-white rounded-2xl p-8 shadow-2xl">
+          <div className="bg-slate-800 rounded-2xl p-8 shadow-2xl">
             <form onSubmit={handleBookingSubmit} className="space-y-6">
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Your Name</label>
+                  <label className="block text-sm font-medium text-slate-200 mb-2">Your Name</label>
                   <input 
                     type="text" 
                     required
                     value={bookingForm.name}
                     onChange={(e) => { setBookingForm({...bookingForm, name: e.target.value}); setBookingErrors(prev => ({...prev, name: ''})); }}
-                    className={`w-full px-4 py-3 rounded-xl border ${bookingErrors.name ? 'border-red-500' : 'border-slate-200'} focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all`}
+                    className={`w-full px-4 py-3 rounded-xl border ${bookingErrors.name ? 'border-red-500' : 'border-slate-700/50'} focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all`}
                     placeholder="John Doe"
                   />
                   {bookingErrors.name && <p className="text-red-500 text-sm mt-1">{bookingErrors.name}</p>}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Phone Number</label>
+                  <label className="block text-sm font-medium text-slate-200 mb-2">Phone Number</label>
                   <input 
                     type="tel" 
                     required
                     value={bookingForm.phone}
                     onChange={(e) => { setBookingForm({...bookingForm, phone: e.target.value}); setBookingErrors(prev => ({...prev, phone: ''})); }}
-                    className={`w-full px-4 py-3 rounded-xl border ${bookingErrors.phone ? 'border-red-500' : 'border-slate-200'} focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all`}
+                    className={`w-full px-4 py-3 rounded-xl border ${bookingErrors.phone ? 'border-red-500' : 'border-slate-700/50'} focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all`}
                     placeholder="0700000000"
                   />
                   {bookingErrors.phone && <p className="text-red-500 text-sm mt-1">{bookingErrors.phone}</p>}
@@ -1106,12 +1100,12 @@ const App = () => {
               </div>
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Device Brand</label>
+                  <label className="block text-sm font-medium text-slate-200 mb-2">Device Brand</label>
                   <select 
                     required
                     value={bookingForm.device}
                     onChange={(e) => { setBookingForm({...bookingForm, device: e.target.value}); setBookingErrors(prev => ({...prev, device: ''})); }}
-                    className={`w-full px-4 py-3 rounded-xl border ${bookingErrors.device ? 'border-red-500' : 'border-slate-200'} focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all`}
+                    className={`w-full px-4 py-3 rounded-xl border ${bookingErrors.device ? 'border-red-500' : 'border-slate-700/50'} focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all`}
                   >
                     <option value="">Select Brand</option>
                     <option value="iphone">iPhone</option>
@@ -1125,12 +1119,12 @@ const App = () => {
                   {bookingErrors.device && <p className="text-red-500 text-sm mt-1">{bookingErrors.device}</p>}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Service Required</label>
+                  <label className="block text-sm font-medium text-slate-200 mb-2">Service Required</label>
                   <select 
                     required
                     value={bookingForm.service}
                     onChange={(e) => { setBookingForm({...bookingForm, service: e.target.value}); setBookingErrors(prev => ({...prev, service: ''})); }}
-                    className={`w-full px-4 py-3 rounded-xl border ${bookingErrors.service ? 'border-red-500' : 'border-slate-200'} focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all`}
+                    className={`w-full px-4 py-3 rounded-xl border ${bookingErrors.service ? 'border-red-500' : 'border-slate-700/50'} focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all`}
                   >
                     <option value="">Select Service</option>
                     <option value="screen">Screen Replacement</option>
@@ -1147,12 +1141,12 @@ const App = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Additional Notes</label>
+                <label className="block text-sm font-medium text-slate-200 mb-2">Additional Notes</label>
                 <textarea 
                   rows={4}
                   value={bookingForm.notes}
                   onChange={(e) => setBookingForm({...bookingForm, notes: e.target.value})}
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all resize-none"
+                  className="w-full px-4 py-3 rounded-xl border border-slate-700/50 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all resize-none"
                   placeholder="Describe your issue..."
                 />
               </div>
@@ -1174,14 +1168,14 @@ const App = () => {
   );
 
   const ContactSection = () => (
-    <section id="contact" className="py-20 bg-white">
+    <section id="contact" className="py-20 bg-slate-800 reveal">
       <div className="max-w-7xl mx-auto px-4">
         <div className="text-center mb-12">
           <span className="inline-block text-amber-600 font-semibold mb-2">Contact Us</span>
-          <h2 className="text-3xl md:text-4xl font-bold text-slate-800 mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             Get In <span className="text-amber-600">Touch</span>
           </h2>
-          <p className="text-slate-600 max-w-2xl mx-auto">
+          <p className="text-slate-300 max-w-2xl mx-auto">
             Have questions? We'd love to hear from you
           </p>
         </div>
@@ -1192,7 +1186,7 @@ const App = () => {
               <h3 className="text-2xl font-bold mb-6">Contact Information</h3>
               <div className="space-y-4">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                  <div className="w-12 h-12 bg-slate-800/20 rounded-xl flex items-center justify-center">
                     <MapPin className="w-6 h-6" />
                   </div>
                   <div>
@@ -1201,7 +1195,7 @@ const App = () => {
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                  <div className="w-12 h-12 bg-slate-800/20 rounded-xl flex items-center justify-center">
                     <Phone className="w-6 h-6" />
                   </div>
                   <div>
@@ -1210,7 +1204,7 @@ const App = () => {
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                  <div className="w-12 h-12 bg-slate-800/20 rounded-xl flex items-center justify-center">
                     <Mail className="w-6 h-6" />
                   </div>
                   <div>
@@ -1219,7 +1213,7 @@ const App = () => {
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                  <div className="w-12 h-12 bg-slate-800/20 rounded-xl flex items-center justify-center">
                     <Clock className="w-6 h-6" />
                   </div>
                   <div>
@@ -1230,81 +1224,81 @@ const App = () => {
               </div>
 
               <div className="flex gap-4 mt-8">
-                <a href="#" className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 transition-colors">
+                <a href="#" className="w-10 h-10 bg-slate-800/20 rounded-full flex items-center justify-center hover:bg-slate-800/30 transition-colors">
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
                 </a>
-                <a href="#" className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 transition-colors">
+                <a href="#" className="w-10 h-10 bg-slate-800/20 rounded-full flex items-center justify-center hover:bg-slate-800/30 transition-colors">
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
                 </a>
-                <a href="#" className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 transition-colors">
+                <a href="#" className="w-10 h-10 bg-slate-800/20 rounded-full flex items-center justify-center hover:bg-slate-800/30 transition-colors">
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
                 </a>
-                <a href="https://wa.me/254703555449" className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 transition-colors">
+                <a href="https://wa.me/254703555449" className="w-10 h-10 bg-slate-800/20 rounded-full flex items-center justify-center hover:bg-slate-800/30 transition-colors">
                   <span className="font-bold">WA</span>
                 </a>
               </div>
             </div>
           </div>
 
-          <div className="bg-slate-50 rounded-2xl p-8">
+          <div className="bg-slate-800/30 rounded-2xl p-8">
             {contactSuccess ? (
               <div className="text-center py-8">
                 <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
                   <CheckCircle className="w-10 h-10 text-green-600" />
                 </div>
-                <h3 className="text-2xl font-bold text-slate-800 mb-2">Message Sent!</h3>
-                <p className="text-slate-600">We'll get back to you shortly.</p>
+                <h3 className="text-2xl font-bold text-white mb-2">Message Sent!</h3>
+                <p className="text-slate-300">We'll get back to you shortly.</p>
               </div>
             ) : (
               <>
-                <h3 className="text-2xl font-bold text-slate-800 mb-6">Send us a Message</h3>
+                <h3 className="text-2xl font-bold text-white mb-6">Send us a Message</h3>
                 <form onSubmit={handleContactSubmit} className="space-y-4">
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-2">Name</label>
+                      <label className="block text-sm font-medium text-slate-200 mb-2">Name</label>
                       <input 
                         type="text" 
                         required
                         value={contactFormData.name}
                         onChange={(e) => { setContactFormData({...contactFormData, name: e.target.value}); setContactErrors(prev => ({...prev, name: ''})); }}
-                        className={`w-full px-4 py-3 rounded-xl border ${contactErrors.name ? 'border-red-500' : 'border-slate-200'} focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all`}
+                        className={`w-full px-4 py-3 rounded-xl border ${contactErrors.name ? 'border-red-500' : 'border-slate-700/50'} focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all`}
                         placeholder="Your Name"
                       />
                       {contactErrors.name && <p className="text-red-500 text-sm mt-1">{contactErrors.name}</p>}
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-2">Email</label>
+                      <label className="block text-sm font-medium text-slate-200 mb-2">Email</label>
                       <input 
                         type="email" 
                         required
                         value={contactFormData.email}
                         onChange={(e) => { setContactFormData({...contactFormData, email: e.target.value}); setContactErrors(prev => ({...prev, email: ''})); }}
-                        className={`w-full px-4 py-3 rounded-xl border ${contactErrors.email ? 'border-red-500' : 'border-slate-200'} focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all`}
+                        className={`w-full px-4 py-3 rounded-xl border ${contactErrors.email ? 'border-red-500' : 'border-slate-700/50'} focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all`}
                         placeholder="your@email.com"
                       />
                       {contactErrors.email && <p className="text-red-500 text-sm mt-1">{contactErrors.email}</p>}
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Phone</label>
+                    <label className="block text-sm font-medium text-slate-200 mb-2">Phone</label>
                     <input 
                       type="tel" 
                       required
                       value={contactFormData.phone}
                       onChange={(e) => { setContactFormData({...contactFormData, phone: e.target.value}); setContactErrors(prev => ({...prev, phone: ''})); }}
-                      className={`w-full px-4 py-3 rounded-xl border ${contactErrors.phone ? 'border-red-500' : 'border-slate-200'} focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all`}
+                      className={`w-full px-4 py-3 rounded-xl border ${contactErrors.phone ? 'border-red-500' : 'border-slate-700/50'} focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all`}
                       placeholder="0700000000"
                     />
                     {contactErrors.phone && <p className="text-red-500 text-sm mt-1">{contactErrors.phone}</p>}
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Message</label>
+                    <label className="block text-sm font-medium text-slate-200 mb-2">Message</label>
                     <textarea 
                       rows={4}
                       required
                       value={contactFormData.message}
                       onChange={(e) => { setContactFormData({...contactFormData, message: e.target.value}); setContactErrors(prev => ({...prev, message: ''})); }}
-                      className={`w-full px-4 py-3 rounded-xl border ${contactErrors.message ? 'border-red-500' : 'border-slate-200'} focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all resize-none`}
+                      className={`w-full px-4 py-3 rounded-xl border ${contactErrors.message ? 'border-red-500' : 'border-slate-700/50'} focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all resize-none`}
                       placeholder="Your message..."
                     />
                     {contactErrors.message && <p className="text-red-500 text-sm mt-1">{contactErrors.message}</p>}
@@ -1326,7 +1320,7 @@ const App = () => {
   );
 
   const Footer = () => (
-    <footer className="bg-slate-900 text-white pt-16 pb-8">
+    <footer className="bg-slate-950 text-white pt-16 pb-8">
       <div className="max-w-7xl mx-auto px-4">
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
           <div>
@@ -1340,7 +1334,7 @@ const App = () => {
                 }}
               />
             </div>
-            <p className="text-slate-400 mb-6">
+            <p className="text-slate-500 mb-6">
               Professional phone repair services in Nairobi, Kenya. Expert technicians with warranty on all repairs.
             </p>
             <div className="flex gap-4">
@@ -1367,7 +1361,7 @@ const App = () => {
                   <a 
                     href="#"
                     onClick={(e) => { e.preventDefault(); setCurrentPage(item.id); }}
-                    className="text-slate-400 hover:text-amber-500 transition-colors"
+                    className="text-slate-500 hover:text-amber-500 transition-colors"
                   >
                     {item.name}
                   </a>
@@ -1379,27 +1373,27 @@ const App = () => {
           <div>
             <h4 className="text-lg font-bold mb-6">Services</h4>
             <ul className="space-y-3">
-              <li><a href="#" className="text-slate-400 hover:text-amber-500 transition-colors">Screen Replacement</a></li>
-              <li><a href="#" className="text-slate-400 hover:text-amber-500 transition-colors">Battery Replacement</a></li>
-              <li><a href="#" className="text-slate-400 hover:text-amber-500 transition-colors">Back Glass Replacement</a></li>
-              <li><a href="#" className="text-slate-400 hover:text-amber-500 transition-colors">Charging Port</a></li>
-              <li><a href="#" className="text-slate-400 hover:text-amber-500 transition-colors">Water Damage</a></li>
-              <li><a href="#" className="text-slate-400 hover:text-amber-500 transition-colors">Screen Guard</a></li>
+              <li><a href="#" className="text-slate-500 hover:text-amber-500 transition-colors">Screen Replacement</a></li>
+              <li><a href="#" className="text-slate-500 hover:text-amber-500 transition-colors">Battery Replacement</a></li>
+              <li><a href="#" className="text-slate-500 hover:text-amber-500 transition-colors">Back Glass Replacement</a></li>
+              <li><a href="#" className="text-slate-500 hover:text-amber-500 transition-colors">Charging Port</a></li>
+              <li><a href="#" className="text-slate-500 hover:text-amber-500 transition-colors">Water Damage</a></li>
+              <li><a href="#" className="text-slate-500 hover:text-amber-500 transition-colors">Screen Guard</a></li>
             </ul>
           </div>
 
           <div>
             <h4 className="text-lg font-bold mb-6">Contact Info</h4>
             <ul className="space-y-4">
-              <li className="flex items-center gap-3 text-slate-400">
+              <li className="flex items-center gap-3 text-slate-500">
                 <Phone className="w-5 h-5 text-amber-500" />
                 <span>0703555449</span>
               </li>
-              <li className="flex items-center gap-3 text-slate-400">
+              <li className="flex items-center gap-3 text-slate-500">
                 <Mail className="w-5 h-5 text-amber-500" />
                 <span>odhiamboj791@gmail.com</span>
               </li>
-              <li className="flex items-center gap-3 text-slate-400">
+              <li className="flex items-center gap-3 text-slate-500">
                 <MapPin className="w-5 h-5 text-amber-500" />
                 <span>Nairobi CBD, Kenya</span>
               </li>
@@ -1408,7 +1402,7 @@ const App = () => {
         </div>
 
         <div className="border-t border-slate-800 pt-8 text-center">
-          <p className="text-slate-400">
+          <p className="text-slate-500">
             &copy; {new Date().getFullYear()} Alphamobitech Phones Solution. All rights reserved.
           </p>
           <div className="flex justify-center gap-6 mt-4">
@@ -1417,7 +1411,7 @@ const App = () => {
                 key={link.id}
                 href="#"
                 onClick={(e) => { e.preventDefault(); setCurrentPage(link.id); window.scrollTo(0, 0); }}
-                className="text-slate-500 hover:text-amber-500 text-sm transition-colors"
+                className="text-slate-400 hover:text-amber-500 text-sm transition-colors"
               >
                 {link.name}
               </a>
@@ -1446,17 +1440,17 @@ const App = () => {
     const hotCount = filteredProducts.filter(p => p.badge === 'HOT').length;
 
     return (
-      <section className="py-20 bg-gradient-to-br from-slate-50 via-white to-amber-50/30 min-h-screen">
+      <section className="py-20 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 min-h-screen">
         <div className="max-w-7xl mx-auto px-4 pt-28">
           <div className="text-center mb-8">
             <span className="inline-flex items-center gap-2 bg-green-100 text-green-700 px-4 py-1.5 rounded-full text-sm font-medium mb-3">
               <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
               {inStockCount} Products In Stock
             </span>
-            <h2 className="text-3xl md:text-5xl font-bold text-slate-800 mb-3">
+            <h2 className="text-3xl md:text-5xl font-bold text-white mb-3">
               Phone <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-amber-700">Store</span>
             </h2>
-            <p className="text-slate-600 max-w-2xl mx-auto">
+            <p className="text-slate-300 max-w-2xl mx-auto">
               Best deals on iPhone, Samsung, Redmi & more. Quality guaranteed with warranty.
             </p>
           </div>
@@ -1464,7 +1458,7 @@ const App = () => {
           <div className="bg-gradient-to-r from-amber-500 to-amber-600 rounded-2xl p-6 mb-8 text-white shadow-xl">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-4">
-                <div className="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center">
+                <div className="w-14 h-14 bg-slate-800/20 rounded-xl flex items-center justify-center">
                   <CreditCard className="w-7 h-7" />
                 </div>
                 <div>
@@ -1481,7 +1475,7 @@ const App = () => {
                   </div>
                 </div>
               </div>
-              <div className="bg-white/20 rounded-xl px-4 py-2 text-sm font-medium whitespace-nowrap">
+              <div className="bg-slate-800/20 rounded-xl px-4 py-2 text-sm font-medium whitespace-nowrap">
                 Pay via Lipa Na M-Pesa
               </div>
             </div>
@@ -1511,13 +1505,13 @@ const App = () => {
 
           <div className="flex flex-wrap justify-between items-center gap-4 mb-8">
             <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
               <input
                 type="text"
                 placeholder="Search phones, tablets..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl focus:border-amber-500 focus:ring-2 focus:ring-amber-200 bg-white"
+                className="w-full pl-10 pr-4 py-3 border border-slate-700/50 rounded-xl focus:border-amber-500 focus:ring-2 focus:ring-amber-200 bg-slate-800"
               />
             </div>
             <div className="flex items-center gap-3">
@@ -1552,7 +1546,7 @@ const App = () => {
                 className={`px-5 py-2.5 rounded-full font-medium transition-all shadow-sm ${
                   activeBrand === cat.id
                     ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-amber-200'
-                    : 'bg-white text-slate-700 hover:bg-amber-50 hover:text-amber-600 border border-slate-200'
+                    : 'bg-slate-800 text-slate-200 hover:bg-amber-50 hover:text-amber-600 border border-slate-700/50'
                 }`}
               >
                 <span className="mr-1.5">{cat.icon}</span>
@@ -1562,16 +1556,16 @@ const App = () => {
           </div>
 
           {filteredProducts.length === 0 ? (
-            <div className="text-center py-16 bg-white rounded-2xl shadow-lg">
+            <div className="text-center py-16 bg-slate-800 rounded-2xl shadow-lg">
               <Search className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-slate-800 mb-2">No products found</h3>
-              <p className="text-slate-500">Try adjusting your search or filters</p>
+              <h3 className="text-xl font-semibold text-white mb-2">No products found</h3>
+              <p className="text-slate-400">Try adjusting your search or filters</p>
             </div>
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
               {filteredProducts.map(product => (
-                <div key={product.id} className={`bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 group ${!product.inStock ? 'opacity-70' : ''}`}>
-                  <div className="h-52 bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center relative overflow-hidden">
+                <div key={product.id} className={`bg-slate-800 rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 group ${!product.inStock ? 'opacity-70' : ''}`}>
+                  <div className="h-52 bg-gradient-to-br from-slate-700 to-slate-800 flex items-center justify-center relative overflow-hidden">
                     <img
                       src={product.image}
                       alt={product.name}
@@ -1603,23 +1597,23 @@ const App = () => {
 
                     <button
                       onClick={() => toggleWishlist(product.id)}
-                      className="absolute top-3 right-3 p-2 bg-white/90 backdrop-blur rounded-full shadow-md hover:scale-110 transition-transform"
+                      className="absolute top-3 right-3 p-2 bg-slate-800/90 backdrop-blur rounded-full shadow-md hover:scale-110 transition-transform"
                     >
-                      <Heart className={`w-4 h-4 ${wishlist.includes(product.id) ? 'fill-red-500 text-red-500' : 'text-slate-400'}`} />
+                      <Heart className={`w-4 h-4 ${wishlist.includes(product.id) ? 'fill-red-500 text-red-500' : 'text-slate-500'}`} />
                     </button>
                   </div>
                   
                   <div className="p-4">
                     <div className="flex items-center gap-2 mb-1">
                       <span className={`text-xs font-semibold px-2 py-0.5 rounded ${
-                        product.brand === 'Apple' ? 'bg-slate-100 text-slate-600' :
+                        product.brand === 'Apple' ? 'bg-slate-100 text-slate-300' :
                         product.brand === 'Samsung' ? 'bg-blue-50 text-blue-600' :
                         'bg-orange-50 text-orange-600'
                       }`}>
                         {product.brand}
                       </span>
                     </div>
-                    <h3 className="font-bold text-slate-800 mb-1 text-sm leading-tight line-clamp-2 min-h-[2.5rem]">{product.name}</h3>
+                    <h3 className="font-bold text-white mb-1 text-sm leading-tight line-clamp-2 min-h-[2.5rem]">{product.name}</h3>
                     
                     <div className="flex items-center gap-1.5 mb-3">
                       <div className="flex items-center">
@@ -1627,13 +1621,13 @@ const App = () => {
                           <Star key={i} className={`w-3 h-3 ${i < Math.floor(product.rating) ? 'text-amber-400 fill-amber-400' : 'text-slate-200'}`} />
                         ))}
                       </div>
-                      <span className="text-xs text-slate-400">({product.reviews})</span>
+                      <span className="text-xs text-slate-500">({product.reviews})</span>
                     </div>
 
                     <div className="flex items-center gap-2 mb-3">
                       <span className="text-lg font-bold text-amber-600">KSh {product.price.toLocaleString()}</span>
                       {product.originalPrice && (
-                        <span className="text-xs text-slate-400 line-through">KSh {product.originalPrice.toLocaleString()}</span>
+                        <span className="text-xs text-slate-500 line-through">KSh {product.originalPrice.toLocaleString()}</span>
                       )}
                     </div>
 
@@ -1648,10 +1642,10 @@ const App = () => {
                       <button
                         onClick={() => toggleCompare(product.id)}
                         disabled={compareList.length >= 3 && !compareList.includes(product.id)}
-                        className="p-2.5 bg-slate-50 rounded-xl hover:bg-slate-100 disabled:opacity-30 transition-colors"
+                        className="p-2.5 bg-slate-800/30 rounded-xl hover:bg-slate-100 disabled:opacity-30 transition-colors"
                         title="Compare"
                       >
-                        <Scale className="w-4 h-4 text-slate-600" />
+                        <Scale className="w-4 h-4 text-slate-300" />
                       </button>
                     </div>
                   </div>
@@ -1660,15 +1654,15 @@ const App = () => {
             </div>
           )}
 
-          <div className="mt-12 bg-white rounded-2xl p-6 shadow-lg">
+          <div className="mt-12 bg-slate-800 rounded-2xl p-6 shadow-lg">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
                   <Phone className="w-6 h-6 text-green-600" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-slate-800">Need Help Choosing?</h4>
-                  <p className="text-sm text-slate-500">Contact us for personalized recommendations</p>
+                  <h4 className="font-bold text-white">Need Help Choosing?</h4>
+                  <p className="text-sm text-slate-400">Contact us for personalized recommendations</p>
                 </div>
               </div>
               <a
@@ -1684,9 +1678,9 @@ const App = () => {
 
           {showCompare && compareProducts.length > 0 && (
             <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowCompare(false)}>
-              <div className="bg-white rounded-2xl p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+              <div className="bg-slate-800 rounded-2xl p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
                 <div className="flex justify-between items-center mb-6">
-                  <h3 className="text-xl font-bold text-slate-800">Compare Products</h3>
+                  <h3 className="text-xl font-bold text-white">Compare Products</h3>
                   <button onClick={() => setShowCompare(false)} className="p-2 hover:bg-slate-100 rounded-lg">
                     <X className="w-5 h-5" />
                   </button>
@@ -1697,16 +1691,16 @@ const App = () => {
                       <button onClick={() => toggleCompare(p.id)} className="absolute top-2 right-2 p-1 bg-slate-100 rounded-full">
                         <X className="w-4 h-4" />
                       </button>
-                      <div className="h-32 bg-slate-50 rounded-lg flex items-center justify-center mb-4">
+                      <div className="h-32 bg-slate-800/30 rounded-lg flex items-center justify-center mb-4">
                         {p.category === 'phone' && <Smartphone className="w-16 h-16 text-slate-300" />}
                         {p.category === 'tablet' && <Tablet className="w-16 h-16 text-slate-300" />}
                         {p.category === 'laptop' && <Laptop className="w-16 h-16 text-slate-300" />}
                       </div>
-                      <h4 className="font-bold text-slate-800 text-sm mb-1">{p.name}</h4>
+                      <h4 className="font-bold text-white text-sm mb-1">{p.name}</h4>
                       <p className="text-lg font-bold text-amber-600 mb-3">KSh {p.price.toLocaleString()}</p>
                       <div className="space-y-1.5 text-xs">
                         {p.specs.map((spec, i) => (
-                          <div key={i} className="flex justify-between text-slate-600">
+                          <div key={i} className="flex justify-between text-slate-300">
                             <span>{spec}</span>
                           </div>
                         ))}
@@ -1729,15 +1723,15 @@ const App = () => {
     const wishlistProducts = products.filter(p => wishlist.includes(p.id));
     
     return (
-      <section className="py-20 bg-slate-50 min-h-screen">
+      <section className="py-20 bg-slate-800/30 min-h-screen">
         <div className="max-w-7xl mx-auto px-4 pt-28">
-          <h2 className="text-3xl font-bold text-slate-800 mb-8">My Wishlist</h2>
+          <h2 className="text-3xl font-bold text-white mb-8">My Wishlist</h2>
           
           {wishlistProducts.length === 0 ? (
-            <div className="text-center py-16 bg-white rounded-2xl shadow-lg">
+            <div className="text-center py-16 bg-slate-800 rounded-2xl shadow-lg">
               <Heart className="w-20 h-20 text-slate-300 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-slate-800 mb-2">Your wishlist is empty</h3>
-              <p className="text-slate-500 mb-6">Add items you like to your wishlist</p>
+              <h3 className="text-xl font-semibold text-white mb-2">Your wishlist is empty</h3>
+              <p className="text-slate-400 mb-6">Add items you like to your wishlist</p>
               <button onClick={() => setCurrentPage('store')} className="px-6 py-3 bg-amber-600 text-white rounded-xl font-medium hover:bg-amber-700">
                 Browse Products
               </button>
@@ -1745,7 +1739,7 @@ const App = () => {
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               {wishlistProducts.map(product => (
-                <div key={product.id} className="bg-white rounded-2xl overflow-hidden shadow-lg">
+                <div key={product.id} className="bg-slate-800 rounded-2xl overflow-hidden shadow-lg">
                   <div className="h-48 bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center relative">
                     <img
                       src={product.image}
@@ -1756,13 +1750,13 @@ const App = () => {
                         target.style.display = 'none';
                       }}
                     />
-                    {product.category === 'phone' && <Smartphone className="w-20 h-20 text-slate-400 absolute" />}
-                    {product.category === 'tablet' && <Tablet className="w-20 h-20 text-slate-400 absolute" />}
-                    {product.category === 'laptop' && <Laptop className="w-20 h-20 text-slate-400 absolute" />}
+                    {product.category === 'phone' && <Smartphone className="w-20 h-20 text-slate-500 absolute" />}
+                    {product.category === 'tablet' && <Tablet className="w-20 h-20 text-slate-500 absolute" />}
+                    {product.category === 'laptop' && <Laptop className="w-20 h-20 text-slate-500 absolute" />}
                   </div>
                   <div className="p-5">
                     <div className="text-xs text-amber-600 font-medium mb-1">{product.brand}</div>
-                    <h3 className="font-bold text-slate-800 mb-2">{product.name}</h3>
+                    <h3 className="font-bold text-white mb-2">{product.name}</h3>
                     <div className="flex items-center gap-2 mb-4">
                       <span className="text-xl font-bold text-amber-600">KSh {product.price.toLocaleString()}</span>
                     </div>
@@ -1791,15 +1785,15 @@ const App = () => {
   };
 
   const CartSection = () => (
-    <section className="py-20 bg-slate-50 min-h-screen">
+    <section className="py-20 bg-slate-800/30 min-h-screen">
       <div className="max-w-7xl mx-auto px-4 pt-28">
-        <h2 className="text-3xl font-bold text-slate-800 mb-8">Shopping Cart</h2>
+        <h2 className="text-3xl font-bold text-white mb-8">Shopping Cart</h2>
         
         {cart.length === 0 ? (
-          <div className="text-center py-16 bg-white rounded-2xl shadow-lg">
+          <div className="text-center py-16 bg-slate-800 rounded-2xl shadow-lg">
             <ShoppingCart className="w-20 h-20 text-slate-300 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-slate-800 mb-2">Your cart is empty</h3>
-            <p className="text-slate-500 mb-6">Start shopping to add items to your cart</p>
+            <h3 className="text-xl font-semibold text-white mb-2">Your cart is empty</h3>
+            <p className="text-slate-400 mb-6">Start shopping to add items to your cart</p>
             <button onClick={() => setCurrentPage('store')} className="px-6 py-3 bg-amber-600 text-white rounded-xl font-medium hover:bg-amber-700">
               Browse Products
             </button>
@@ -1808,7 +1802,7 @@ const App = () => {
           <div className="grid lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 space-y-4">
               {cart.map(item => (
-                <div key={item.product.id} className="bg-white rounded-xl p-4 shadow-lg flex gap-4">
+                <div key={item.product.id} className="bg-slate-800 rounded-xl p-4 shadow-lg flex gap-4">
                   <div className="w-24 h-24 bg-slate-100 rounded-lg flex items-center justify-center relative">
                     <img
                       src={item.product.image}
@@ -1819,15 +1813,15 @@ const App = () => {
                         target.style.display = 'none';
                       }}
                     />
-                    {item.product.category === 'phone' && <Smartphone className="w-12 h-12 text-slate-400 absolute" />}
-                    {item.product.category === 'tablet' && <Tablet className="w-12 h-12 text-slate-400 absolute" />}
-                    {item.product.category === 'laptop' && <Laptop className="w-12 h-12 text-slate-400 absolute" />}
+                    {item.product.category === 'phone' && <Smartphone className="w-12 h-12 text-slate-500 absolute" />}
+                    {item.product.category === 'tablet' && <Tablet className="w-12 h-12 text-slate-500 absolute" />}
+                    {item.product.category === 'laptop' && <Laptop className="w-12 h-12 text-slate-500 absolute" />}
                   </div>
                   <div className="flex-1">
                     <div className="flex justify-between">
                       <div>
-                        <h3 className="font-semibold text-slate-800">{item.product.name}</h3>
-                        <p className="text-sm text-slate-500">{item.product.category}</p>
+                        <h3 className="font-semibold text-white">{item.product.name}</h3>
+                        <p className="text-sm text-slate-400">{item.product.category}</p>
                       </div>
                       <button onClick={() => removeFromCart(item.product.id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg">
                         <Trash2 className="w-5 h-5" />
@@ -1849,14 +1843,14 @@ const App = () => {
                 </div>
               ))}
             </div>
-            <div className="bg-white rounded-xl p-6 shadow-lg h-fit">
-              <h3 className="text-lg font-semibold text-slate-800 mb-4">Order Summary</h3>
+            <div className="bg-slate-800 rounded-xl p-6 shadow-lg h-fit">
+              <h3 className="text-lg font-semibold text-white mb-4">Order Summary</h3>
               <div className="space-y-3 mb-4">
-                <div className="flex justify-between text-slate-600">
+                <div className="flex justify-between text-slate-300">
                   <span>Subtotal ({cartCount} items)</span>
                   <span>KSh {cartTotal.toLocaleString()}</span>
                 </div>
-                <div className="flex justify-between text-slate-600">
+                <div className="flex justify-between text-slate-300">
                   <span>Delivery</span>
                   <span className="text-green-600">Free</span>
                 </div>
@@ -1900,17 +1894,17 @@ const App = () => {
   };
 
   const TrackOrderSection = () => (
-    <section className="py-20 bg-slate-50 min-h-screen">
+    <section className="py-20 bg-slate-800/30 min-h-screen">
       <div className="max-w-2xl mx-auto px-4 pt-28">
-        <h2 className="text-3xl font-bold text-slate-800 mb-8 text-center">Track Your Order</h2>
-        <div className="bg-white rounded-xl p-6 shadow-lg">
+        <h2 className="text-3xl font-bold text-white mb-8 text-center">Track Your Order</h2>
+        <div className="bg-slate-800 rounded-xl p-6 shadow-lg">
           <div className="flex gap-4">
             <input
               type="text"
               placeholder="Enter order ID (e.g., ORD001)"
               value={trackOrderId}
               onChange={(e) => setTrackOrderId(e.target.value)}
-              className="flex-1 px-4 py-3 border border-slate-200 rounded-xl focus:border-amber-500 focus:ring-2"
+              className="flex-1 px-4 py-3 border border-slate-700/50 rounded-xl focus:border-amber-500 focus:ring-2"
             />
             <button onClick={handleTrackOrder} className="px-6 py-3 bg-amber-600 text-white rounded-xl font-medium hover:bg-amber-700">
               Track
@@ -1922,9 +1916,9 @@ const App = () => {
                 <CheckCircle className="w-6 h-6" />
                 <span className="font-semibold">Order Found</span>
               </div>
-              <p className="text-slate-800">Order ID: <strong>{trackedOrder.id}</strong></p>
-              <p className="text-slate-600">Status: <span className="text-green-600 font-medium">{trackedOrder.status}</span></p>
-              <p className="text-slate-500 text-sm">Date: {trackedOrder.date}</p>
+              <p className="text-white">Order ID: <strong>{trackedOrder.id}</strong></p>
+              <p className="text-slate-300">Status: <span className="text-green-600 font-medium">{trackedOrder.status}</span></p>
+              <p className="text-slate-400 text-sm">Date: {trackedOrder.date}</p>
             </div>
           )}
           {trackOrderId && !trackedOrder && (
@@ -1938,13 +1932,13 @@ const App = () => {
   );
 
   const CheckoutSection = () => (
-    <section className="py-20 bg-slate-50 min-h-screen">
+    <section className="py-20 bg-slate-800/30 min-h-screen">
       <div className="max-w-7xl mx-auto px-4 pt-28">
         {checkoutSuccess ? (
-          <div className="text-center py-16 bg-white rounded-2xl shadow-lg">
+          <div className="text-center py-16 bg-slate-800 rounded-2xl shadow-lg">
             <CheckCircle className="w-20 h-20 text-green-500 mx-auto mb-4" />
-            <h3 className="text-2xl font-bold text-slate-800 mb-2">Order Placed Successfully!</h3>
-            <p className="text-slate-500 mb-6">We&apos;ll contact you shortly to confirm your order.</p>
+            <h3 className="text-2xl font-bold text-white mb-2">Order Placed Successfully!</h3>
+            <p className="text-slate-400 mb-6">We&apos;ll contact you shortly to confirm your order.</p>
             <button onClick={() => { setCheckoutSuccess(false); setCart([]); setCurrentPage('home'); }} className="px-6 py-3 bg-amber-600 text-white rounded-xl font-medium hover:bg-amber-700">
               Back to Home
             </button>
@@ -1952,27 +1946,27 @@ const App = () => {
         ) : (
           <div className="grid lg:grid-cols-2 gap-8">
             <div>
-              <h2 className="text-2xl font-bold text-slate-800 mb-6">Checkout</h2>
-              <form onSubmit={handleCheckoutSubmit} className="bg-white rounded-xl p-6 shadow-lg space-y-4">
+              <h2 className="text-2xl font-bold text-white mb-6">Checkout</h2>
+              <form onSubmit={handleCheckoutSubmit} className="bg-slate-800 rounded-xl p-6 shadow-lg space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Full Name</label>
-                  <input type="text" required value={checkoutData.name} onChange={e => setCheckoutData({...checkoutData, name: e.target.value})} className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:border-amber-500 focus:ring-2 focus:ring-amber-200" placeholder="John Doe" />
+                  <label className="block text-sm font-medium text-slate-200 mb-2">Full Name</label>
+                  <input type="text" required value={checkoutData.name} onChange={e => setCheckoutData({...checkoutData, name: e.target.value})} className="w-full px-4 py-3 border border-slate-700/50 rounded-xl focus:border-amber-500 focus:ring-2 focus:ring-amber-200" placeholder="John Doe" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Email</label>
-                  <input type="email" required value={checkoutData.email} onChange={e => setCheckoutData({...checkoutData, email: e.target.value})} className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:border-amber-500 focus:ring-2 focus:ring-amber-200" placeholder="john@email.com" />
+                  <label className="block text-sm font-medium text-slate-200 mb-2">Email</label>
+                  <input type="email" required value={checkoutData.email} onChange={e => setCheckoutData({...checkoutData, email: e.target.value})} className="w-full px-4 py-3 border border-slate-700/50 rounded-xl focus:border-amber-500 focus:ring-2 focus:ring-amber-200" placeholder="john@email.com" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Phone</label>
-                  <input type="tel" required value={checkoutData.phone} onChange={e => setCheckoutData({...checkoutData, phone: e.target.value})} className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:border-amber-500 focus:ring-2 focus:ring-amber-200" placeholder="0700000000" />
+                  <label className="block text-sm font-medium text-slate-200 mb-2">Phone</label>
+                  <input type="tel" required value={checkoutData.phone} onChange={e => setCheckoutData({...checkoutData, phone: e.target.value})} className="w-full px-4 py-3 border border-slate-700/50 rounded-xl focus:border-amber-500 focus:ring-2 focus:ring-amber-200" placeholder="0700000000" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Delivery Address</label>
-                  <input type="text" required value={checkoutData.address} onChange={e => setCheckoutData({...checkoutData, address: e.target.value})} className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:border-amber-500 focus:ring-2 focus:ring-amber-200" placeholder="Street address" />
+                  <label className="block text-sm font-medium text-slate-200 mb-2">Delivery Address</label>
+                  <input type="text" required value={checkoutData.address} onChange={e => setCheckoutData({...checkoutData, address: e.target.value})} className="w-full px-4 py-3 border border-slate-700/50 rounded-xl focus:border-amber-500 focus:ring-2 focus:ring-amber-200" placeholder="Street address" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">City</label>
-                  <select value={checkoutData.city} onChange={e => setCheckoutData({...checkoutData, city: e.target.value})} className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:border-amber-500 focus:ring-2 focus:ring-amber-200">
+                  <label className="block text-sm font-medium text-slate-200 mb-2">City</label>
+                  <select value={checkoutData.city} onChange={e => setCheckoutData({...checkoutData, city: e.target.value})} className="w-full px-4 py-3 border border-slate-700/50 rounded-xl focus:border-amber-500 focus:ring-2 focus:ring-amber-200">
                     <option>Nairobi</option>
                     <option>Mombasa</option>
                     <option>Kisumu</option>
@@ -1981,17 +1975,17 @@ const App = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Payment Method</label>
+                  <label className="block text-sm font-medium text-slate-200 mb-2">Payment Method</label>
                   <div className="space-y-2">
                     <label className="flex items-center gap-3 p-3 border border-amber-500 rounded-xl bg-amber-50 cursor-pointer">
                       <input type="radio" name="payment" value="mpesa" checked={checkoutData.paymentMethod === 'mpesa'} onChange={e => setCheckoutData({...checkoutData, paymentMethod: e.target.value})} />
                       <span>M-Pesa</span>
                     </label>
-                    <label className="flex items-center gap-3 p-3 border border-slate-200 rounded-xl cursor-pointer">
+                    <label className="flex items-center gap-3 p-3 border border-slate-700/50 rounded-xl cursor-pointer">
                       <input type="radio" name="payment" value="cash" checked={checkoutData.paymentMethod === 'cash'} onChange={e => setCheckoutData({...checkoutData, paymentMethod: e.target.value})} />
                       <span>Cash on Delivery</span>
                     </label>
-                    <label className="flex items-center gap-3 p-3 border border-slate-200 rounded-xl cursor-pointer">
+                    <label className="flex items-center gap-3 p-3 border border-slate-700/50 rounded-xl cursor-pointer">
                       <input type="radio" name="payment" value="card" checked={checkoutData.paymentMethod === 'card'} onChange={e => setCheckoutData({...checkoutData, paymentMethod: e.target.value})} />
                       <span>Card Payment</span>
                     </label>
@@ -2003,13 +1997,13 @@ const App = () => {
               </form>
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-slate-800 mb-4">Order Summary</h3>
-              <div className="bg-white rounded-xl p-6 shadow-lg space-y-4">
+              <h3 className="text-lg font-semibold text-white mb-4">Order Summary</h3>
+              <div className="bg-slate-800 rounded-xl p-6 shadow-lg space-y-4">
                 {cart.map(item => (
                   <div key={item.product.id} className="flex justify-between">
                     <div>
-                      <span className="text-slate-800">{item.product.name}</span>
-                      <span className="text-slate-500 text-sm ml-2">x{item.quantity}</span>
+                      <span className="text-white">{item.product.name}</span>
+                      <span className="text-slate-400 text-sm ml-2">x{item.quantity}</span>
                     </div>
                     <span className="font-medium">KSh {(item.product.price * item.quantity).toLocaleString()}</span>
                   </div>
@@ -2031,7 +2025,7 @@ const App = () => {
       href="https://wa.me/254703555449?text=Hello%2C%20I%20need%20phone%20repair%20services"
       target="_blank"
       rel="noopener noreferrer"
-      className="fixed bottom-6 right-6 w-16 h-16 bg-green-500 rounded-full flex items-center justify-center text-white shadow-2xl hover:bg-green-600 hover:scale-110 transition-all z-50 animate-bounce"
+      className="fixed bottom-6 right-6 w-16 h-16 bg-green-500 rounded-full flex items-center justify-center text-white shadow-2xl hover:bg-green-600 hover:scale-110 transition-all z-50 animate-bounce animate-glow-pulse"
     >
       <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
         <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
@@ -2040,7 +2034,7 @@ const App = () => {
   );
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-slate-900 text-slate-100">
       {isLoading && <PageLoader />}
       {currentPage !== 'admin' && <Header />}
       {currentPage !== 'admin' && <MobileMenu />}
