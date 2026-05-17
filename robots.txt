@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://alphamobitech.vercel.app/sitemap.xml
+
+# Crawl-delay
+Crawl-delay: 1
+
+# Sitemaps
+Sitemap: https://alphamobitech.vercel.app/sitemap.xml
+
+# Disallow admin areas
+Disallow: /api/
+Disallow: /admin/

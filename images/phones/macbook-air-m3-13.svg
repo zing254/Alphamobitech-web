@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
+  <rect fill="#f8fafc" width="400" height="300"/>
+  <rect x="70" y="40" width="260" height="170" rx="10" fill="#e2e8f0" stroke="#cbd5e1" stroke-width="2"/>
+  <rect x="85" y="55" width="230" height="140" rx="4" fill="#334155"/>
+  <rect x="175" y="198" width="50" height="7" rx="3" fill="#cbd5e1"/>
+  <rect x="130" y="210" width="140" height="5" rx="2" fill="#e2e8f0"/>
+  <text x="200" y="248" text-anchor="middle" font-family="system-ui, sans-serif" font-size="20" font-weight="600" fill="#0f172a">MacBook Air M3 13"</text>
+  <text x="200" y="270" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" fill="#64748b">M3 · 8GB RAM · 256GB · Midnight</text>
+</svg>
