@@ -4,6 +4,18 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     
+    <!-- Preconnect for performance -->
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+    <link rel="preconnect" href="https://www.google-analytics.com" crossorigin>
+    <link rel="preconnect" href="https://wa.me" crossorigin>
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com">
+    <link rel="dns-prefetch" href="https://www.google-analytics.com">
+    
+    <!-- Google Fonts with display swap -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <!-- Primary Meta Tags -->
     <title>Alphamobitech Phones Solution Kenya | Mobile Repair & Services</title>
     <meta name="title" content="Alphamobitech Phones Solution Kenya | Mobile Repair & Services" />
@@ -59,8 +71,8 @@
     <meta name="ICBM" content="-1.2921,36.8219" />
     
     <!-- Contact -->
-    <meta name="contact" content="+254703555449" />
-    <meta name="email" content="odhiamboj791@gmail.com" />
+     <meta name="contact" content="+254703555449" />
+     <meta name="email" content="alphamobitech767@gmail.com" />
     
     <!-- JSON-LD Structured Data -->
     <script type="application/ld+json">
@@ -72,18 +84,18 @@
       "description": "Premium mobile phone repair services in Nairobi, Kenya. Expert technicians offering screen replacement, battery, FRP bypass, software flashing, and data recovery services.",
       "url": "https://alphamobitech.vercel.app/",
       "telephone": "+254703555449",
-      "email": "odhiamboj791@gmail.com",
+       "email": "alphamobitech767@gmail.com",
       "priceRange": "KSh 1,500 - KSh 4,000",
       "currenciesAccepted": "KES",
       "paymentAccepted": "Cash, M-Pesa",
-      "openingHoursSpecification": [
-        {
-          "@type": "OpeningHoursSpecification",
-          "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-          "opens": "08:00",
-          "closes": "18:00"
-        }
-      ],
+       "openingHoursSpecification": [
+         {
+           "@type": "OpeningHoursSpecification",
+           "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+           "opens": "07:00",
+           "closes": "20:00"
+         }
+       ],
       "geo": {
         "@type": "GeoCoordinates",
         "latitude": "-1.2921",
@@ -91,7 +103,7 @@
       },
       "address": {
         "@type": "PostalAddress",
-        "streetAddress": "Stan Bank House, 3rd Floor Room 10",
+         "streetAddress": "Stan Bank Building, Moi Avenue, Across Archives Floor 3 Room 10",
         "addressLocality": "Nairobi",
         "addressRegion": "Nairobi County",
         "addressCountry": "KE"
@@ -221,6 +233,55 @@
     }
     </script>
     
+    <!-- BreadcrumbList Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://alphamobitech.vercel.app/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Services",
+          "item": "https://alphamobitech.vercel.app/#services"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Store",
+          "item": "https://alphamobitech.vercel.app/store"
+        },
+        {
+          "@type": "ListItem",
+          "position": 4,
+          "name": "Contact",
+          "item": "https://alphamobitech.vercel.app/#contact"
+        }
+      ]
+    }
+    </script>
+    
+    <!-- Site Navigation Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Alphamobitech Phones Solution",
+      "url": "https://alphamobitech.vercel.app/",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://alphamobitech.vercel.app/store?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+    
     <!-- Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-VVhlKW5YoKXiTUfRe"></script>
     <script>
@@ -233,5 +294,12 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(() => {});
+        });
+      }
+    </script>
   </body>
 </html>

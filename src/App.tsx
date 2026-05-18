@@ -6,7 +6,7 @@ import {
   Send, CheckCircle, Menu, X, ChevronDown, Users,
   Award, Truck, CreditCard, Headphones, Moon, Sun,
   Check, ShoppingCart, Trash2, Plus, Minus, Laptop, Tablet,
-  Search, Heart, Scale, ImageOff
+  Search, Heart, Scale, ImageOff, ArrowUp, XCircle
 } from 'lucide-react';
 import AdminDashboard from './AdminDashboard';
 import { PageLoader } from './components/Loading';
@@ -128,6 +128,13 @@ const App = () => {
   const [showCompare, setShowCompare] = useState(false);
   const [bookingErrors, setBookingErrors] = useState<Record<string, string>>({});
   const [contactErrors, setContactErrors] = useState<Record<string, string>>({});
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+  const [showBackToTop, setShowBackToTop] = useState(false);
+
+  const showToast = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 800);
@@ -165,6 +172,96 @@ const App = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    const handleScroll = () => setShowBackToTop(window.scrollY > 500);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Page-specific SEO titles and descriptions
+  useEffect(() => {
+    const pageMeta: Record<string, { title: string; description: string }> = {
+      home: {
+        title: 'Alphamobitech Phones Solution | Phone Repair Nairobi Kenya',
+        description: 'Premium mobile repair services in Nairobi, Kenya. Screen replacement, battery, back glass, charging port. Expert technicians with warranty. Same-day service.',
+      },
+      services: {
+        title: 'Phone Repair Services Nairobi | Screen, Battery, FRP Bypass | Alphamobitech',
+        description: 'Professional phone repair services in Nairobi. Screen replacement from KSh 2,800, battery replacement from KSh 2,000, FRP bypass, data recovery, software flashing.',
+      },
+      store: {
+        title: 'Buy Phones Nairobi Kenya | iPhone, Samsung, Redmi | Alphamobitech Store',
+        description: 'Shop new and refurbished phones in Nairobi. Best prices on iPhone, Samsung Galaxy, Redmi, and more. Quality guaranteed with warranty. M-Pesa accepted.',
+      },
+      gallery: {
+        title: 'Repair Gallery | Before & After Photos | Alphamobitech',
+        description: 'See our repair quality through before and after photos. Screen replacements, battery services, water damage recovery, and more.',
+      },
+      reviews: {
+        title: 'Customer Reviews | What Clients Say | Alphamobitech',
+        description: 'Real feedback from our valued customers. 4.9/5 average rating from 127+ reviews. See why Nairobi trusts Alphamobitech for phone repairs.',
+      },
+      faq: {
+        title: 'FAQ | Phone Repair Questions Answered | Alphamobitech',
+        description: 'Frequently asked questions about phone repair services. Learn about repair times, warranties, pricing, and more.',
+      },
+      contact: {
+        title: 'Contact Us | Phone Repair Nairobi | Alphamobitech',
+        description: 'Get in touch with Alphamobitech. Call 0703555449, WhatsApp, or visit us at Stan Bank Building, Moi Avenue, Nairobi CBD. Open Mon-Sat 7AM-8PM.',
+      },
+      about: {
+        title: 'About Us | Phone Repair Experts Nairobi | Alphamobitech',
+        description: 'Learn about Alphamobitech - Nairobi\'s trusted phone repair experts. 5+ years experience, 500+ happy customers, certified technicians.',
+      },
+      booking: {
+        title: 'Book a Repair | Schedule Your Phone Repair | Alphamobitech',
+        description: 'Book your phone repair online. Fast, easy booking with same-day service. Screen replacement, battery, charging port, and more.',
+      },
+      cart: {
+        title: 'Shopping Cart | Phone Store | Alphamobitech',
+        description: 'Review your selected phones and accessories. Secure checkout with M-Pesa. Free delivery in Nairobi.',
+      },
+      wishlist: {
+        title: 'My Wishlist | Saved Phones | Alphamobitech',
+        description: 'Your saved phones and accessories. Compare prices and buy when ready.',
+      },
+      orders: {
+        title: 'Track Your Order | Alphamobitech',
+        description: 'Track your phone order status. Enter your order ID to see real-time updates.',
+      },
+      privacy: {
+        title: 'Privacy Policy | Alphamobitech',
+        description: 'Our privacy policy explains how we collect, use, and protect your personal information.',
+      },
+      terms: {
+        title: 'Terms of Service | Alphamobitech',
+        description: 'Terms and conditions for using Alphamobitech services and purchasing products.',
+      },
+    };
+
+    const meta = pageMeta[currentPage] || pageMeta.home;
+    document.title = meta.title;
+
+    // Update meta description
+    let metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc) {
+      metaDesc.setAttribute('content', meta.description);
+    }
+
+    // Update Open Graph title and description
+    let ogTitle = document.querySelector('meta[property="og:title"]');
+    if (ogTitle) ogTitle.setAttribute('content', meta.title);
+    let ogDesc = document.querySelector('meta[property="og:description"]');
+    if (ogDesc) ogDesc.setAttribute('content', meta.description);
+    let twitterTitle = document.querySelector('meta[name="twitter:title"]');
+    if (twitterTitle) twitterTitle.setAttribute('content', meta.title);
+    let twitterDesc = document.querySelector('meta[name="twitter:description"]');
+    if (twitterDesc) twitterDesc.setAttribute('content', meta.description);
+
+    // Scroll to top on page change
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [currentPage]);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentSlide((prev) => (prev + 1) % 3), 6000);
@@ -223,7 +320,8 @@ const App = () => {
     }
     setBookingErrors({});
     const confirmationNumber = generateConfirmationNumber();
-    console.log('Booking submitted:', { ...sanitized, confirmationNumber });
+    // In production, send to backend
+    void confirmationNumber;
     setFormSubmitted(true);
   };
 
@@ -238,6 +336,7 @@ const App = () => {
     } else {
       setCart([...cart, { product, quantity: 1 }]);
     }
+    showToast(`${product.name} added to cart!`, 'success');
   };
 
   const removeFromCart = (productId: number) => {
@@ -397,10 +496,10 @@ const App = () => {
     { id: 94, name: 'iPhone 15 Pro Max 512GB', brand: 'Apple', category: 'phone', price: 95000, description: '512GB Storage. A17 Pro. Titanium max.', specs: ['512GB Storage', 'A17 Pro', '6.7" OLED 120Hz', '48MP Triple'], features: ['Refurbished', '6 Months Warranty'], image: '/images/phones/15-pro-max-512gb.jpg', inStock: true, rating: 5.0, reviews: 52 },
     { id: 95, name: 'iPhone 16 Pro Max 256GB', brand: 'Apple', category: 'phone', price: 113000, description: '256GB Storage. A18 Pro. Latest flagship.', specs: ['256GB Storage', 'A18 Pro', '6.9" OLED 120Hz', '48MP Triple'], features: ['Brand New', '1 Year Warranty'], image: '/images/phones/16-pro-max-256gb.jpg', inStock: true, rating: 5.0, reviews: 25, badge: 'NEW' },
     { id: 96, name: 'iPhone 16 Pro Max 512GB', brand: 'Apple', category: 'phone', price: 122000, description: '512GB Storage. A18 Pro. Ultimate.', specs: ['512GB Storage', 'A18 Pro', '6.9" OLED 120Hz', '48MP Triple'], features: ['Brand New', '1 Year Warranty'], image: '/images/phones/16-pro-max-512gb.jpg', inStock: true, rating: 5.0, reviews: 18, badge: 'NEW' },
-    { id: 97, name: 'iPad Pro 12.9"', brand: 'Apple', category: 'tablet', price: 155000, description: '256GB, Wi-Fi. M2 chip.', specs: ['256GB Storage', 'M2 Chip', '12.9" Display', 'Face ID'], features: ['Free Delivery', '1 Year Warranty'], image: '/images/phones/ipad-pro-129.svg', inStock: true, rating: 4.9, reviews: 67 },
-    { id: 98, name: 'iPad Pro 11"', brand: 'Apple', category: 'tablet', price: 125000, description: '256GB, Wi-Fi. M2 chip.', specs: ['256GB Storage', 'M2 Chip', '11" Display', 'Face ID'], features: ['Free Delivery', '1 Year Warranty'], image: '/images/phones/ipad-pro-11.svg', inStock: true, rating: 4.8, reviews: 56 },
-    { id: 99, name: 'MacBook Pro 16"', brand: 'Apple', category: 'laptop', price: 385000, description: 'M3 Pro, 18GB RAM, 512GB.', specs: ['512GB SSD', 'M3 Pro', '16.2" Display', '18GB RAM'], features: ['Free Delivery', '1 Year Warranty'], image: '/images/phones/macbook-pro-16.svg', inStock: true, rating: 4.9, reviews: 123 },
-    { id: 100, name: 'MacBook Air M3 13"', brand: 'Apple', category: 'laptop', price: 165000, description: '256GB, 8GB RAM. Midnight.', specs: ['256GB SSD', 'M3 Chip', '13.6" Display', '8GB RAM'], features: ['Free Delivery', '1 Year Warranty'], image: '/images/phones/macbook-air-m3-13.svg', inStock: true, rating: 4.8, reviews: 98 },
+    { id: 97, name: 'iPad Pro 12.9"', brand: 'Apple', category: 'tablet', price: 155000, description: '256GB, Wi-Fi. M2 chip.', specs: ['256GB Storage', 'M2 Chip', '12.9" Display', 'Face ID'], features: ['Free Delivery', '1 Year Warranty'], image: '/images/phones/ipad-pro-129.jpg', inStock: true, rating: 4.9, reviews: 67 },
+    { id: 98, name: 'iPad Pro 11"', brand: 'Apple', category: 'tablet', price: 125000, description: '256GB, Wi-Fi. M2 chip.', specs: ['256GB Storage', 'M2 Chip', '11" Display', 'Face ID'], features: ['Free Delivery', '1 Year Warranty'], image: '/images/phones/ipad-pro-11.jpg', inStock: true, rating: 4.8, reviews: 56 },
+    { id: 99, name: 'MacBook Pro 16"', brand: 'Apple', category: 'laptop', price: 385000, description: 'M3 Pro, 18GB RAM, 512GB.', specs: ['512GB SSD', 'M3 Pro', '16.2" Display', '18GB RAM'], features: ['Free Delivery', '1 Year Warranty'], image: '/images/phones/macbook-pro-16.jpg', inStock: true, rating: 4.9, reviews: 123 },
+    { id: 100, name: 'MacBook Air M3 13"', brand: 'Apple', category: 'laptop', price: 165000, description: '256GB, 8GB RAM. Midnight.', specs: ['256GB SSD', 'M3 Chip', '13.6" Display', '8GB RAM'], features: ['Free Delivery', '1 Year Warranty'], image: '/images/phones/macbook-air-m3-13.jpg', inStock: true, rating: 4.8, reviews: 98 },
   ];
 
   const services: Service[] = [
@@ -446,22 +545,19 @@ const App = () => {
       title: 'Expert Phone Repair Services', 
       subtitle: 'All Brands Supported', 
       description: 'Premium repair services for iPhone, Samsung, OnePlus, Google Pixel and more. Get your device back to perfect condition.',
-      cta: 'Book Now',
-      image: 'phone-repair-hero.svg'
+      cta: 'Book Now'
     },
     { 
       title: 'Battery Replacement', 
       subtitle: 'All Brands', 
       description: 'Original capacity batteries for iPhone, Samsung, OnePlus and more. Fast replacement service.',
-      cta: 'Get Help Now',
-      image: 'battery-service.svg'
+      cta: 'Get Help Now'
     },
     { 
       title: 'Charging Port Repair', 
       subtitle: 'Expert Technicians', 
       description: 'Fix charging issues for all brands. Your trusted mobile repair experts in Kenya.',
-      cta: 'Learn More',
-      image: 'charging-service.svg'
+      cta: 'Learn More'
     },
   ];
 
@@ -734,6 +830,27 @@ const App = () => {
     </section>
   );
 
+  const TrustBadges = () => (
+    <div className="bg-slate-800/50 border-b border-slate-700/30 py-4">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="flex flex-wrap justify-center gap-6 md:gap-10">
+          {[
+            { icon: <Shield className="w-5 h-5" />, text: 'Warranty on All Repairs' },
+            { icon: <Truck className="w-5 h-5" />, text: 'Free Pickup & Delivery in Nairobi' },
+            { icon: <Zap className="w-5 h-5" />, text: 'Same Day Service' },
+            { icon: <CreditCard className="w-5 h-5" />, text: 'M-Pesa Accepted' },
+            { icon: <Headphones className="w-5 h-5" />, text: '24/7 Support' },
+          ].map((badge, i) => (
+            <div key={i} className="flex items-center gap-2 text-slate-400 text-sm">
+              <span className="text-amber-500">{badge.icon}</span>
+              <span>{badge.text}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
   const FeatureBanner = () => (
     <section className="py-12 bg-slate-800">
       <div className="max-w-7xl mx-auto px-4">
@@ -751,6 +868,54 @@ const App = () => {
               <p className="text-sm text-slate-400">{feature.description}</p>
             </div>
           ))}
+        </div>
+      </div>
+    </section>
+  );
+
+  const BrandsSection = () => (
+    <section className="py-16 bg-slate-900 reveal">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="text-center mb-10">
+          <span className="inline-block text-amber-500 font-semibold mb-2">Brands We Work With</span>
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+            Authorized Repair for <span className="text-amber-500">All Major Brands</span>
+          </h2>
+          <p className="text-slate-400 max-w-2xl mx-auto">
+            We service and sell devices from all top manufacturers with genuine parts and expert technicians
+          </p>
+        </div>
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4 items-center">
+          {[
+            { name: 'Apple', color: 'from-gray-700 to-gray-900', icon: '🍎' },
+            { name: 'Samsung', color: 'from-blue-700 to-blue-900', icon: '💎' },
+            { name: 'Xiaomi', color: 'from-orange-500 to-orange-700', icon: '🔶' },
+            { name: 'OnePlus', color: 'from-red-600 to-red-800', icon: '➕' },
+            { name: 'Google', color: 'from-green-600 to-green-800', icon: '🔍' },
+            { name: 'Huawei', color: 'from-red-500 to-red-700', icon: '🌸' },
+            { name: 'Oppo', color: 'from-green-500 to-green-700', icon: '📱' },
+            { name: 'Vivo', color: 'from-blue-500 to-blue-700', icon: '🎵' },
+            { name: 'Realme', color: 'from-yellow-500 to-yellow-700', icon: '⚡' },
+            { name: 'Tecno', color: 'from-teal-500 to-teal-700', icon: '📲' },
+            { name: 'Infinix', color: 'from-purple-500 to-purple-700', icon: '🔥' },
+            { name: 'Nokia', color: 'from-blue-600 to-blue-800', icon: '🏔️' },
+            { name: 'Sony', color: 'from-gray-600 to-gray-800', icon: '🎮' },
+            { name: 'LG', color: 'from-pink-500 to-pink-700', icon: '📺' },
+            { name: 'Motorola', color: 'from-gray-500 to-gray-700', icon: '📞' },
+            { name: 'Itel', color: 'from-indigo-500 to-indigo-700', icon: '💡' },
+          ].map((brand) => (
+            <div
+              key={brand.name}
+              className={`group relative bg-gradient-to-br ${brand.color} rounded-xl p-4 text-center hover:scale-110 transition-all duration-300 cursor-pointer shadow-lg hover:shadow-xl`}
+            >
+              <div className="text-2xl mb-1">{brand.icon}</div>
+              <div className="text-white text-xs font-semibold">{brand.name}</div>
+              <div className="absolute inset-0 bg-white/10 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity" />
+            </div>
+          ))}
+        </div>
+        <div className="mt-8 text-center">
+          <p className="text-slate-500 text-sm">...and many more brands. Contact us if your brand isn't listed.</p>
         </div>
       </div>
     </section>
@@ -852,6 +1017,9 @@ const App = () => {
               <img 
                 src={item.image} 
                 alt={item.title}
+                loading="lazy"
+                width="400"
+                height="300"
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                 onError={(e) => {
                   (e.target as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300"%3E%3Crect fill="%23374151" width="400" height="300"/%3E%3Ctext fill="%239ca3af" font-family="sans-serif" font-size="24" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3E' + item.title + '%3C/text%3E%3C/svg%3E';
@@ -1185,7 +1353,7 @@ const App = () => {
                   </div>
                   <div>
                     <div className="font-semibold">Email</div>
-                    <div className="opacity-80">odhiamboj791@gmail.com</div>
+                     <div className="opacity-80">alphamobitech767@gmail.com</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
@@ -1200,17 +1368,17 @@ const App = () => {
               </div>
 
               <div className="flex gap-4 mt-8">
-                <a href="#" className="w-10 h-10 bg-slate-800/20 rounded-full flex items-center justify-center hover:bg-slate-800/30 transition-colors">
+                <a href="https://facebook.com/alphamobitech" target="_blank" rel="noopener noreferrer" aria-label="Follow us on Facebook" className="w-10 h-10 bg-slate-800/20 rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors">
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
                 </a>
-                <a href="#" className="w-10 h-10 bg-slate-800/20 rounded-full flex items-center justify-center hover:bg-slate-800/30 transition-colors">
+                <a href="https://instagram.com/alphamobitech" target="_blank" rel="noopener noreferrer" aria-label="Follow us on Instagram" className="w-10 h-10 bg-slate-800/20 rounded-full flex items-center justify-center hover:bg-pink-600 transition-colors">
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
                 </a>
-                <a href="#" className="w-10 h-10 bg-slate-800/20 rounded-full flex items-center justify-center hover:bg-slate-800/30 transition-colors">
+                <a href="https://twitter.com/alphamobitech" target="_blank" rel="noopener noreferrer" aria-label="Follow us on Twitter" className="w-10 h-10 bg-slate-800/20 rounded-full flex items-center justify-center hover:bg-sky-500 transition-colors">
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
                 </a>
-                <a href="https://wa.me/254703555449" className="w-10 h-10 bg-slate-800/20 rounded-full flex items-center justify-center hover:bg-slate-800/30 transition-colors">
-                  <span className="font-bold">WA</span>
+                <a href="https://wa.me/254703555449" target="_blank" rel="noopener noreferrer" aria-label="Chat on WhatsApp" className="w-10 h-10 bg-slate-800/20 rounded-full flex items-center justify-center hover:bg-green-500 transition-colors">
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
                 </a>
               </div>
             </div>
@@ -1314,17 +1482,17 @@ const App = () => {
               Professional phone repair services in Nairobi, Kenya. Expert technicians with warranty on all repairs.
             </p>
             <div className="flex gap-4">
-              <a href="#" className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center hover:bg-amber-600 transition-colors">
+              <a href="https://facebook.com/alphamobitech" target="_blank" rel="noopener noreferrer" aria-label="Follow us on Facebook" className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors">
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
               </a>
-              <a href="#" className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center hover:bg-amber-600 transition-colors">
+              <a href="https://instagram.com/alphamobitech" target="_blank" rel="noopener noreferrer" aria-label="Follow us on Instagram" className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center hover:bg-pink-600 transition-colors">
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
               </a>
-              <a href="#" className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center hover:bg-amber-600 transition-colors">
+              <a href="https://twitter.com/alphamobitech" target="_blank" rel="noopener noreferrer" aria-label="Follow us on Twitter" className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center hover:bg-sky-500 transition-colors">
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
               </a>
-              <a href="https://wa.me/254703555449" className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center hover:bg-green-500 transition-colors">
-                <span className="text-sm font-bold">WA</span>
+              <a href="https://wa.me/254703555449" target="_blank" rel="noopener noreferrer" aria-label="Chat on WhatsApp" className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center hover:bg-green-500 transition-colors">
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
               </a>
             </div>
           </div>
@@ -1367,7 +1535,7 @@ const App = () => {
               </li>
               <li className="flex items-center gap-3 text-slate-500">
                 <Mail className="w-5 h-5 text-amber-500" />
-                <span>odhiamboj791@gmail.com</span>
+                 <span>alphamobitech767@gmail.com</span>
               </li>
               <li className="flex items-center gap-3 text-slate-500">
                 <MapPin className="w-5 h-5 text-amber-500" />
@@ -1440,20 +1608,25 @@ const App = () => {
                 <div>
                   <h3 className="text-xl font-bold">M-Pesa Payment</h3>
                   <div className="flex flex-col sm:flex-row gap-3 sm:gap-6 mt-1">
-                    <div>
-                      <span className="text-amber-100 text-sm">Paybill:</span>
-                      <span className="font-bold text-lg ml-2">247247</span>
-                    </div>
-                    <div>
-                      <span className="text-amber-100 text-sm">Account:</span>
-                      <span className="font-bold text-lg ml-2">0470182181792</span>
-                    </div>
+                   <div>
+                     <span className="text-amber-100 text-sm">Paybill:</span>
+                     <span className="font-bold text-lg ml-2">714888</span>
+                   </div>
+                   <div>
+                     <span className="text-amber-100 text-sm">Account:</span>
+                     <span className="font-bold text-lg ml-2">169405</span>
+                   </div>
                   </div>
                 </div>
               </div>
-              <div className="bg-slate-800/20 rounded-xl px-4 py-2 text-sm font-medium whitespace-nowrap">
-                Pay via Lipa Na M-Pesa
-              </div>
+               <div className="bg-slate-800/20 rounded-xl px-4 py-2 text-sm font-medium whitespace-nowrap">
+                 Pay via Lipa Na M-Pesa
+               </div>
+               <div className="mt-4 p-3 bg-amber-50/10 rounded-lg">
+                 <p className="text-amber-800 text-sm mb-1"><strong>Location:</strong> Stan Bank Building, Moi Avenue, Across Archives Floor 3 Room 10</p>
+                 <p className="text-amber-800 text-sm mb-1"><strong>Email:</strong> alphamobitech767@gmail.com</p>
+                 <p className="text-amber-800 text-sm"><strong>Hours:</strong> 7AM - 8PM</p>
+               </div>
             </div>
           </div>
 
@@ -1545,6 +1718,9 @@ const App = () => {
                     <img
                       src={product.image}
                       alt={product.name}
+                      loading="lazy"
+                      width="400"
+                      height="500"
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
@@ -1580,7 +1756,7 @@ const App = () => {
                   </div>
                   
                   <div className="p-4">
-                    <div className="flex items-center gap-2 mb-1">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
                       <span className={`text-xs font-semibold px-2 py-0.5 rounded ${
                         product.brand === 'Apple' ? 'bg-slate-100 text-slate-300' :
                         product.brand === 'Samsung' ? 'bg-blue-50 text-blue-600' :
@@ -1588,6 +1764,21 @@ const App = () => {
                       }`}>
                         {product.brand}
                       </span>
+                      {product.features.some(f => f.toLowerCase().includes('brand new') || f.toLowerCase().includes('ea warranty')) && (
+                        <span className="text-xs font-semibold px-2 py-0.5 rounded bg-green-500/20 text-green-400 border border-green-500/30">
+                          ✓ Brand New
+                        </span>
+                      )}
+                      {product.features.some(f => f.toLowerCase().includes('refurbished')) && (
+                        <span className="text-xs font-semibold px-2 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                          ↻ Refurbished
+                        </span>
+                      )}
+                      {product.features.some(f => f.toLowerCase().includes('dubai')) && (
+                        <span className="text-xs font-semibold px-2 py-0.5 rounded bg-purple-500/20 text-purple-400 border border-purple-500/30">
+                          🌍 Dubai Version
+                        </span>
+                      )}
                     </div>
                     <h3 className="font-bold text-white mb-1 text-sm leading-tight line-clamp-2 min-h-[2.5rem]">{product.name}</h3>
                     
@@ -2009,17 +2200,49 @@ const App = () => {
     </a>
   );
 
+  const BackToTop = () => (
+    <button
+      onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+      className={`fixed bottom-24 right-6 w-12 h-12 bg-gradient-to-br from-amber-500 to-amber-600 rounded-full flex items-center justify-center text-white shadow-xl hover:shadow-2xl hover:scale-110 transition-all z-50 ${showBackToTop ? 'opacity-100 visible' : 'opacity-0 invisible'}`}
+    >
+      <ArrowUp className="w-5 h-5" />
+    </button>
+  );
+
+  const Toast = () => {
+    if (!toast) return null;
+    return (
+      <div className={`fixed top-24 right-4 z-[100] max-w-sm p-4 rounded-xl shadow-2xl flex items-center gap-3 animate-slide-up ${
+        toast.type === 'success' ? 'bg-green-600 text-white' :
+        toast.type === 'error' ? 'bg-red-600 text-white' :
+        'bg-blue-600 text-white'
+      }`}>
+        {toast.type === 'success' && <CheckCircle className="w-5 h-5 flex-shrink-0" />}
+        {toast.type === 'error' && <XCircle className="w-5 h-5 flex-shrink-0" />}
+        {toast.type === 'info' && <CheckCircle className="w-5 h-5 flex-shrink-0" />}
+        <span className="text-sm font-medium">{toast.message}</span>
+        <button onClick={() => setToast(null)} className="ml-2 hover:opacity-70">
+          <X className="w-4 h-4" />
+        </button>
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100">
       {isLoading && <PageLoader />}
       {currentPage !== 'admin' && <Header />}
       {currentPage !== 'admin' && <MobileMenu />}
+      <Toast />
+      <BackToTop />
 
       <main className={currentPage === 'admin' ? '' : 'pt-0'}>
         {currentPage === 'home' && (
           <>
             <HeroSection />
+            <TrustBadges />
             <FeatureBanner />
+            <BrandsSection />
             <ServicesSection />
             <GallerySection />
             <ReviewsSection />

@@ -1,9 +1,62 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
-  <rect fill="#f8fafc" width="400" height="300"/>
-  <rect x="60" y="50" width="280" height="180" rx="12" fill="#e2e8f0" stroke="#cbd5e1" stroke-width="2"/>
-  <rect x="75" y="65" width="250" height="150" rx="6" fill="#1e293b"/>
-  <rect x="170" y="218" width="60" height="8" rx="4" fill="#cbd5e1"/>
-  <rect x="120" y="230" width="160" height="6" rx="3" fill="#e2e8f0"/>
-  <text x="200" y="260" text-anchor="middle" font-family="system-ui, sans-serif" font-size="20" font-weight="600" fill="#0f172a">MacBook Pro 16"</text>
-  <text x="200" y="282" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" fill="#64748b">M3 Pro · 18GB RAM · 512GB</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 380" width="500" height="380">
+  <defs>
+    <linearGradient id="scr" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1E293B"/>
+      <stop offset="100%" style="stop-color:#0F172A"/>
+    </linearGradient>
+    <linearGradient id="body" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#475569"/>
+      <stop offset="100%" style="stop-color:#334155"/>
+    </linearGradient>
+    <filter id="shadow"><feDropShadow dx="0" dy="4" stdDeviation="6" flood-opacity="0.3"/></filter>
+  </defs>
+
+  <!-- MacBook body -->
+  <rect x="40" y="40" width="420" height="280" rx="16" ry="16" fill="url(#body)" filter="url(#shadow)"/>
+
+  <!-- Screen bezel -->
+  <rect x="56" y="56" width="388" height="260" rx="8" ry="8" fill="#0F172A"/>
+
+  <!-- Screen content -->
+  <rect x="70" y="70" width="360" height="220" rx="4" ry="4" fill="url(#scr)"/>
+
+  <!-- Code lines on screen -->
+  <rect x="85" y="90" width="120" height="3" rx="1.5" fill="#10B981" opacity="0.6"/>
+  <rect x="85" y="105" width="160" height="3" rx="1.5" fill="#3B82F6" opacity="0.6"/>
+  <rect x="85" y="120" width="90" height="3" rx="1.5" fill="#F59E0B" opacity="0.5"/>
+  <rect x="85" y="140" width="200" height="3" rx="1.5" fill="#64748B" opacity="0.4"/>
+  <rect x="85" y="155" width="140" height="3" rx="1.5" fill="#10B981" opacity="0.5"/>
+  <rect x="85" y="170" width="110" height="3" rx="1.5" fill="#3B82F6" opacity="0.4"/>
+
+  <!-- Window bar -->
+  <circle cx="85" cy="78" r="3" fill="#EF4444"/>
+  <circle cx="97" cy="78" r="3" fill="#F59E0B"/>
+  <circle cx="109" cy="78" r="3" fill="#10B981"/>
+
+  <!-- Bottom hinge area -->
+  <rect x="40" y="320" width="420" height="12" rx="4" fill="#334155"/>
+
+  <!-- Keyboard base -->
+  <rect x="50" y="332" width="400" height="40" rx="6" fill="#1E293B"/>
+
+  <!-- Keyboard keys hint -->
+  <g fill="#334155" opacity="0.5">
+    <rect x="65" y="338" width="12" height="8" rx="1"/>
+    <rect x="81" y="338" width="12" height="8" rx="1"/>
+    <rect x="97" y="338" width="12" height="8" rx="1"/>
+    <rect x="113" y="338" width="12" height="8" rx="1"/>
+    <rect x="133" y="338" width="12" height="8" rx="1"/>
+    <rect x="149" y="338" width="12" height="8" rx="1"/>
+    <rect x="165" y="338" width="12" height="8" rx="1"/>
+    <rect x="181" y="338" width="12" height="8" rx="1"/>
+    <rect x="201" y="338" width="30" height="8" rx="1"/>
+  </g>
+
+  <!-- Trackpad -->
+  <rect x="200" y="352" width="100" height="12" rx="4" fill="#334155" opacity="0.5"/>
+
+  <!-- Apple logo hint -->
+  <g transform="translate(250, 340)" opacity="0.15">
+    <circle cx="0" cy="0" r="6" fill="white"/>
+  </g>
 </svg>

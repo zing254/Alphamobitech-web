@@ -83,19 +83,24 @@ export const StoreSection = () => {
               <div className="w-14 h-14 bg-white/10 rounded-xl flex items-center justify-center">
                 <ShoppingCart className="w-7 h-7" />
               </div>
-              <div>
-                <h3 className="text-xl font-bold">M-Pesa Payment</h3>
-                <div className="flex flex-col sm:flex-row gap-3 sm:gap-6 mt-1">
-                  <div>
-                    <span className="text-amber-200 text-sm">Paybill:</span>
-                    <span className="font-bold text-lg ml-2">714888</span>
-                  </div>
-                  <div>
-                    <span className="text-amber-200 text-sm">Account:</span>
-                    <span className="font-bold text-lg ml-2">169405</span>
-                  </div>
-                </div>
-              </div>
+               <div>
+                 <h3 className="text-xl font-bold">M-Pesa Payment</h3>
+                 <div className="flex flex-col sm:flex-row gap-3 sm:gap-6 mt-1">
+                   <div>
+                     <span className="text-amber-200 text-sm">Paybill:</span>
+                     <span className="font-bold text-lg ml-2">714888</span>
+                   </div>
+                   <div>
+                     <span className="text-amber-200 text-sm">Account:</span>
+                     <span className="font-bold text-lg ml-2">169405</span>
+                   </div>
+                 </div>
+                 <div className="mt-4 p-3 bg-amber-500/10 rounded-lg">
+                   <p className="text-amber-200 text-sm mb-1"><strong>Location:</strong> Stan Bank Building, Moi Avenue, Across Archives Floor 3 Room 10</p>
+                   <p className="text-amber-200 text-sm mb-1"><strong>Email:</strong> alphamobitech767@gmail.com</p>
+                   <p className="text-amber-200 text-sm"><strong>Hours:</strong> 7AM - 8PM</p>
+                 </div>
+               </div>
               <div className="bg-white/10 rounded-xl px-4 py-2 text-sm font-medium whitespace-nowrap">
                 Pay via Lipa Na M-Pesa
               </div>

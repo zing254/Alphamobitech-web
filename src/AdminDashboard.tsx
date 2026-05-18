@@ -4,7 +4,8 @@ import {
   TrendingUp, TrendingDown, DollarSign, Phone,
   Clock, CheckCircle, XCircle, Settings,
   LogOut, Search, Eye, Trash2,
-  Edit, Plus, BarChart3, Activity, Loader
+  Edit, Plus, BarChart3, Activity, Loader,
+  ShoppingCart, Image, Edit2
 } from 'lucide-react';
 import AdminLogin from './components/AdminLogin';
 
@@ -171,35 +172,50 @@ const AdminDashboard = () => {
 
   const Sidebar = () => (
     <aside className="w-64 bg-slate-800 border-r border-slate-700/50 text-white min-h-screen p-4 relative">
-      <div className="mb-8">
-        <h1 className="text-xl font-bold text-amber-500">Alphamobitech</h1>
-        <p className="text-xs text-slate-500">Admin Portal</p>
-      </div>
+       <div className="mb-8 text-center border-b pb-4">
+         <div className="flex items-center justify-center gap-3 mb-4">
+           <div className="w-12 h-12 bg-gradient-to-r from-amber-500 to-amber-600 rounded-xl flex items-center justify-center">
+             <LayoutDashboard className="w-6 h-6 text-white" />
+           </div>
+           <div>
+             <h1 className="text-2xl font-bold text-amber-100">Alphamobitech</h1>
+             <p className="text-xs text-amber-300">Admin Portal</p>
+           </div>
+         </div>
+         <div className="w-full h-0.5 bg-gradient-to-r from-transparent via-amber-500 to-transparent mx-4"></div>
+       </div>
       
-      <nav className="space-y-2">
-        {[
-          { id: 'dashboard', icon: <LayoutDashboard className="w-5 h-5" />, label: 'Dashboard' },
-          { id: 'orders', icon: <Calendar className="w-5 h-5" />, label: 'Orders' },
-          { id: 'bookings', icon: <Calendar className="w-5 h-5" />, label: 'Repair Bookings' },
-          { id: 'customers', icon: <Users className="w-5 h-5" />, label: 'Customers' },
-          { id: 'services', icon: <Wrench className="w-5 h-5" />, label: 'Services' },
-          { id: 'analytics', icon: <BarChart3 className="w-5 h-5" />, label: 'Analytics' },
-          { id: 'settings', icon: <Settings className="w-5 h-5" />, label: 'Settings' },
-        ].map(item => (
-          <button
-            key={item.id}
-            onClick={() => setActiveTab(item.id)}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all cursor-pointer ${
-              activeTab === item.id 
-                ? 'bg-amber-600 text-white' 
-                : 'text-slate-300 hover:bg-slate-700 hover:text-white'
-            }`}
-          >
-            {item.icon}
-            <span>{item.label}</span>
-          </button>
-        ))}
-      </nav>
+        <nav className="space-y-2 mt-4">
+          {[
+            { id: 'dashboard', icon: <LayoutDashboard className="w-5 h-5" />, label: 'Dashboard' },
+            { id: 'orders', icon: <Calendar className="w-5 h-5" />, label: 'Orders' },
+            { id: 'bookings', icon: <Calendar className="w-5 h-5" />, label: 'Repair Bookings' },
+            { id: 'customers', icon: <Users className="w-5 h-5" />, label: 'Customers' },
+            { id: 'services', icon: <Wrench className="w-5 h-5" />, label: 'Services' },
+            { id: 'products', icon: <ShoppingCart className="w-5 h-5" />, label: 'Products' },
+            { id: 'gallery', icon: <Image className="w-5 h-5" />, label: 'Gallery' },
+            { id: 'content', icon: <Edit2 className="w-5 h-5" />, label: 'Content' },
+            { id: 'analytics', icon: <BarChart3 className="w-5 h-5" />, label: 'Analytics' },
+            { id: 'settings', icon: <Settings className="w-5 h-5" />, label: 'Settings' },
+          ].map(item => (
+            <button
+              key={item.id}
+              onClick={() => setActiveTab(item.id)}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all cursor-pointer ${
+                activeTab === item.id 
+                  ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-sm' 
+                  : 'text-amber-200 hover:bg-amber-900/50 hover:text-white'
+              }`}
+            >
+              <div className="flex-shrink-0">
+                {item.icon}
+              </div>
+              <div className="flex-1">
+                <span className="text-sm font-medium">{item.label}</span>
+              </div>
+            </button>
+          ))}
+        </nav>
       
       <div className="absolute bottom-4 left-4 right-4">
         <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-white hover:bg-slate-700 transition-colors rounded-lg cursor-pointer">
@@ -726,18 +742,21 @@ const AdminDashboard = () => {
     );
   };
 
-  const renderContent = () => {
-    switch (activeTab) {
-      case 'dashboard': return <DashboardContent />;
-      case 'orders': return <OrdersContent />;
-      case 'bookings': return <BookingsContent />;
-      case 'customers': return <CustomersContent />;
-      case 'services': return <ServicesContent />;
-      case 'analytics': return <AnalyticsContent />;
-      case 'settings': return <SettingsContent />;
-      default: return <DashboardContent />;
-    }
-  };
+   const renderContent = () => {
+     switch (activeTab) {
+       case 'dashboard': return <DashboardContent />;
+       case 'orders': return <OrdersContent />;
+       case 'bookings': return <BookingsContent />;
+       case 'customers': return <CustomersContent />;
+       case 'services': return <ServicesContent />;
+       case 'products': return <ProductsContent />;
+       case 'gallery': return <GalleryContent />;
+       case 'content': return <ContentManagementContent />;
+       case 'analytics': return <AnalyticsContent />;
+       case 'settings': return <SettingsContent />;
+       default: return <DashboardContent />;
+     }
+   };
 
   const BookingModal = () => {
     if (!viewingBooking) return null;
@@ -837,9 +856,28 @@ const EditBookingModal: React.FC<EditBookingModalProps> = ({ booking, onClose, o
     <div className="flex min-h-screen bg-slate-900 text-slate-100">
       <Sidebar />
       <main className="flex-1 p-8">
-        <header className="bg-slate-800/80 backdrop-blur-sm border-b border-slate-700/50 -mx-8 -mt-8 px-8 pt-8 pb-6 mb-8">
-          <h1 className="text-2xl font-bold text-white capitalize">{activeTab === 'dashboard' ? 'Dashboard Overview' : activeTab}</h1>
-          <p className="text-slate-400">Welcome back! Here's what's happening today.</p>
+        <header className="bg-gradient-to-r from-amber-500 to-amber-600 bg-opacity-90 backdrop-blur-sm border-b border-amber-200/20 mx-0 mt-0 px-6 py-4 mb-6 shadow-lg">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                <LayoutDashboard className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-white capitalize">{activeTab === 'dashboard' ? 'Dashboard Overview' : activeTab}</h1>
+                <p className="text-amber-100/90 text-sm">Welcome back! Here's what's happening today.</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 text-amber-100/90">
+              <button className="flex items-center gap-2 px-3 py-1 bg-white/20 rounded-lg hover:bg-white/30 transition-all text-sm">
+                <Calendar className="w-4 h-4" />
+                <span>{new Date().toLocaleDateString()}</span>
+              </button>
+              <button className="flex items-center gap-2 px-3 py-1 bg-white/20 rounded-lg hover:bg-white/30 transition-all text-sm">
+                <Clock className="w-4 h-4" />
+                <span>{new Date().toLocaleTimeString()}</span>
+              </button>
+            </div>
+          </div>
         </header>
         {renderContent()}
       </main>

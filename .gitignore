@@ -13,3 +13,6 @@ Thumbs.db
 *.log
 *.zip
 .vercel
+*.backup
+*.bak
+Alphamobitech-web/

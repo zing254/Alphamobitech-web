@@ -1,9 +1,56 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
-  <rect fill="#f8fafc" width="400" height="300"/>
-  <rect x="70" y="40" width="260" height="170" rx="10" fill="#e2e8f0" stroke="#cbd5e1" stroke-width="2"/>
-  <rect x="85" y="55" width="230" height="140" rx="4" fill="#334155"/>
-  <rect x="175" y="198" width="50" height="7" rx="3" fill="#cbd5e1"/>
-  <rect x="130" y="210" width="140" height="5" rx="2" fill="#e2e8f0"/>
-  <text x="200" y="248" text-anchor="middle" font-family="system-ui, sans-serif" font-size="20" font-weight="600" fill="#0f172a">MacBook Air M3 13"</text>
-  <text x="200" y="270" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" fill="#64748b">M3 · 8GB RAM · 256GB · Midnight</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 360" width="500" height="360">
+  <defs>
+    <linearGradient id="scr" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1E293B"/>
+      <stop offset="100%" style="stop-color:#0F172A"/>
+    </linearGradient>
+    <filter id="shadow"><feDropShadow dx="0" dy="4" stdDeviation="6" flood-opacity="0.3"/></filter>
+  </defs>
+
+  <!-- MacBook Air body -->
+  <rect x="50" y="30" width="400" height="260" rx="14" ry="14" fill="#475569" filter="url(#shadow)"/>
+
+  <!-- Screen bezel -->
+  <rect x="64" y="44" width="372" height="242" rx="6" ry="6" fill="#0F172A"/>
+
+  <!-- Screen content -->
+  <rect x="78" y="58" width="344" height="200" rx="4" ry="4" fill="url(#scr)"/>
+
+  <!-- Content on screen -->
+  <rect x="92" y="75" width="100" height="3" rx="1.5" fill="#10B981" opacity="0.5"/>
+  <rect x="92" y="92" width="180" height="3" rx="1.5" fill="#3B82F6" opacity="0.5"/>
+  <rect x="92" y="109" width="140" height="3" rx="1.5" fill="#64748B" opacity="0.4"/>
+
+  <!-- Window dots -->
+  <circle cx="92" cy="65" r="2.5" fill="#EF4444"/>
+  <circle cx="103" cy="65" r="2.5" fill="#F59E0B"/>
+  <circle cx="114" cy="65" r="2.5" fill="#10B981"/>
+
+  <!-- Bottom base -->
+  <rect x="50" y="292" width="400" height="50" rx="6" fill="#334155"/>
+
+  <!-- Keyboard -->
+  <g fill="#334155" opacity="0.4">
+    <rect x="68" y="298" width="14" height="9" rx="1"/>
+    <rect x="86" y="298" width="14" height="9" rx="1"/>
+    <rect x="104" y="298" width="14" height="9" rx="1"/>
+    <rect x="122" y="298" width="14" height="9" rx="1"/>
+    <rect x="140" y="298" width="14" height="9" rx="1"/>
+    <rect x="158" y="298" width="22" height="9" rx="1"/>
+    <rect x="184" y="298" width="14" height="9" rx="1"/>
+    <rect x="202" y="298" width="14" height="9" rx="1"/>
+    <rect x="220" y="298" width="14" height="9" rx="1"/>
+    <rect x="238" y="298" width="14" height="9" rx="1"/>
+    <rect x="256" y="298" width="22" height="9" rx="1"/>
+    <rect x="282" y="298" width="14" height="9" rx="1"/>
+    <rect x="300" y="298" width="14" height="9" rx="1"/>
+    <rect x="318" y="298" width="14" height="9" rx="1"/>
+    <rect x="336" y="298" width="14" height="9" rx="1"/>
+    <rect x="354" y="298" width="22" height="9" rx="1"/>
+    <rect x="380" y="298" width="14" height="9" rx="1"/>
+    <rect x="398" y="298" width="30" height="9" rx="1"/>
+  </g>
+
+  <!-- Trackpad -->
+  <rect x="200" y="315" width="100" height="18" rx="6" fill="#334155" opacity="0.6"/>
 </svg>
