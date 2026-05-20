@@ -739,41 +739,40 @@ const App = () => {
   );
 
   const TrustBadges = () => (
-    <div className="bg-gradient-to-r from-slate-800/80 via-slate-800/50 to-slate-800/80 border-b border-slate-700/30 py-5 backdrop-blur-sm">
+    <section className="bg-slate-800/30 border-b border-slate-700/30 py-6">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="flex flex-wrap justify-center gap-6 md:gap-10">
+        <div className="flex flex-wrap justify-center items-center gap-8 md:gap-12">
           {[
             { icon: <Shield className="w-5 h-5" />, text: 'Warranty on All Repairs', color: 'text-amber-400' },
-            { icon: <Truck className="w-5 h-5" />, text: 'Free Pickup & Delivery in Nairobi', color: 'text-blue-400' },
+            { icon: <Truck className="w-5 h-5" />, text: 'Free Pickup & Delivery', color: 'text-blue-400' },
             { icon: <Zap className="w-5 h-5" />, text: 'Same Day Service', color: 'text-yellow-400' },
-            { icon: <CreditCard className="w-5 h-5" />, text: 'M-Pesa Paybill: 714888', color: 'text-green-400' },
+            { icon: <CreditCard className="w-5 h-5" />, text: 'M-Pesa: 714888', color: 'text-green-400' },
             { icon: <Headphones className="w-5 h-5" />, text: '24/7 Support', color: 'text-purple-400' },
           ].map((badge, i) => (
-            <div key={i} className="flex items-center gap-2 text-slate-300 text-sm group cursor-default">
+            <div key={i} className="flex items-center gap-2.5 text-slate-300 text-sm group cursor-default">
               <span className={`${badge.color} group-hover:scale-125 transition-transform duration-300`}>{badge.icon}</span>
-              <span className="group-hover:text-white transition-colors duration-300">{badge.text}</span>
+              <span className="group-hover:text-white transition-colors duration-300 font-medium">{badge.text}</span>
             </div>
           ))}
         </div>
       </div>
-    </div>
+    </section>
   );
 
   const FeatureBanner = () => (
     <section className="py-20 bg-slate-800">
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
           {features.map((feature, i) => (
             <div 
               key={i} 
-              className="group text-center p-6 rounded-2xl hover:bg-gradient-to-br hover:from-amber-950/30 hover:to-slate-800 transition-all duration-300 cursor-pointer animate-fade-in-up"
-              style={{ animationDelay: `${i * 100}ms` }}
+              className="group text-center p-6 rounded-2xl hover:bg-gradient-to-br hover:from-amber-950/30 hover:to-slate-800 transition-all duration-300 cursor-pointer"
             >
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-100 to-amber-200 text-amber-600 mb-4 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
                 {feature.icon}
               </div>
-              <h3 className="font-semibold text-white mb-1 group-hover:text-amber-600 transition-colors">{feature.title}</h3>
-              <p className="text-sm text-slate-400">{feature.description}</p>
+              <h3 className="font-semibold text-white mb-1 group-hover:text-amber-500 transition-colors text-sm">{feature.title}</h3>
+              <p className="text-xs text-slate-400 leading-relaxed">{feature.description}</p>
             </div>
           ))}
         </div>
@@ -782,18 +781,16 @@ const App = () => {
   );
 
   const BrandsSection = () => (
-    <section className="py-16 bg-slate-900 reveal">
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="text-center mb-10">
-          <span className="inline-block text-amber-500 font-semibold mb-2">Brands We Work With</span>
+    <section className="py-20 bg-slate-900">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="text-center mb-12">
+          <span className="inline-block text-amber-500 font-semibold text-sm uppercase tracking-wider mb-3">Brands We Work With</span>
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             Authorized Repair for <span className="text-amber-500">All Major Brands</span>
           </h2>
-          <p className="text-slate-400 max-w-2xl mx-auto">
-            We service and sell devices from all top manufacturers with genuine parts and expert technicians
-          </p>
+          <p className="text-slate-400 max-w-2xl mx-auto">We service and sell devices from all top manufacturers with genuine parts and expert technicians</p>
         </div>
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4 items-center">
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
           {[
             { name: 'Apple', color: 'from-gray-700 to-gray-900', icon: '🍎' },
             { name: 'Samsung', color: 'from-blue-700 to-blue-900', icon: '💎' },
@@ -812,17 +809,14 @@ const App = () => {
             { name: 'Motorola', color: 'from-gray-500 to-gray-700', icon: '📞' },
             { name: 'Itel', color: 'from-indigo-500 to-indigo-700', icon: '💡' },
           ].map((brand) => (
-            <div
-              key={brand.name}
-              className={`group relative bg-gradient-to-br ${brand.color} rounded-xl p-4 text-center hover:scale-110 transition-all duration-300 cursor-pointer shadow-lg hover:shadow-xl`}
-            >
+            <div key={brand.name} className={`group relative bg-gradient-to-br ${brand.color} rounded-xl p-4 text-center hover:scale-105 transition-all duration-300 cursor-pointer shadow-lg hover:shadow-xl`}>
               <div className="text-2xl mb-1">{brand.icon}</div>
               <div className="text-white text-xs font-semibold">{brand.name}</div>
               <div className="absolute inset-0 bg-white/10 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
           ))}
         </div>
-        <div className="mt-8 text-center">
+        <div className="mt-10 text-center">
           <p className="text-slate-500 text-sm">...and many more brands. Contact us if your brand isn't listed.</p>
         </div>
       </div>
@@ -831,9 +825,9 @@ const App = () => {
 
   const ServicesSection = () => (
     <section id="services" className="py-24 bg-gradient-to-br from-slate-800/50 to-slate-900">
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-12">
-          <span className="inline-block text-amber-600 font-semibold mb-2">Our Services</span>
+          <span className="inline-block text-amber-500 font-semibold text-sm uppercase tracking-wider mb-3">Our Services</span>
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             Professional Repair Services
           </h2>
@@ -905,9 +899,9 @@ const App = () => {
 
   const GallerySection = () => (
     <section id="gallery" className="py-24 bg-slate-900">
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-12">
-          <span className="inline-block text-amber-500 font-semibold mb-2">Our Work</span>
+          <span className="inline-block text-amber-500 font-semibold text-sm uppercase tracking-wider mb-3">Our Work</span>
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             Repair <span className="text-amber-500">Gallery</span>
           </h2>
@@ -949,9 +943,9 @@ const App = () => {
 
   const ReviewsSection = () => (
     <section id="reviews" className="py-20 bg-gradient-to-br from-amber-950/20 to-slate-900 reveal">
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-12">
-          <span className="inline-block text-amber-600 font-semibold mb-2">Testimonials</span>
+          <span className="inline-block text-amber-500 font-semibold text-sm uppercase tracking-wider mb-3">Testimonials</span>
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             What Our <span className="text-amber-600">Clients Say</span>
           </h2>
@@ -993,7 +987,7 @@ const App = () => {
     <section id="faq" className="py-20 bg-slate-800 reveal">
       <div className="max-w-3xl mx-auto px-4">
         <div className="text-center mb-12">
-          <span className="inline-block text-amber-600 font-semibold mb-2">Help & Support</span>
+          <span className="inline-block text-amber-500 font-semibold text-sm uppercase tracking-wider mb-3">Help & Support</span>
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             Frequently Asked <span className="text-amber-600">Questions</span>
           </h2>
@@ -1027,10 +1021,10 @@ const App = () => {
 
   const AboutSection = () => (
     <section id="about" className="py-20 bg-slate-800/30 reveal">
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div>
-            <span className="inline-block text-amber-600 font-semibold mb-2">About Us</span>
+            <span className="inline-block text-amber-500 font-semibold text-sm uppercase tracking-wider mb-3">About Us</span>
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
               Your Trusted Phone Repair Experts in Nairobi
             </h2>
@@ -1098,7 +1092,7 @@ const App = () => {
     <section id="booking" className="py-20 bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 reveal">
       <div className="max-w-4xl mx-auto px-4">
         <div className="text-center mb-12">
-          <span className="inline-block text-amber-500 font-semibold mb-2">Get Started</span>
+          <span className="inline-block text-amber-500 font-semibold text-sm uppercase tracking-wider mb-3">Get Started</span>
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             Book Your <span className="text-amber-500">Repair</span>
           </h2>
@@ -1221,9 +1215,9 @@ const App = () => {
 
   const ContactSection = () => (
     <section id="contact" className="py-20 bg-slate-800 reveal">
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-12">
-          <span className="inline-block text-amber-600 font-semibold mb-2">Contact Us</span>
+          <span className="inline-block text-amber-500 font-semibold text-sm uppercase tracking-wider mb-3">Contact Us</span>
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             Get In <span className="text-amber-600">Touch</span>
           </h2>
@@ -1373,7 +1367,7 @@ const App = () => {
 
   const Footer = () => (
     <footer className="bg-slate-950 text-white pt-16 pb-8">
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
           <div>
             <div className="flex items-center gap-3 mb-6">
