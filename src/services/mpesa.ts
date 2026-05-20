@@ -4,7 +4,7 @@
 const MPESA_CONFIG = {
   consumerKey: import.meta.env.VITE_MPESA_CONSUMER_KEY || '',
   consumerSecret: import.meta.env.VITE_MPESA_CONSUMER_SECRET || '',
-  shortcode: import.meta.env.VITE_MPESA_SHORTCODE || '247247',
+  shortcode: import.meta.env.VITE_MPESA_SHORTCODE || '714888',
   passkey: import.meta.env.VITE_MPESA_PASSKEY || '',
   callbackUrl: 'https://your-domain.com/api/mpesa/callback',
   environment: (import.meta.env.VITE_MPESA_ENVIRONMENT || 'sandbox') as 'sandbox' | 'live' | 'simulation',

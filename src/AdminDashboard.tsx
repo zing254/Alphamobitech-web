@@ -1,53 +1,45 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  LayoutDashboard, Users, Wrench, Calendar, 
+import React, { useState, useEffect, useRef } from 'react';
+import {
+  LayoutDashboard, Users, Wrench, Calendar,
   TrendingUp, TrendingDown, DollarSign, Phone,
   Clock, CheckCircle, XCircle, Settings,
   LogOut, Search, Eye, Trash2,
   Edit, Plus, BarChart3, Activity, Loader,
-  ShoppingCart, Image, Edit2
+  ShoppingCart, Image, Edit2, Save, X, Upload,
+  Link, Type, Star, Smartphone
 } from 'lucide-react';
 import AdminLogin from './components/AdminLogin';
+import { products as defaultProducts } from './data/products';
+import {
+  getServices, saveServices, getGallery, saveGallery,
+  getSocialLinks, saveSocialLinks, getHeroSlides, saveHeroSlides,
+  getFeatures, saveFeatures, AVAILABLE_ICONS,
+  type Service, type GalleryItem, type SocialLinks, type HeroSlide, type Feature
+} from './data/content';
 
 interface Booking {
-  id: string;
-  customerName: string;
-  phone: string;
-  device: string;
-  service: string;
+  id: string; customerName: string; phone: string; device: string; service: string;
   status: 'pending' | 'in-progress' | 'completed' | 'cancelled';
-  date: string;
-  amount: number;
-  notes?: string;
+  date: string; amount: number; notes?: string;
 }
-
-interface StatCard {
-  title: string;
-  value: string | number;
-  change: number;
-  icon: React.ReactNode;
-  color: string;
-}
-
+interface StatCard { title: string; value: string | number; change: number; icon: React.ReactNode; color: string; }
 interface Order {
-  id: string;
-  customer: string;
-  email: string;
-  phone: string;
+  id: string; customer: string; email: string; phone: string;
   items: { name: string; qty: number; price: number }[];
-  total: number;
-  status: 'pending' | 'confirmed' | 'shipped' | 'delivered';
-  date: string;
-  payment: string;
+  total: number; status: 'pending' | 'confirmed' | 'shipped' | 'delivered'; date: string; payment: string;
+}
+interface Customer { id: number; name: string; email: string; phone: string; totalBookings: number; spent: number; }
+interface ProductItem {
+  id: number; name: string; brand: string; category: string; price: number; description: string;
+  specs: string[]; features: string[]; image: string; inStock: boolean; rating: number; reviews: number; badge?: string;
 }
 
-const ADMIN_CREDENTIALS = {
-  email: import.meta.env.VITE_ADMIN_EMAIL || '',
-  password: import.meta.env.VITE_ADMIN_PASSWORD || ''
-};
-
+const ADMIN_CREDENTIALS = { email: import.meta.env.VITE_ADMIN_EMAIL || '', password: import.meta.env.VITE_ADMIN_PASSWORD || '' };
 const SESSION_DURATION = 24 * 60 * 60 * 1000;
 const REMEMBER_ME_DURATION = 7 * 24 * 60 * 60 * 1000;
+const BRANDS = ['Apple','Samsung','Xiaomi','OnePlus','Google Pixel','Huawei','Oppo','Vivo','Realme','Tecno','Infinix','Nokia','Sony','LG','Motorola','Itel'];
+const PRODUCT_CATEGORIES = ['phone','tablet','laptop'];
+const BADGE_OPTIONS = ['','NEW','HOT','SALE','EX-UK','REFURBISHED BOXED','LIMITED'];
 
 const AdminDashboard = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
@@ -70,158 +62,113 @@ const AdminDashboard = () => {
     { id: 'ORD003', customer: 'Bob Wilson', email: 'bob@email.com', phone: '0700000003', items: [{ name: 'iPad Pro 12.9"', qty: 2, price: 155000 }], total: 310000, status: 'shipped', date: '2026-04-22', payment: 'mpesa' },
   ]);
   const [orderSearch, setOrderSearch] = useState('');
+  const [products, setProducts] = useState<ProductItem[]>(() => { try { const s = localStorage.getItem('admin_products'); return s ? JSON.parse(s) : defaultProducts; } catch { return defaultProducts; } });
+  const [productSearch, setProductSearch] = useState('');
+  const [productBrandFilter, setProductBrandFilter] = useState('All');
+  const [editingProduct, setEditingProduct] = useState<ProductItem | null>(null);
+  const [showProductForm, setShowProductForm] = useState(false);
+  const [productForm, setProductForm] = useState<Partial<ProductItem>>({});
+  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>(() => getGallery());
+  const [editingGalleryItem, setEditingGalleryItem] = useState<GalleryItem | null>(null);
+  const [showGalleryForm, setShowGalleryForm] = useState(false);
+  const [galleryForm, setGalleryForm] = useState<Partial<GalleryItem>>({});
+  const [heroSlides, setHeroSlides] = useState<HeroSlide[]>(() => getHeroSlides());
+  const [features, setFeatures] = useState<Feature[]>(() => getFeatures());
+  const [socialLinks, setSocialLinks] = useState<SocialLinks>(() => getSocialLinks());
+  const [siteServices, setSiteServices] = useState<Service[]>(() => getServices());
+  const [editingHeroSlide, setEditingHeroSlide] = useState<HeroSlide | null>(null);
+  const [editingFeature, setEditingFeature] = useState<Feature | null>(null);
+  const [editingService, setEditingService] = useState<Service | null>(null);
+  const [showHeroForm, setShowHeroForm] = useState(false);
+  const [showFeatureForm, setShowFeatureForm] = useState(false);
+  const [showServiceForm, setShowServiceForm] = useState(false);
+  const [customers, setCustomers] = useState<Customer[]>([
+    { id: 1, name: 'Sarah Johnson', email: 'sarah@email.com', phone: '0703555449', totalBookings: 5, spent: 12500 },
+    { id: 2, name: 'David Kamau', email: 'david@email.com', phone: '0712345678', totalBookings: 3, spent: 8500 },
+    { id: 3, name: 'Emily Rodriguez', email: 'emily@email.com', phone: '0723456789', totalBookings: 2, spent: 5500 },
+    { id: 4, name: 'Michael Ochieng', email: 'michael@email.com', phone: '0734567890', totalBookings: 1, spent: 3500 },
+    { id: 5, name: 'Faith Nekesa', email: 'faith@email.com', phone: '0745678901', totalBookings: 4, spent: 15000 },
+  ]);
+  const [customerSearch, setCustomerSearch] = useState('');
+  const [showCustomerForm, setShowCustomerForm] = useState(false);
+  const [customerForm, setCustomerForm] = useState<Partial<Customer>>({});
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+  const showToast = (message: string, type: 'success' | 'error' | 'info' = 'success') => { setToast({ message, type }); setTimeout(() => setToast(null), 3000); };
 
+  useEffect(() => { localStorage.setItem('admin_products', JSON.stringify(products)); }, [products]);
   useEffect(() => {
     const auth = localStorage.getItem('adminAuth');
     const authTime = localStorage.getItem('adminAuthTime');
-    
-    if (auth === 'true') {
-      if (authTime) {
-        const elapsed = Date.now() - parseInt(authTime);
-        if (elapsed > SESSION_DURATION) {
-          localStorage.removeItem('adminAuth');
-          localStorage.removeItem('adminAuthTime');
-          setIsAuthenticated(false);
-          return;
-        }
-      }
-      setIsAuthenticated(true);
-    } else {
-      setIsAuthenticated(false);
-    }
+    if (auth === 'true') { if (authTime) { const elapsed = Date.now() - parseInt(authTime); if (elapsed > SESSION_DURATION) { localStorage.removeItem('adminAuth'); localStorage.removeItem('adminAuthTime'); setIsAuthenticated(false); return; } } setIsAuthenticated(true); } else { setIsAuthenticated(false); }
   }, []);
 
-  const handleLogin = async (email: string, password: string, rememberMe: boolean = false): Promise<boolean> => {
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    if (!ADMIN_CREDENTIALS.email || !ADMIN_CREDENTIALS.password) {
-      setLoginError('Admin credentials not configured. Set VITE_ADMIN_EMAIL and VITE_ADMIN_PASSWORD in .env');
-      return false;
-    }
-    
-    if (email === ADMIN_CREDENTIALS.email && password === ADMIN_CREDENTIALS.password) {
-      const duration = rememberMe ? REMEMBER_ME_DURATION : SESSION_DURATION;
-      localStorage.setItem('adminAuth', 'true');
-      localStorage.setItem('adminAuthTime', Date.now().toString());
-      localStorage.setItem('adminSessionExpiry', (Date.now() + duration).toString());
-      setIsAuthenticated(true);
-      setLoginError('');
-      return true;
-    } else {
-      setLoginError('Invalid email or password');
-      return false;
-    }
-  };
-
-  const handleResetPassword = async (email: string): Promise<boolean> => {
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    alert(`Password reset link sent to ${email}\n\nDemo: In production, check your email for the reset link.`);
-    return true;
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem('adminAuth');
-    localStorage.removeItem('adminAuthTime');
-    localStorage.removeItem('adminSessionExpiry');
-    setIsAuthenticated(false);
-  };
-
-  const updateBookingStatus = (id: string, status: Booking['status']) => {
-    setBookings(bookings.map(b => b.id === id ? { ...b, status } : b));
-  };
-
-  const deleteBooking = (id: string) => {
-    if (confirm(`Are you sure you want to delete booking ${id}?`)) {
-      setBookings(bookings.filter(b => b.id !== id));
-    }
-  };
-
-  const updateOrderStatus = (id: string, status: Order['status']) => {
-    setOrders(orders.map(o => o.id === id ? { ...o, status } : o));
-  };
-
+  const handleLogin = async (email: string, password: string, rememberMe: boolean = false): Promise<boolean> => { await new Promise(resolve => setTimeout(resolve, 1000)); if (!ADMIN_CREDENTIALS.email || !ADMIN_CREDENTIALS.password) { setLoginError('Admin credentials not configured.'); return false; } if (email === ADMIN_CREDENTIALS.email && password === ADMIN_CREDENTIALS.password) { const duration = rememberMe ? REMEMBER_ME_DURATION : SESSION_DURATION; localStorage.setItem('adminAuth', 'true'); localStorage.setItem('adminAuthTime', Date.now().toString()); localStorage.setItem('adminSessionExpiry', (Date.now() + duration).toString()); setIsAuthenticated(true); setLoginError(''); return true; } else { setLoginError('Invalid email or password'); return false; } };
+  const handleResetPassword = async (email: string): Promise<boolean> => { await new Promise(resolve => setTimeout(resolve, 1500)); alert('Password reset link sent to ' + email); return true; };
+  const handleLogout = () => { localStorage.removeItem('adminAuth'); localStorage.removeItem('adminAuthTime'); localStorage.removeItem('adminSessionExpiry'); setIsAuthenticated(false); };
+  const updateBookingStatus = (id: string, status: Booking['status']) => { setBookings(bookings.map(b => b.id === id ? { ...b, status } : b)); };
+  const deleteBooking = (id: string) => { if (confirm('Delete booking ' + id + '?')) { setBookings(bookings.filter(b => b.id !== id)); showToast('Booking deleted', 'success'); } };
+  const addBooking = (booking: Booking) => { setBookings([booking, ...bookings]); showToast('Booking added', 'success'); };
+  const updateOrderStatus = (id: string, status: Order['status']) => { setOrders(orders.map(o => o.id === id ? { ...o, status } : o)); };
+  const addOrder = (order: Order) => { setOrders([order, ...orders]); showToast('Order added', 'success'); };
   const stats: StatCard[] = [
-    { title: 'Total Bookings', value: bookings.length, change: Math.round(((bookings.length - Math.max(3, bookings.length - 2)) / Math.max(3, bookings.length - 2)) * 100), icon: <Calendar className="w-6 h-6" />, color: 'bg-blue-500' },
+    { title: 'Total Bookings', value: bookings.length, change: 12, icon: <Calendar className="w-6 h-6" />, color: 'bg-blue-500' },
     { title: 'Completed', value: bookings.filter(b => b.status === 'completed').length, change: 8, icon: <CheckCircle className="w-6 h-6" />, color: 'bg-green-500' },
-    { title: 'In Progress', value: bookings.filter(b => b.status === 'in-progress').length, change: bookings.filter(b => b.status === 'in-progress').length - 3, icon: <Activity className="w-6 h-6" />, color: 'bg-amber-500' },
+    { title: 'In Progress', value: bookings.filter(b => b.status === 'in-progress').length, change: 3, icon: <Activity className="w-6 h-6" />, color: 'bg-amber-500' },
     { title: 'Revenue (KSh)', value: (bookings.reduce((sum, b) => sum + b.amount, 0) + orders.reduce((sum, o) => sum + o.total, 0)).toLocaleString(), change: 15, icon: <DollarSign className="w-6 h-6" />, color: 'bg-purple-500' },
   ];
-
   const services = [
-    { name: 'Screen Replacement', count: 45, revenue: 157500 },
-    { name: 'Battery Replacement', count: 32, revenue: 64000 },
-    { name: 'Charging Port', count: 18, revenue: 36000 },
-    { name: 'Back Glass', count: 15, revenue: 37500 },
-    { name: 'Water Damage', count: 10, revenue: 35000 },
-    { name: 'Camera Repair', count: 7, revenue: 17500 },
+    { name: 'Screen Replacement', count: 45, revenue: 157500 }, { name: 'Battery Replacement', count: 32, revenue: 64000 },
+    { name: 'Charging Port', count: 18, revenue: 36000 }, { name: 'Back Glass', count: 15, revenue: 37500 },
+    { name: 'Water Damage', count: 10, revenue: 35000 }, { name: 'Camera Repair', count: 7, revenue: 17500 },
   ];
+  const filteredBookings = bookings.filter(b => { const ms = b.customerName.toLowerCase().includes(searchTerm.toLowerCase()) || b.phone.includes(searchTerm) || b.id.toLowerCase().includes(searchTerm.toLowerCase()); const msf = statusFilter === 'All Status' || b.status === statusFilter.toLowerCase().replace(' ', '-'); return ms && msf; });
+  const filteredOrders = orders.filter(o => o.customer.toLowerCase().includes(orderSearch.toLowerCase()) || o.id.toLowerCase().includes(orderSearch.toLowerCase()) || o.phone.includes(orderSearch));
+  const filteredProducts = products.filter(p => { const ms = p.name.toLowerCase().includes(productSearch.toLowerCase()) || p.brand.toLowerCase().includes(productSearch.toLowerCase()); const mb = productBrandFilter === 'All' || p.brand === productBrandFilter; return ms && mb; });
+  const filteredCustomers = customers.filter(c => c.name.toLowerCase().includes(customerSearch.toLowerCase()) || c.email.toLowerCase().includes(customerSearch.toLowerCase()) || c.phone.includes(customerSearch));
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, callback: (url: string) => void) => { const file = e.target.files?.[0]; if (!file) return; if (file.size > 2 * 1024 * 1024) { showToast('Image must be under 2MB', 'error'); return; } const reader = new FileReader(); reader.onload = (ev) => { callback(ev.target?.result as string); }; reader.readAsDataURL(file); };
+  const saveProduct = () => { if (!productForm.name || !productForm.brand || !productForm.price) { showToast('Name, brand, and price required', 'error'); return; } const np: ProductItem = { id: editingProduct?.id || Math.max(0, ...products.map(p => p.id)) + 1, name: productForm.name || '', brand: productForm.brand || '', category: productForm.category || 'phone', price: Number(productForm.price) || 0, description: productForm.description || '', specs: productForm.specs || [], features: productForm.features || [], image: productForm.image || '/images/phones/placeholder.jpg', inStock: productForm.inStock !== false, rating: productForm.rating || 4.0, reviews: productForm.reviews || 0, badge: productForm.badge || undefined }; if (editingProduct) { setProducts(products.map(p => p.id === editingProduct.id ? np : p)); showToast('Product updated', 'success'); } else { setProducts([...products, np]); showToast('Product added', 'success'); } setShowProductForm(false); setEditingProduct(null); setProductForm({}); };
+  const deleteProduct = (id: number) => { if (confirm('Delete this product?')) { setProducts(products.filter(p => p.id !== id)); showToast('Product deleted', 'success'); } };
+  const startEditProduct = (product: ProductItem) => { setEditingProduct(product); setProductForm({ ...product }); setShowProductForm(true); };
+  const saveGalleryItem = () => { if (!galleryForm.title) { showToast('Title required', 'error'); return; } const ni: GalleryItem = { id: editingGalleryItem?.id || Math.max(0, ...galleryItems.map(g => g.id)) + 1, title: galleryForm.title || '', description: galleryForm.description || '', image: galleryForm.image || '', category: galleryForm.category || 'Repair' }; let updated; if (editingGalleryItem) { updated = galleryItems.map(g => g.id === editingGalleryItem.id ? ni : g); showToast('Gallery item updated', 'success'); } else { updated = [...galleryItems, ni]; showToast('Gallery item added', 'success'); } setGalleryItems(updated); saveGallery(updated); setShowGalleryForm(false); setEditingGalleryItem(null); setGalleryForm({}); };
+  const deleteGalleryItem = (id: number) => { if (confirm('Delete this item?')) { const updated = galleryItems.filter(g => g.id !== id); setGalleryItems(updated); saveGallery(updated); showToast('Item deleted', 'success'); } };
+  const saveHeroSlideFn = () => { if (!editingHeroSlide?.title) { showToast('Title required', 'error'); return; } const idx = heroSlides.findIndex(h => h === editingHeroSlide); let updated; if (idx >= 0) { updated = heroSlides.map((h, i) => i === idx ? editingHeroSlide : h); } else { updated = [...heroSlides, editingHeroSlide]; } setHeroSlides(updated); saveHeroSlides(updated); setEditingHeroSlide(null); setShowHeroForm(false); showToast('Hero slide saved', 'success'); };
+  const saveFeatureFn = () => { if (!editingFeature?.title) { showToast('Title required', 'error'); return; } const idx = features.findIndex(f => f === editingFeature); let updated; if (idx >= 0) { updated = features.map((f, i) => i === idx ? editingFeature : f); } else { updated = [...features, editingFeature]; } setFeatures(updated); saveFeatures(updated); setEditingFeature(null); setShowFeatureForm(false); showToast('Feature saved', 'success'); };
+  const saveSiteServiceFn = () => { if (!editingService?.name) { showToast('Name required', 'error'); return; } const idx = siteServices.findIndex(s => s.id === editingService.id); let updated; if (idx >= 0) { updated = siteServices.map((s, i) => i === idx ? editingService : s); } else { const newId = Math.max(0, ...siteServices.map(s => s.id)) + 1; updated = [...siteServices, { ...editingService, id: newId }]; } setSiteServices(updated); saveServices(updated); setEditingService(null); setShowServiceForm(false); showToast('Service saved', 'success'); };
+  const saveCustomerFn = () => { if (!customerForm.name || !customerForm.phone) { showToast('Name and phone required', 'error'); return; } const nc: Customer = { id: Math.max(0, ...customers.map(c => c.id)) + 1, name: customerForm.name || '', email: customerForm.email || '', phone: customerForm.phone || '', totalBookings: customerForm.totalBookings || 0, spent: customerForm.spent || 0 }; setCustomers([...customers, nc]); setShowCustomerForm(false); setCustomerForm({}); showToast('Customer added', 'success'); };
+  const saveSocialLinksFn = () => { saveSocialLinks(socialLinks); showToast('Social links saved!', 'success'); };
 
-  const filteredBookings = bookings.filter(b => {
-    const matchesSearch = b.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      b.phone.includes(searchTerm) ||
-      b.id.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'All Status' || b.status === statusFilter.toLowerCase().replace(' ', '-');
-    return matchesSearch && matchesStatus;
-  });
-
-  const filteredOrders = orders.filter(o => 
-    o.customer.toLowerCase().includes(orderSearch.toLowerCase()) ||
-    o.id.toLowerCase().includes(orderSearch.toLowerCase()) ||
-    o.phone.includes(orderSearch)
-  );
-
+  // ─── SIDEBAR ───
   const Sidebar = () => (
     <aside className="w-64 bg-slate-800 border-r border-slate-700/50 text-white min-h-screen p-4 relative">
-       <div className="mb-8 text-center border-b pb-4">
-         <div className="flex items-center justify-center gap-3 mb-4">
-           <div className="w-12 h-12 bg-gradient-to-r from-amber-500 to-amber-600 rounded-xl flex items-center justify-center">
-             <LayoutDashboard className="w-6 h-6 text-white" />
-           </div>
-           <div>
-             <h1 className="text-2xl font-bold text-amber-100">Alphamobitech</h1>
-             <p className="text-xs text-amber-300">Admin Portal</p>
-           </div>
-         </div>
-         <div className="w-full h-0.5 bg-gradient-to-r from-transparent via-amber-500 to-transparent mx-4"></div>
-       </div>
-      
-        <nav className="space-y-2 mt-4">
-          {[
-            { id: 'dashboard', icon: <LayoutDashboard className="w-5 h-5" />, label: 'Dashboard' },
-            { id: 'orders', icon: <Calendar className="w-5 h-5" />, label: 'Orders' },
-            { id: 'bookings', icon: <Calendar className="w-5 h-5" />, label: 'Repair Bookings' },
-            { id: 'customers', icon: <Users className="w-5 h-5" />, label: 'Customers' },
-            { id: 'services', icon: <Wrench className="w-5 h-5" />, label: 'Services' },
-            { id: 'products', icon: <ShoppingCart className="w-5 h-5" />, label: 'Products' },
-            { id: 'gallery', icon: <Image className="w-5 h-5" />, label: 'Gallery' },
-            { id: 'content', icon: <Edit2 className="w-5 h-5" />, label: 'Content' },
-            { id: 'analytics', icon: <BarChart3 className="w-5 h-5" />, label: 'Analytics' },
-            { id: 'settings', icon: <Settings className="w-5 h-5" />, label: 'Settings' },
-          ].map(item => (
-            <button
-              key={item.id}
-              onClick={() => setActiveTab(item.id)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all cursor-pointer ${
-                activeTab === item.id 
-                  ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-sm' 
-                  : 'text-amber-200 hover:bg-amber-900/50 hover:text-white'
-              }`}
-            >
-              <div className="flex-shrink-0">
-                {item.icon}
-              </div>
-              <div className="flex-1">
-                <span className="text-sm font-medium">{item.label}</span>
-              </div>
-            </button>
-          ))}
-        </nav>
-      
+      <div className="mb-8 text-center border-b pb-4">
+        <div className="flex items-center justify-center gap-3 mb-4">
+          <div className="w-12 h-12 bg-gradient-to-r from-amber-500 to-amber-600 rounded-xl flex items-center justify-center"><LayoutDashboard className="w-6 h-6 text-white" /></div>
+          <div><h1 className="text-2xl font-bold text-amber-100">Alphamobitech</h1><p className="text-xs text-amber-300">Admin Portal</p></div>
+        </div>
+        <div className="w-full h-0.5 bg-gradient-to-r from-transparent via-amber-500 to-transparent mx-4"></div>
+      </div>
+      <nav className="space-y-2 mt-4">
+        {[
+          { id: 'dashboard', icon: <LayoutDashboard className="w-5 h-5" />, label: 'Dashboard' },
+          { id: 'orders', icon: <ShoppingCart className="w-5 h-5" />, label: 'Orders' },
+          { id: 'bookings', icon: <Calendar className="w-5 h-5" />, label: 'Repair Bookings' },
+          { id: 'customers', icon: <Users className="w-5 h-5" />, label: 'Customers' },
+          { id: 'services', icon: <Wrench className="w-5 h-5" />, label: 'Services' },
+          { id: 'products', icon: <Smartphone className="w-5 h-5" />, label: 'Products' },
+          { id: 'gallery', icon: <Image className="w-5 h-5" />, label: 'Gallery' },
+          { id: 'content', icon: <Edit2 className="w-5 h-5" />, label: 'Content' },
+          { id: 'analytics', icon: <BarChart3 className="w-5 h-5" />, label: 'Analytics' },
+          { id: 'settings', icon: <Settings className="w-5 h-5" />, label: 'Settings' },
+        ].map(item => (
+          <button key={item.id} onClick={() => setActiveTab(item.id)}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all cursor-pointer ${activeTab === item.id ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-sm' : 'text-amber-200 hover:bg-amber-900/50 hover:text-white'}`}>
+            <div className="flex-shrink-0">{item.icon}</div>
+            <div className="flex-1"><span className="text-sm font-medium">{item.label}</span></div>
+          </button>
+        ))}
+      </nav>
       <div className="absolute bottom-4 left-4 right-4">
-        <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-white hover:bg-slate-700 transition-colors rounded-lg cursor-pointer">
-          <LogOut className="w-5 h-5" />
-          <span>Logout</span>
-        </button>
+        <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-white hover:bg-slate-700 transition-colors rounded-lg cursor-pointer"><LogOut className="w-5 h-5" /><span>Logout</span></button>
       </div>
     </aside>
   );
@@ -230,627 +177,179 @@ const AdminDashboard = () => {
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
       {stats.map((stat, i) => (
         <div key={i} className="bg-slate-800 rounded-xl p-6 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
-            <div className={`p-3 rounded-lg ${stat.color}`}>
-              <div className="text-white">{stat.icon}</div>
-            </div>
-            <div className={`flex items-center gap-1 text-sm ${stat.change >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-              {stat.change >= 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
-              <span>{Math.abs(stat.change)}%</span>
-            </div>
-          </div>
-          <div className="text-3xl font-bold text-white mb-1">{stat.value}</div>
-          <div className="text-sm text-slate-400">{stat.title}</div>
+          <div className="flex items-center justify-between mb-4"><div className={`p-3 rounded-lg ${stat.color}`}><div className="text-white">{stat.icon}</div></div><div className={`flex items-center gap-1 text-sm ${stat.change >= 0 ? 'text-green-500' : 'text-red-500'}`}>{stat.change >= 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}<span>{Math.abs(stat.change)}%</span></div></div>
+          <div className="text-3xl font-bold text-white mb-1">{stat.value}</div><div className="text-sm text-slate-400">{stat.title}</div>
         </div>
       ))}
     </div>
   );
 
-  const BookingsTable = () => (
+  const BookingsTable = ({ compact = false }: { compact?: boolean }) => (
     <div className="bg-slate-800 rounded-xl shadow-sm overflow-hidden">
-      <div className="p-6 border-b border-slate-700/30">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <h2 className="text-lg font-semibold text-white">Recent Bookings</h2>
-          <div className="flex items-center gap-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
-              <input
-                type="text"
-                placeholder="Search bookings..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 pr-4 py-2 bg-slate-700 border-slate-600 rounded-lg focus:border-amber-500 focus:outline-none"
-              />
-            </div>
-            <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="px-4 py-2 bg-slate-700 border-slate-600 rounded-lg focus:border-amber-500 focus:outline-none">
-              <option>All Status</option>
-              <option>Pending</option>
-              <option>In Progress</option>
-              <option>Completed</option>
-              <option>Cancelled</option>
-            </select>
-          </div>
-        </div>
-      </div>
-      
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead className="bg-slate-800/50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">ID</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Customer</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Device</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Service</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Status</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Amount</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-700/30">
-            {filteredBookings.map((booking) => (
-              <tr key={booking.id} className="hover:bg-slate-700/50 transition-colors">
-                <td className="px-6 py-4 text-sm font-medium text-amber-400">{booking.id}</td>
-                <td className="px-6 py-4">
-                  <div className="font-medium text-white">{booking.customerName}</div>
-                  <div className="text-sm text-slate-400">{booking.phone}</div>
-                </td>
-                <td className="px-6 py-4 text-sm text-slate-300">{booking.device}</td>
-                <td className="px-6 py-4 text-sm text-slate-300">{booking.service}</td>
-                <td className="px-6 py-4">
-                  <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium ${
-                    booking.status === 'completed' ? 'bg-green-500/10 text-green-400' :
-                    booking.status === 'in-progress' ? 'bg-amber-500/10 text-amber-400' :
-                    booking.status === 'pending' ? 'bg-blue-500/10 text-blue-400' :
-                    'bg-red-500/10 text-red-400'
-                  }`}>
-                    {booking.status === 'completed' && <CheckCircle className="w-3 h-3" />}
-                    {booking.status === 'pending' && <Clock className="w-3 h-3" />}
-                    {booking.status === 'cancelled' && <XCircle className="w-3 h-3" />}
-                    {booking.status.replace('-', ' ')}
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-sm font-semibold text-white">KSh {booking.amount.toLocaleString()}</td>
-                <td className="px-6 py-4">
-                  <div className="flex items-center gap-2">
-                    <button onClick={() => setViewingBooking(booking)} className="p-2 text-slate-500 hover:text-amber-400 hover:bg-amber-500/10 rounded-lg transition-colors cursor-pointer">
-                      <Eye className="w-4 h-4" />
-                    </button>
-                    <button onClick={() => setEditingBooking({...booking})} className="p-2 text-slate-500 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors cursor-pointer">
-                      <Edit className="w-4 h-4" />
-                    </button>
-                    <button onClick={() => deleteBooking(booking.id)} className="p-2 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors cursor-pointer">
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      {!compact && (<div className="p-6 border-b border-slate-700/30"><div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4"><h2 className="text-lg font-semibold text-white">Recent Bookings</h2><div className="flex items-center gap-4"><div className="relative"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" /><input type="text" placeholder="Search..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-10 pr-4 py-2 bg-slate-700 border-slate-600 rounded-lg focus:border-amber-500 focus:outline-none text-white" /></div><select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="px-4 py-2 bg-slate-700 border-slate-600 rounded-lg text-white"><option>All Status</option><option>Pending</option><option>In Progress</option><option>Completed</option><option>Cancelled</option></select></div></div></div>)}
+      <div className="overflow-x-auto"><table className="w-full"><thead className="bg-slate-800/50"><tr><th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">ID</th><th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Customer</th><th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Device</th><th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Service</th><th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Status</th><th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Amount</th><th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Actions</th></tr></thead><tbody className="divide-y divide-slate-700/30">{filteredBookings.map((b) => (<tr key={b.id} className="hover:bg-slate-700/50 transition-colors"><td className="px-6 py-4 text-sm font-medium text-amber-400">{b.id}</td><td className="px-6 py-4"><div className="font-medium text-white">{b.customerName}</div><div className="text-sm text-slate-400">{b.phone}</div></td><td className="px-6 py-4 text-sm text-slate-300">{b.device}</td><td className="px-6 py-4 text-sm text-slate-300">{b.service}</td><td className="px-6 py-4"><span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium ${b.status === 'completed' ? 'bg-green-500/10 text-green-400' : b.status === 'in-progress' ? 'bg-amber-500/10 text-amber-400' : b.status === 'pending' ? 'bg-blue-500/10 text-blue-400' : 'bg-red-500/10 text-red-400'}`}>{b.status === 'completed' && <CheckCircle className="w-3 h-3" />}{b.status === 'pending' && <Clock className="w-3 h-3" />}{b.status === 'cancelled' && <XCircle className="w-3 h-3" />}{b.status.replace('-', ' ')}</span></td><td className="px-6 py-4 text-sm font-semibold text-white">KSh {b.amount.toLocaleString()}</td><td className="px-6 py-4"><div className="flex items-center gap-2"><button onClick={() => setViewingBooking(b)} className="p-2 text-slate-500 hover:text-amber-400 hover:bg-amber-500/10 rounded-lg transition-colors cursor-pointer"><Eye className="w-4 h-4" /></button><button onClick={() => setEditingBooking({...b})} className="p-2 text-slate-500 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors cursor-pointer"><Edit className="w-4 h-4" /></button><button onClick={() => deleteBooking(b.id)} className="p-2 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors cursor-pointer"><Trash2 className="w-4 h-4" /></button></div></td></tr>))}</tbody></table></div>
     </div>
   );
 
   const ServicesChart = () => (
     <div className="grid lg:grid-cols-2 gap-6">
-      <div className="bg-slate-800 rounded-xl shadow-sm p-6">
-        <h2 className="text-lg font-semibold text-white mb-6">Services Breakdown</h2>
-        <div className="space-y-4">
-          {services.map((service, i) => (
-            <div key={i}>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-slate-200">{service.name}</span>
-                <span className="text-sm text-slate-400">{service.count} repairs</span>
-              </div>
-              <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
-                <div 
-                  className="h-full bg-gradient-to-r from-amber-500 to-amber-600 rounded-full"
-                  style={{ width: `${(service.count / 50) * 100}%` }}
-                ></div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-      
-      <div className="bg-slate-800 rounded-xl shadow-sm p-6">
-        <h2 className="text-lg font-semibold text-white mb-6">Revenue by Service</h2>
-        <div className="space-y-4">
-          {services.map((service, i) => (
-            <div key={i} className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center">
-                  <Wrench className="w-5 h-5 text-amber-400" />
-                </div>
-                <div>
-                  <div className="font-medium text-white">{service.name}</div>
-                  <div className="text-sm text-slate-400">{service.count} repairs</div>
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="font-semibold text-white">KSh {service.revenue.toLocaleString()}</div>
-                <div className="text-sm text-green-400">+{Math.round((service.revenue / 350000) * 100)}%</div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      <div className="bg-slate-800 rounded-xl shadow-sm p-6"><h2 className="text-lg font-semibold text-white mb-6">Services Breakdown</h2><div className="space-y-4">{services.map((s, i) => (<div key={i}><div className="flex items-center justify-between mb-2"><span className="text-sm font-medium text-slate-200">{s.name}</span><span className="text-sm text-slate-400">{s.count} repairs</span></div><div className="h-2 bg-slate-700 rounded-full overflow-hidden"><div className="h-full bg-gradient-to-r from-amber-500 to-amber-600 rounded-full" style={{ width: `${(s.count / 50) * 100}%` }}></div></div></div>))}</div></div>
+      <div className="bg-slate-800 rounded-xl shadow-sm p-6"><h2 className="text-lg font-semibold text-white mb-6">Revenue by Service</h2><div className="space-y-4">{services.map((s, i) => (<div key={i} className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg"><div className="flex items-center gap-3"><div className="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center"><Wrench className="w-5 h-5 text-amber-400" /></div><div><div className="font-medium text-white">{s.name}</div><div className="text-sm text-slate-400">{s.count} repairs</div></div></div><div className="text-right"><div className="font-semibold text-white">KSh {s.revenue.toLocaleString()}</div><div className="text-sm text-green-400">+{Math.round((s.revenue / 350000) * 100)}%</div></div></div>))}</div></div>
     </div>
   );
 
   const QuickActions = () => (
-    <div className="bg-slate-800 rounded-xl shadow-sm p-6">
-      <h2 className="text-lg font-semibold text-white mb-6">Quick Actions</h2>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {[
-          { icon: <Plus className="w-5 h-5" />, label: 'New Booking', color: 'bg-amber-500' },
-          { icon: <Calendar className="w-5 h-5" />, label: 'Schedule', color: 'bg-blue-500' },
-          { icon: <Phone className="w-5 h-5" />, label: 'Call Customer', color: 'bg-green-500' },
-          { icon: <BarChart3 className="w-5 h-5" />, label: 'Generate Report', color: 'bg-purple-500' },
-        ].map((action, i) => (
-          <button key={i} className="flex flex-col items-center gap-3 p-4 rounded-xl border-2 border-dashed border-slate-700/50 hover:border-amber-500 hover:bg-amber-500/10 transition-all cursor-pointer">
-            <div className={`w-12 h-12 rounded-xl ${action.color} flex items-center justify-center text-white`}>
-              {action.icon}
-            </div>
-            <span className="text-sm font-medium text-slate-200">{action.label}</span>
-          </button>
-        ))}
-      </div>
-    </div>
+    <div className="bg-slate-800 rounded-xl shadow-sm p-6"><h2 className="text-lg font-semibold text-white mb-6">Quick Actions</h2><div className="grid grid-cols-2 md:grid-cols-4 gap-4">{[{ icon: <Plus className="w-5 h-5" />, label: 'New Booking', color: 'bg-amber-500', action: () => setActiveTab('bookings') },{ icon: <Smartphone className="w-5 h-5" />, label: 'Add Product', color: 'bg-blue-500', action: () => { setProductForm({}); setEditingProduct(null); setShowProductForm(true); setActiveTab('products'); } },{ icon: <Image className="w-5 h-5" />, label: 'Add to Gallery', color: 'bg-green-500', action: () => { setGalleryForm({}); setEditingGalleryItem(null); setShowGalleryForm(true); setActiveTab('gallery'); } },{ icon: <BarChart3 className="w-5 h-5" />, label: 'View Analytics', color: 'bg-purple-500', action: () => setActiveTab('analytics') }].map((a, i) => (<button key={i} onClick={a.action} className="flex flex-col items-center gap-3 p-4 rounded-xl border-2 border-dashed border-slate-700/50 hover:border-amber-500 hover:bg-amber-500/10 transition-all cursor-pointer"><div className={`w-12 h-12 rounded-xl ${a.color} flex items-center justify-center text-white`}>{a.icon}</div><span className="text-sm font-medium text-slate-200">{a.label}</span></button>))}</div></div>
   );
 
-  const DashboardContent = () => (
-    <div className="space-y-6">
-      <StatsGrid />
-      <BookingsTable />
-      <ServicesChart />
-      <QuickActions />
-    </div>
-  );
+  const DashboardContent = () => (<div className="space-y-6"><StatsGrid /><BookingsTable compact /><ServicesChart /><QuickActions /></div>);
 
-  const BookingsContent = () => (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-white">Bookings Management</h1>
-        <button className="flex items-center gap-2 bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600 transition-colors cursor-pointer">
-          <Plus className="w-5 h-5" />
-          <span>New Booking</span>
-        </button>
-      </div>
-      <BookingsTable />
-    </div>
-  );
+  const Toast = () => {
+    if (!toast) return null;
+    return (<div className={`fixed top-24 right-4 z-[100] max-w-sm p-4 rounded-xl shadow-2xl flex items-center gap-3 ${toast.type === 'success' ? 'bg-green-600 text-white' : toast.type === 'error' ? 'bg-red-600 text-white' : 'bg-blue-600 text-white'}`}><span className="text-sm font-medium">{toast.message}</span><button onClick={() => setToast(null)} className="ml-2 hover:opacity-70"><X className="w-4 h-4" /></button></div>);
+  };
 
-  const OrdersContent = () => (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-white">Store Orders</h1>
-        <button className="flex items-center gap-2 bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600 cursor-pointer">
-          <Plus className="w-5 h-5" />
-          <span>Export</span>
-        </button>
-      </div>
-      <div className="bg-slate-800 rounded-xl shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-slate-700/30">
-          <input type="text" placeholder="Search orders..." value={orderSearch} onChange={(e) => setOrderSearch(e.target.value)} className="px-4 py-2 bg-slate-700 border-slate-600 rounded-lg w-full max-w-md" />
+  // ─── CONTENT MANAGEMENT ───
+  const ContentManagementContent = () => {
+    const [contentTab, setContentTab] = useState<'hero' | 'features' | 'social' | 'services'>('hero');
+    return (
+      <div className="space-y-6">
+        <h1 className="text-2xl font-bold text-white">Content Management</h1>
+        <div className="flex gap-2 flex-wrap">
+          {([{ id: 'hero' as const, label: 'Hero Slides', icon: <Type className="w-4 h-4" /> },{ id: 'features' as const, label: 'Features', icon: <Star className="w-4 h-4" /> },{ id: 'social' as const, label: 'Social Links', icon: <Link className="w-4 h-4" /> },{ id: 'services' as const, label: 'Site Services', icon: <Wrench className="w-4 h-4" /> }]).map(tab => (
+            <button key={tab.id} onClick={() => setContentTab(tab.id)} className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm cursor-pointer ${contentTab === tab.id ? 'bg-amber-500 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}`}>{tab.icon}{tab.label}</button>
+          ))}
         </div>
-        <table className="w-full">
-          <thead className="bg-slate-800/50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Order ID</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Customer</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Items</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Total</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Status</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Date</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-700/30">
-            {filteredOrders.map((order) => (
-              <tr key={order.id} className="hover:bg-slate-700/50">
-                <td className="px-6 py-4 font-medium text-amber-400">{order.id}</td>
-                <td className="px-6 py-4">
-                  <div className="font-medium text-white">{order.customer}</div>
-                  <div className="text-sm text-slate-400">{order.phone}</div>
-                </td>
-                <td className="px-6 py-4 text-sm">
-                  {order.items.map((item, i) => (
-                    <div key={i}>{item.name} x{item.qty}</div>
-                  ))}
-                </td>
-                <td className="px-6 py-4 font-bold text-white">KSh {order.total.toLocaleString()}</td>
-                <td className="px-6 py-4">
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                    order.status === 'pending' ? 'bg-yellow-500/10 text-yellow-400' :
-                    order.status === 'confirmed' ? 'bg-blue-500/10 text-blue-400' :
-                    order.status === 'shipped' ? 'bg-purple-500/10 text-purple-400' :
-                    'bg-green-500/10 text-green-400'
-                  }`}>
-                    {order.status}
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-sm text-slate-400">{order.date}</td>
-                <td className="px-6 py-4">
-                  <div className="flex gap-2">
-                    <select value={order.status} onChange={(e) => updateOrderStatus(order.id, e.target.value as Order['status'])} className="text-sm bg-slate-700 border-slate-600 rounded px-2 py-1">
-                      <option value="pending">Pending</option>
-                      <option value="confirmed">Confirmed</option>
-                      <option value="shipped">Shipped</option>
-                      <option value="delivered">Delivered</option>
-                    </select>
-                    <button className="p-1 text-amber-400 hover:bg-amber-500/10 rounded">
-                      <Eye className="w-4 h-4" />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        {contentTab === 'hero' && (<div className="space-y-4"><div className="flex justify-between items-center"><h2 className="text-lg font-semibold text-white">Hero Slides ({heroSlides.length})</h2><button onClick={() => { setEditingHeroSlide({ title: '', subtitle: '', description: '', cta: 'Learn More', image: '' }); setShowHeroForm(true); }} className="flex items-center gap-2 bg-amber-500 text-white px-3 py-1.5 rounded-lg text-sm hover:bg-amber-600 cursor-pointer"><Plus className="w-4 h-4" />Add Slide</button></div>{heroSlides.map((slide, i) => (<div key={i} className="bg-slate-800 rounded-xl p-4 flex items-center justify-between"><div><h3 className="font-medium text-white">{slide.title}</h3><p className="text-sm text-slate-400">{slide.subtitle}</p></div><div className="flex gap-2"><button onClick={() => { setEditingHeroSlide({...slide}); setShowHeroForm(true); }} className="p-2 text-slate-400 hover:text-amber-400 cursor-pointer"><Edit className="w-4 h-4" /></button><button onClick={() => { const u = heroSlides.filter((_, idx) => idx !== i); setHeroSlides(u); saveHeroSlides(u); showToast('Slide removed', 'success'); }} className="p-2 text-slate-400 hover:text-red-400 cursor-pointer"><Trash2 className="w-4 h-4" /></button></div></div>))}</div>)}
+        {contentTab === 'features' && (<div className="space-y-4"><div className="flex justify-between items-center"><h2 className="text-lg font-semibold text-white">Features ({features.length})</h2><button onClick={() => { setEditingFeature({ iconName: 'Shield', title: '', description: '' }); setShowFeatureForm(true); }} className="flex items-center gap-2 bg-amber-500 text-white px-3 py-1.5 rounded-lg text-sm hover:bg-amber-600 cursor-pointer"><Plus className="w-4 h-4" />Add Feature</button></div><div className="grid md:grid-cols-2 gap-4">{features.map((f, i) => (<div key={i} className="bg-slate-800 rounded-xl p-4 flex items-center justify-between"><div><h3 className="font-medium text-white">{f.title}</h3><p className="text-sm text-slate-400">{f.description}</p><span className="text-xs text-slate-500">Icon: {f.iconName}</span></div><div className="flex gap-2"><button onClick={() => { setEditingFeature({...f}); setShowFeatureForm(true); }} className="p-2 text-slate-400 hover:text-amber-400 cursor-pointer"><Edit className="w-4 h-4" /></button><button onClick={() => { const u = features.filter((_, idx) => idx !== i); setFeatures(u); saveFeatures(u); showToast('Feature removed', 'success'); }} className="p-2 text-slate-400 hover:text-red-400 cursor-pointer"><Trash2 className="w-4 h-4" /></button></div></div>))}</div></div>)}
+        {contentTab === 'social' && (<div className="bg-slate-800 rounded-xl p-6"><h2 className="text-lg font-semibold text-white mb-4">Social Media Links</h2><div className="space-y-4">{(['facebook', 'instagram', 'twitter', 'whatsapp'] as const).map(key => (<div key={key}><label className="block text-sm font-medium text-slate-300 mb-1 capitalize">{key}</label><input type="url" value={socialLinks[key]} onChange={e => setSocialLinks({...socialLinks, [key]: e.target.value})} className="w-full px-4 py-2 bg-slate-700 border-slate-600 rounded-lg text-white" placeholder={`https://${key}.com/yourpage`} /></div>))}<button onClick={saveSocialLinksFn} className="px-6 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 cursor-pointer">Save Social Links</button></div></div>)}
+        {contentTab === 'services' && (<div className="space-y-4"><div className="flex justify-between items-center"><h2 className="text-lg font-semibold text-white">Website Services ({siteServices.length})</h2><button onClick={() => { setEditingService({ id: 0, name: '', description: '', price: 0, category: 'Hardware', iconName: 'Wrench', duration: '1 hour' }); setShowServiceForm(true); }} className="flex items-center gap-2 bg-amber-500 text-white px-3 py-1.5 rounded-lg text-sm hover:bg-amber-600 cursor-pointer"><Plus className="w-4 h-4" />Add Service</button></div><div className="grid md:grid-cols-2 gap-4">{siteServices.map((s, i) => (<div key={i} className="bg-slate-800 rounded-xl p-4 flex items-center justify-between"><div><h3 className="font-medium text-white">{s.name}</h3><p className="text-sm text-slate-400">{s.description}</p><span className="text-amber-400 font-semibold">KSh {s.price.toLocaleString()}</span></div><div className="flex gap-2"><button onClick={() => { setEditingService({...s}); setShowServiceForm(true); }} className="p-2 text-slate-400 hover:text-amber-400 cursor-pointer"><Edit className="w-4 h-4" /></button><button onClick={() => { const u = siteServices.filter(x => x.id !== s.id); setSiteServices(u); saveServices(u); showToast('Service removed', 'success'); }} className="p-2 text-slate-400 hover:text-red-400 cursor-pointer"><Trash2 className="w-4 h-4" /></button></div></div>))}</div></div>)}
       </div>
+    );
+  };
+
+  // ─── PRODUCTS CONTENT ───
+  const ProductsContent = () => (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between"><div><h1 className="text-2xl font-bold text-white">Products</h1><p className="text-slate-400 text-sm">{products.length} products total</p></div><button onClick={() => { setProductForm({ brand: 'Samsung', category: 'phone', inStock: true, rating: 4.0, reviews: 0, specs: [], features: [] }); setEditingProduct(null); setShowProductForm(true); }} className="flex items-center gap-2 bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600 transition-colors cursor-pointer"><Plus className="w-5 h-5" /><span>Add Product</span></button></div>
+      <div className="flex flex-col md:flex-row gap-4"><div className="relative flex-1"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" /><input type="text" placeholder="Search products..." value={productSearch} onChange={e => setProductSearch(e.target.value)} className="pl-10 pr-4 py-2 bg-slate-800 border border-slate-700 rounded-lg w-full text-white" /></div><select value={productBrandFilter} onChange={e => setProductBrandFilter(e.target.value)} className="px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white"><option value="All">All Brands</option>{BRANDS.map(b => <option key={b} value={b}>{b}</option>)}</select></div>
+      <div className="bg-slate-800 rounded-xl shadow-sm overflow-hidden"><div className="overflow-x-auto"><table className="w-full"><thead className="bg-slate-800/50"><tr><th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase">ID</th><th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase">Product</th><th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase">Brand</th><th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase">Price</th><th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase">Stock</th><th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase">Badge</th><th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase">Actions</th></tr></thead><tbody className="divide-y divide-slate-700/30">{filteredProducts.slice(0, 50).map((p) => (<tr key={p.id} className="hover:bg-slate-700/50 transition-colors"><td className="px-4 py-3 text-sm text-amber-400">{p.id}</td><td className="px-4 py-3"><div className="flex items-center gap-3"><div className="w-10 h-10 rounded-lg bg-slate-700 flex items-center justify-center overflow-hidden flex-shrink-0">{p.image ? <img src={p.image} alt="" className="w-full h-full object-cover" /> : <Smartphone className="w-5 h-5 text-slate-500" />}</div><div className="font-medium text-white text-sm truncate max-w-[200px]">{p.name}</div></div></td><td className="px-4 py-3 text-sm text-slate-300">{p.brand}</td><td className="px-4 py-3 text-sm font-semibold text-white">KSh {p.price.toLocaleString()}</td><td className="px-4 py-3"><span className={`px-2 py-1 rounded text-xs ${p.inStock ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>{p.inStock ? 'In Stock' : 'Out'}</span></td><td className="px-4 py-3">{p.badge && <span className="px-2 py-1 rounded text-xs bg-amber-500/10 text-amber-400">{p.badge}</span>}</td><td className="px-4 py-3"><div className="flex items-center gap-1"><button onClick={() => startEditProduct(p)} className="p-2 text-slate-500 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors cursor-pointer"><Edit className="w-4 h-4" /></button><button onClick={() => deleteProduct(p.id)} className="p-2 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors cursor-pointer"><Trash2 className="w-4 h-4" /></button></div></td></tr>))}</tbody></table></div>{filteredProducts.length > 50 && <div className="p-4 text-center text-slate-400 text-sm">Showing 50 of {filteredProducts.length} products</div>}</div>
     </div>
   );
 
+  // ─── GALLERY CONTENT ───
+  const GalleryContent = () => (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between"><div><h1 className="text-2xl font-bold text-white">Gallery</h1><p className="text-slate-400 text-sm">{galleryItems.length} items</p></div><button onClick={() => { setGalleryForm({ category: 'Repair' }); setEditingGalleryItem(null); setShowGalleryForm(true); }} className="flex items-center gap-2 bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600 transition-colors cursor-pointer"><Plus className="w-5 h-5" /><span>Add Image</span></button></div>
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">{galleryItems.map((item) => (<div key={item.id} className="bg-slate-800 rounded-xl overflow-hidden"><div className="aspect-square bg-slate-700 flex items-center justify-center overflow-hidden">{item.image ? <img src={item.image} alt={item.title} className="w-full h-full object-cover" /> : <Image className="w-12 h-12 text-slate-600" />}</div><div className="p-3"><h3 className="font-medium text-white text-sm truncate">{item.title}</h3><p className="text-xs text-slate-400">{item.category}</p><div className="flex gap-2 mt-2"><button onClick={() => { setEditingGalleryItem({...item}); setGalleryForm({...item}); setShowGalleryForm(true); }} className="flex-1 py-1 text-xs bg-slate-700 text-slate-300 rounded hover:bg-slate-600 cursor-pointer">Edit</button><button onClick={() => deleteGalleryItem(item.id)} className="py-1 px-2 text-xs bg-red-500/10 text-red-400 rounded hover:bg-red-500/20 cursor-pointer"><Trash2 className="w-3 h-3" /></button></div></div></div>))}</div>
+    </div>
+  );
+
+  // ─── BOOKINGS CONTENT ───
+  const BookingsContent = () => {
+    const [newBooking, setNewBooking] = useState<Partial<Booking>>({ status: 'pending', date: new Date().toISOString().split('T')[0], amount: 0 });
+    const [showAdd, setShowAdd] = useState(false);
+    return (<div className="space-y-6"><div className="flex items-center justify-between"><h1 className="text-2xl font-bold text-white">Bookings Management</h1><button onClick={() => setShowAdd(!showAdd)} className="flex items-center gap-2 bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600 transition-colors cursor-pointer"><Plus className="w-5 h-5" /><span>New Booking</span></button></div>
+    {showAdd && (<div className="bg-slate-800 rounded-xl p-6"><h3 className="text-lg font-semibold text-white mb-4">Add New Booking</h3><div className="grid md:grid-cols-2 gap-4"><div><label className="block text-sm text-slate-300 mb-1">Customer Name *</label><input type="text" value={newBooking.customerName || ''} onChange={e => setNewBooking({...newBooking, customerName: e.target.value})} className="w-full px-3 py-2 bg-slate-700 rounded-lg text-white" /></div><div><label className="block text-sm text-slate-300 mb-1">Phone *</label><input type="text" value={newBooking.phone || ''} onChange={e => setNewBooking({...newBooking, phone: e.target.value})} className="w-full px-3 py-2 bg-slate-700 rounded-lg text-white" /></div><div><label className="block text-sm text-slate-300 mb-1">Device *</label><input type="text" value={newBooking.device || ''} onChange={e => setNewBooking({...newBooking, device: e.target.value})} className="w-full px-3 py-2 bg-slate-700 rounded-lg text-white" /></div><div><label className="block text-sm text-slate-300 mb-1">Service *</label><input type="text" value={newBooking.service || ''} onChange={e => setNewBooking({...newBooking, service: e.target.value})} className="w-full px-3 py-2 bg-slate-700 rounded-lg text-white" /></div><div><label className="block text-sm text-slate-300 mb-1">Date</label><input type="date" value={newBooking.date || ''} onChange={e => setNewBooking({...newBooking, date: e.target.value})} className="w-full px-3 py-2 bg-slate-700 rounded-lg text-white" /></div><div><label className="block text-sm text-slate-300 mb-1">Amount (KSh)</label><input type="number" value={newBooking.amount || 0} onChange={e => setNewBooking({...newBooking, amount: parseInt(e.target.value) || 0})} className="w-full px-3 py-2 bg-slate-700 rounded-lg text-white" /></div><div><label className="block text-sm text-slate-300 mb-1">Status</label><select value={newBooking.status || 'pending'} onChange={e => setNewBooking({...newBooking, status: e.target.value as Booking['status']})} className="w-full px-3 py-2 bg-slate-700 rounded-lg text-white"><option value="pending">Pending</option><option value="in-progress">In Progress</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option></select></div><div><label className="block text-sm text-slate-300 mb-1">Notes</label><input type="text" value={newBooking.notes || ''} onChange={e => setNewBooking({...newBooking, notes: e.target.value})} className="w-full px-3 py-2 bg-slate-700 rounded-lg text-white" /></div></div><div className="flex gap-3 mt-4"><button onClick={() => { if (!newBooking.customerName || !newBooking.phone || !newBooking.device || !newBooking.service) { showToast('Fill required fields', 'error'); return; } addBooking({ ...newBooking, id: 'AMB' + String(bookings.length + 1).padStart(3, '0') } as Booking); setNewBooking({ status: 'pending', date: new Date().toISOString().split('T')[0], amount: 0 }); setShowAdd(false); }} className="px-6 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 cursor-pointer">Save Booking</button><button onClick={() => setShowAdd(false)} className="px-6 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-500 cursor-pointer">Cancel</button></div></div>)}
+    <BookingsTable /></div>);
+  };
+
+  // ─── ORDERS CONTENT ───
+  const OrdersContent = () => {
+    const [showAdd, setShowAdd] = useState(false);
+    const [newOrder, setNewOrder] = useState<Partial<Order>>({ status: 'pending', date: new Date().toISOString().split('T')[0], payment: 'mpesa', items: [{ name: '', qty: 1, price: 0 }] });
+    return (<div className="space-y-6"><div className="flex items-center justify-between"><h1 className="text-2xl font-bold text-white">Store Orders</h1><button onClick={() => setShowAdd(!showAdd)} className="flex items-center gap-2 bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600 cursor-pointer"><Plus className="w-5 h-5" /><span>New Order</span></button></div>
+    {showAdd && (<div className="bg-slate-800 rounded-xl p-6"><h3 className="text-lg font-semibold text-white mb-4">Add New Order</h3><div className="grid md:grid-cols-2 gap-4"><div><label className="block text-sm text-slate-300 mb-1">Customer *</label><input type="text" value={newOrder.customer || ''} onChange={e => setNewOrder({...newOrder, customer: e.target.value})} className="w-full px-3 py-2 bg-slate-700 rounded-lg text-white" /></div><div><label className="block text-sm text-slate-300 mb-1">Email</label><input type="email" value={newOrder.email || ''} onChange={e => setNewOrder({...newOrder, email: e.target.value})} className="w-full px-3 py-2 bg-slate-700 rounded-lg text-white" /></div><div><label className="block text-sm text-slate-300 mb-1">Phone</label><input type="text" value={newOrder.phone || ''} onChange={e => setNewOrder({...newOrder, phone: e.target.value})} className="w-full px-3 py-2 bg-slate-700 rounded-lg text-white" /></div><div><label className="block text-sm text-slate-300 mb-1">Item Name *</label><input type="text" value={newOrder.items?.[0]?.name || ''} onChange={e => { const items = [...(newOrder.items || [])]; items[0] = { ...items[0], name: e.target.value }; setNewOrder({...newOrder, items}); }} className="w-full px-3 py-2 bg-slate-700 rounded-lg text-white" /></div><div><label className="block text-sm text-slate-300 mb-1">Qty</label><input type="number" value={newOrder.items?.[0]?.qty || 1} onChange={e => { const items = [...(newOrder.items || [])]; items[0] = { ...items[0], qty: parseInt(e.target.value) || 1 }; setNewOrder({...newOrder, items}); }} className="w-full px-3 py-2 bg-slate-700 rounded-lg text-white" /></div><div><label className="block text-sm text-slate-300 mb-1">Price (KSh)</label><input type="number" value={newOrder.items?.[0]?.price || 0} onChange={e => { const items = [...(newOrder.items || [])]; const price = parseInt(e.target.value) || 0; items[0] = { ...items[0], price }; setNewOrder({...newOrder, items, total: price * (items[0]?.qty || 1) }); }} className="w-full px-3 py-2 bg-slate-700 rounded-lg text-white" /></div><div><label className="block text-sm text-slate-300 mb-1">Status</label><select value={newOrder.status || 'pending'} onChange={e => setNewOrder({...newOrder, status: e.target.value as Order['status']})} className="w-full px-3 py-2 bg-slate-700 rounded-lg text-white"><option value="pending">Pending</option><option value="confirmed">Confirmed</option><option value="shipped">Shipped</option><option value="delivered">Delivered</option></select></div><div><label className="block text-sm text-slate-300 mb-1">Payment</label><select value={newOrder.payment || 'mpesa'} onChange={e => setNewOrder({...newOrder, payment: e.target.value})} className="w-full px-3 py-2 bg-slate-700 rounded-lg text-white"><option value="mpesa">M-Pesa</option><option value="cash">Cash</option></select></div></div><div className="flex gap-3 mt-4"><button onClick={() => { if (!newOrder.customer || !newOrder.items?.[0]?.name) { showToast('Fill required fields', 'error'); return; } const total = (newOrder.items || []).reduce((s, i) => s + i.price * i.qty, 0); addOrder({ ...newOrder, id: 'ORD' + String(orders.length + 1).padStart(3, '0'), total } as Order); setNewOrder({ status: 'pending', date: new Date().toISOString().split('T')[0], payment: 'mpesa', items: [{ name: '', qty: 1, price: 0 }] }); setShowAdd(false); }} className="px-6 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 cursor-pointer">Save Order</button><button onClick={() => setShowAdd(false)} className="px-6 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-500 cursor-pointer">Cancel</button></div></div>)}
+    <div className="bg-slate-800 rounded-xl shadow-sm overflow-hidden"><div className="p-4 border-b border-slate-700/30"><input type="text" placeholder="Search orders..." value={orderSearch} onChange={(e) => setOrderSearch(e.target.value)} className="px-4 py-2 bg-slate-700 border-slate-600 rounded-lg w-full max-w-md text-white" /></div><table className="w-full"><thead className="bg-slate-800/50"><tr><th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Order ID</th><th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Customer</th><th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Items</th><th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Total</th><th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Status</th><th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Date</th><th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Actions</th></tr></thead><tbody className="divide-y divide-slate-700/30">{filteredOrders.map((order) => (<tr key={order.id} className="hover:bg-slate-700/50"><td className="px-6 py-4 font-medium text-amber-400">{order.id}</td><td className="px-6 py-4"><div className="font-medium text-white">{order.customer}</div><div className="text-sm text-slate-400">{order.phone}</div></td><td className="px-6 py-4 text-sm">{order.items.map((item, i) => (<div key={i}>{item.name} x{item.qty}</div>))}</td><td className="px-6 py-4 font-bold text-white">KSh {order.total.toLocaleString()}</td><td className="px-6 py-4"><span className={`px-3 py-1 rounded-full text-xs font-medium ${order.status === 'pending' ? 'bg-yellow-500/10 text-yellow-400' : order.status === 'confirmed' ? 'bg-blue-500/10 text-blue-400' : order.status === 'shipped' ? 'bg-purple-500/10 text-purple-400' : 'bg-green-500/10 text-green-400'}`}>{order.status}</span></td><td className="px-6 py-4 text-sm text-slate-400">{order.date}</td><td className="px-6 py-4"><div className="flex gap-2"><select value={order.status} onChange={(e) => updateOrderStatus(order.id, e.target.value as Order['status'])} className="text-sm bg-slate-700 border-slate-600 rounded px-2 py-1 text-white"><option value="pending">Pending</option><option value="confirmed">Confirmed</option><option value="shipped">Shipped</option><option value="delivered">Delivered</option></select><button className="p-1 text-amber-400 hover:bg-amber-500/10 rounded"><Eye className="w-4 h-4" /></button></div></td></tr>))}</tbody></table></div></div>);
+  };
+
+  // ─── SERVICES CONTENT ───
   const ServicesContent = () => (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-white">Services Management</h1>
-        <button className="flex items-center gap-2 bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600 transition-colors cursor-pointer">
-          <Plus className="w-5 h-5" />
-          <span>Add Service</span>
-        </button>
-      </div>
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {services.map((service, i) => (
-          <div key={i} className="bg-slate-800 rounded-xl shadow-sm p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center">
-                <Wrench className="w-6 h-6 text-amber-400" />
-              </div>
-              <button className="p-2 text-slate-500 hover:text-amber-400 hover:bg-amber-500/10 rounded-lg transition-colors cursor-pointer">
-                <Edit className="w-4 h-4" />
-              </button>
-            </div>
-            <h3 className="font-semibold text-white mb-2">{service.name}</h3>
-            <div className="flex items-center justify-between text-sm text-slate-400">
-              <span>{service.count} repairs</span>
-              <span className="font-semibold text-amber-400">KSh {service.revenue.toLocaleString()}</span>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
+    <div className="space-y-6"><div className="flex items-center justify-between"><h1 className="text-2xl font-semibold text-white">Services Management</h1><button onClick={() => { setEditingService({ id: 0, name: '', description: '', price: 0, category: 'Hardware', iconName: 'Wrench', duration: '1 hour' }); setShowServiceForm(true); }} className="flex items-center gap-2 bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600 transition-colors cursor-pointer"><Plus className="w-5 h-5" /><span>Add Service</span></button></div>
+    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">{siteServices.map((service, i) => (<div key={i} className="bg-slate-800 rounded-xl shadow-sm p-6"><div className="flex items-center justify-between mb-4"><div className="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center"><Wrench className="w-6 h-6 text-amber-400" /></div><div className="flex gap-2"><button onClick={() => { setEditingService({...service}); setShowServiceForm(true); }} className="p-2 text-slate-500 hover:text-amber-400 hover:bg-amber-500/10 rounded-lg transition-colors cursor-pointer"><Edit className="w-4 h-4" /></button><button onClick={() => { if (confirm('Delete this service?')) { const u = siteServices.filter(s => s.id !== service.id); setSiteServices(u); saveServices(u); showToast('Service deleted', 'success'); } }} className="p-2 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors cursor-pointer"><Trash2 className="w-4 h-4" /></button></div></div><h3 className="font-semibold text-white mb-2">{service.name}</h3><p className="text-sm text-slate-400 mb-3">{service.description}</p><div className="flex items-center justify-between text-sm"><span className="text-slate-400">{service.duration}</span><span className="font-semibold text-amber-400">KSh {service.price.toLocaleString()}</span></div><div className="mt-2"><span className="text-xs bg-slate-700 text-slate-300 px-2 py-1 rounded">{service.category}</span></div></div>))}</div></div>
   );
 
+  // ─── CUSTOMERS CONTENT ───
+  const CustomersContent = () => (
+    <div className="space-y-6"><div className="flex items-center justify-between"><h1 className="text-2xl font-bold text-white">Customers</h1><button onClick={() => { setCustomerForm({}); setShowCustomerForm(true); }} className="flex items-center gap-2 bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600 transition-colors cursor-pointer"><Plus className="w-5 h-5" /><span>Add Customer</span></button></div>
+    {showCustomerForm && (<div className="bg-slate-800 rounded-xl p-6"><h3 className="text-lg font-semibold text-white mb-4">Add Customer</h3><div className="grid md:grid-cols-2 gap-4"><div><label className="block text-sm text-slate-300 mb-1">Name *</label><input type="text" value={customerForm.name || ''} onChange={e => setCustomerForm({...customerForm, name: e.target.value})} className="w-full px-3 py-2 bg-slate-700 rounded-lg text-white" /></div><div><label className="block text-sm text-slate-300 mb-1">Email</label><input type="email" value={customerForm.email || ''} onChange={e => setCustomerForm({...customerForm, email: e.target.value})} className="w-full px-3 py-2 bg-slate-700 rounded-lg text-white" /></div><div><label className="block text-sm text-slate-300 mb-1">Phone *</label><input type="text" value={customerForm.phone || ''} onChange={e => setCustomerForm({...customerForm, phone: e.target.value})} className="w-full px-3 py-2 bg-slate-700 rounded-lg text-white" /></div></div><div className="flex gap-3 mt-4"><button onClick={saveCustomerFn} className="px-6 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 cursor-pointer">Save</button><button onClick={() => setShowCustomerForm(false)} className="px-6 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-500 cursor-pointer">Cancel</button></div></div>)}
+    <div className="bg-slate-800 rounded-xl shadow-sm overflow-hidden"><div className="p-4 border-b border-slate-700/30"><input type="text" placeholder="Search customers..." value={customerSearch} onChange={e => setCustomerSearch(e.target.value)} className="px-4 py-2 bg-slate-700 border-slate-600 rounded-lg w-full max-w-md text-white" /></div><table className="w-full"><thead className="bg-slate-800/50"><tr><th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Customer</th><th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Phone</th><th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Bookings</th><th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Total Spent</th><th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Actions</th></tr></thead><tbody className="divide-y divide-slate-700/30">{filteredCustomers.map((c) => (<tr key={c.id} className="hover:bg-slate-700/50 transition-colors"><td className="px-6 py-4"><div className="font-medium text-white">{c.name}</div><div className="text-sm text-slate-400">{c.email}</div></td><td className="px-6 py-4 text-sm text-slate-300">{c.phone}</td><td className="px-6 py-4 text-sm text-slate-300">{c.totalBookings}</td><td className="px-6 py-4 text-sm font-semibold text-amber-400">KSh {c.spent.toLocaleString()}</td><td className="px-6 py-4"><div className="flex items-center gap-2"><button className="p-2 text-slate-500 hover:text-amber-400 hover:bg-amber-500/10 rounded-lg transition-colors cursor-pointer"><Eye className="w-4 h-4" /></button><button className="p-2 text-slate-500 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors cursor-pointer"><Phone className="w-4 h-4" /></button></div></td></tr>))}</tbody></table></div></div>
+  );
+
+  // ─── ANALYTICS ───
   const AnalyticsContent = () => (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-white">Analytics & Reports</h1>
-      <div className="grid lg:grid-cols-2 gap-6">
-        <div className="bg-slate-800 rounded-xl shadow-sm p-6">
-          <h2 className="text-lg font-semibold text-white mb-6">Monthly Revenue</h2>
-          <div className="h-64 flex items-end justify-around gap-2">
-            {[65, 45, 78, 52, 88, 70, 95, 60, 85, 72, 90, 80].map((h, i) => (
-              <div key={i} className="w-full bg-gradient-to-t from-amber-500 to-amber-300 rounded-t" style={{ height: `${h}%` }}></div>
-            ))}
-          </div>
-          <div className="flex justify-around mt-4 text-xs text-slate-400">
-            <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span>
-            <span>May</span><span>Jun</span><span>Jul</span><span>Aug</span>
-            <span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span>
-          </div>
-        </div>
-        <div className="bg-slate-800 rounded-xl shadow-sm p-6">
-          <h2 className="text-lg font-semibold text-white mb-6">Services Distribution</h2>
-          <div className="flex items-center justify-center">
-            <div className="relative w-48 h-48">
-              <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                <circle cx="18" cy="18" r="15.915" fill="none" stroke="#334155" strokeWidth="3" />
-                <circle cx="18" cy="18" r="15.915" fill="none" stroke="#f59e0b" strokeWidth="3" strokeDasharray="35 65" />
-                <circle cx="18" cy="18" r="15.915" fill="none" stroke="#d97706" strokeWidth="3" strokeDasharray="25 75" strokeDashoffset="-35" />
-                <circle cx="18" cy="18" r="15.915" fill="none" stroke="#92400e" strokeWidth="3" strokeDasharray="18 82" strokeDashoffset="-60" />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-2xl font-bold text-white">127</span>
-              </div>
-            </div>
-          </div>
-          <div className="mt-6 space-y-3">
-            {[
-              { label: 'Screen Replacement', color: 'bg-amber-500' },
-              { label: 'Battery', color: 'bg-amber-700' },
-              { label: 'Charging Port', color: 'bg-amber-900' },
-              { label: 'Other', color: 'bg-slate-600' },
-            ].map((item, i) => (
-              <div key={i} className="flex items-center gap-3">
-                <div className={`w-4 h-4 rounded ${item.color}`}></div>
-                <span className="text-sm text-slate-300">{item.label}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
+    <div className="space-y-6"><h1 className="text-2xl font-bold text-white">Analytics & Reports</h1><div className="grid lg:grid-cols-2 gap-6"><div className="bg-slate-800 rounded-xl shadow-sm p-6"><h2 className="text-lg font-semibold text-white mb-6">Monthly Revenue</h2><div className="h-64 flex items-end justify-around gap-2">{[65,45,78,52,88,70,95,60,85,72,90,80].map((h,i) => (<div key={i} className="w-full bg-gradient-to-t from-amber-500 to-amber-300 rounded-t" style={{ height: `${h}%` }}></div>))}</div><div className="flex justify-around mt-4 text-xs text-slate-400"><span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span><span>Jul</span><span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span></div></div><div className="bg-slate-800 rounded-xl shadow-sm p-6"><h2 className="text-lg font-semibold text-white mb-6">Services Distribution</h2><div className="flex items-center justify-center"><div className="relative w-48 h-48"><svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36"><circle cx="18" cy="18" r="15.915" fill="none" stroke="#334155" strokeWidth="3" /><circle cx="18" cy="18" r="15.915" fill="none" stroke="#f59e0b" strokeWidth="3" strokeDasharray="35 65" /><circle cx="18" cy="18" r="15.915" fill="none" stroke="#d97706" strokeWidth="3" strokeDasharray="25 75" strokeDashoffset="-35" /><circle cx="18" cy="18" r="15.915" fill="none" stroke="#92400e" strokeWidth="3" strokeDasharray="18 82" strokeDashoffset="-60" /></svg><div className="absolute inset-0 flex items-center justify-center"><span className="text-2xl font-bold text-white">127</span></div></div></div><div className="mt-6 space-y-3">{[{ label: 'Screen Replacement', color: 'bg-amber-500' },{ label: 'Battery', color: 'bg-amber-700' },{ label: 'Charging Port', color: 'bg-amber-900' },{ label: 'Other', color: 'bg-slate-600' }].map((item, i) => (<div key={i} className="flex items-center gap-3"><div className={`w-4 h-4 rounded ${item.color}`}></div><span className="text-sm text-slate-300">{item.label}</span></div>))}</div></div></div></div>
   );
 
+  // ─── SETTINGS ───
   const SettingsContent = () => {
     const [profileSaved, setProfileSaved] = useState(false);
     const [passwordUpdated, setPasswordUpdated] = useState(false);
-
-    const handleSaveProfile = () => {
-      setProfileSaved(true);
-      setTimeout(() => setProfileSaved(false), 3000);
-    };
-
-    const handleUpdatePassword = () => {
-      setPasswordUpdated(true);
-      setTimeout(() => setPasswordUpdated(false), 3000);
-    };
-
-    return (
-      <div className="space-y-6">
-        <h1 className="text-2xl font-bold text-white">Settings</h1>
-        
-        <div className="grid lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-6">
-            <div className="bg-slate-800 rounded-xl shadow-sm p-6">
-              <h2 className="text-lg font-semibold text-white mb-6">Profile Settings</h2>
-              <div className="space-y-4">
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-slate-200 mb-2">First Name</label>
-                    <input type="text" defaultValue="Admin" className="w-full px-4 py-2 bg-slate-700 border-slate-600 rounded-lg focus:border-amber-500 focus:outline-none" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-200 mb-2">Last Name</label>
-                    <input type="text" defaultValue="User" className="w-full px-4 py-2 bg-slate-700 border-slate-600 rounded-lg focus:border-amber-500 focus:outline-none" />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-200 mb-2">Email</label>
-                  <input type="email" defaultValue="admin@alphamobitech.com" className="w-full px-4 py-2 bg-slate-700 border-slate-600 rounded-lg focus:border-amber-500 focus:outline-none" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-200 mb-2">Phone</label>
-                  <input type="tel" defaultValue="0703555449" className="w-full px-4 py-2 bg-slate-700 border-slate-600 rounded-lg focus:border-amber-500 focus:outline-none" />
-                </div>
-                <button onClick={handleSaveProfile} className="px-6 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors cursor-pointer">
-                  {profileSaved ? 'Saved!' : 'Save Changes'}
-                </button>
-                {profileSaved && <p className="text-green-400 text-sm">Profile saved successfully!</p>}
-              </div>
-            </div>
-
-            <div className="bg-slate-800 rounded-xl shadow-sm p-6">
-              <h2 className="text-lg font-semibold text-white mb-6">Change Password</h2>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-200 mb-2">Current Password</label>
-                  <input type="password" className="w-full px-4 py-2 bg-slate-700 border-slate-600 rounded-lg focus:border-amber-500 focus:outline-none" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-200 mb-2">New Password</label>
-                  <input type="password" className="w-full px-4 py-2 bg-slate-700 border-slate-600 rounded-lg focus:border-amber-500 focus:outline-none" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-200 mb-2">Confirm New Password</label>
-                  <input type="password" className="w-full px-4 py-2 bg-slate-700 border-slate-600 rounded-lg focus:border-amber-500 focus:outline-none" />
-                </div>
-                <button onClick={handleUpdatePassword} className="px-6 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors cursor-pointer">
-                  {passwordUpdated ? 'Updated!' : 'Update Password'}
-                </button>
-                {passwordUpdated && <p className="text-green-400 text-sm">Password updated successfully!</p>}
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-6">
-            <div className="bg-slate-800 rounded-xl shadow-sm p-6">
-              <h2 className="text-lg font-semibold text-white mb-6">Business Information</h2>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-200 mb-2">Business Name</label>
-                  <input type="text" defaultValue="Alphamobitech" className="w-full px-4 py-2 bg-slate-700 border-slate-600 rounded-lg focus:border-amber-500 focus:outline-none" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-200 mb-2">Address</label>
-                  <input type="text" defaultValue="Nairobi CBD, Kenya" className="w-full px-4 py-2 bg-slate-700 border-slate-600 rounded-lg focus:border-amber-500 focus:outline-none" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-200 mb-2">Working Hours</label>
-                  <input type="text" defaultValue="Mon-Sat: 8AM - 6PM" className="w-full px-4 py-2 bg-slate-700 border-slate-600 rounded-lg focus:border-amber-500 focus:outline-none" />
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-slate-800 rounded-xl shadow-sm p-6">
-              <h2 className="text-lg font-semibold text-white mb-6">Notifications</h2>
-              <div className="space-y-4">
-                <label className="flex items-center justify-between cursor-pointer">
-                  <span className="text-sm text-slate-200">Email notifications for new bookings</span>
-                  <input type="checkbox" defaultChecked className="w-5 h-5 text-amber-500 rounded cursor-pointer" />
-                </label>
-                <label className="flex items-center justify-between cursor-pointer">
-                  <span className="text-sm text-slate-200">WhatsApp notifications</span>
-                  <input type="checkbox" defaultChecked className="w-5 h-5 text-amber-500 rounded cursor-pointer" />
-                </label>
-                <label className="flex items-center justify-between cursor-pointer">
-                  <span className="text-sm text-slate-200">Daily reports</span>
-                  <input type="checkbox" className="w-5 h-5 text-amber-500 rounded cursor-pointer" />
-                </label>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+    return (<div className="space-y-6"><h1 className="text-2xl font-bold text-white">Settings</h1><div className="grid lg:grid-cols-3 gap-6"><div className="lg:col-span-2 space-y-6"><div className="bg-slate-800 rounded-xl shadow-sm p-6"><h2 className="text-lg font-semibold text-white mb-6">Profile Settings</h2><div className="space-y-4"><div className="grid md:grid-cols-2 gap-4"><div><label className="block text-sm font-medium text-slate-200 mb-2">First Name</label><input type="text" defaultValue="Admin" className="w-full px-4 py-2 bg-slate-700 border-slate-600 rounded-lg focus:border-amber-500 focus:outline-none text-white" /></div><div><label className="block text-sm font-medium text-slate-200 mb-2">Last Name</label><input type="text" defaultValue="User" className="w-full px-4 py-2 bg-slate-700 border-slate-600 rounded-lg focus:border-amber-500 focus:outline-none text-white" /></div></div><div><label className="block text-sm font-medium text-slate-200 mb-2">Email</label><input type="email" defaultValue="alphamobitech767@gmail.com" className="w-full px-4 py-2 bg-slate-700 border-slate-600 rounded-lg focus:border-amber-500 focus:outline-none text-white" /></div><div><label className="block text-sm font-medium text-slate-200 mb-2">Phone</label><input type="tel" defaultValue="0703555449" className="w-full px-4 py-2 bg-slate-700 border-slate-600 rounded-lg focus:border-amber-500 focus:outline-none text-white" /></div><button onClick={() => { setProfileSaved(true); setTimeout(() => setProfileSaved(false), 3000); }} className="px-6 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors cursor-pointer">{profileSaved ? 'Saved!' : 'Save Changes'}</button>{profileSaved && <p className="text-green-400 text-sm">Profile saved successfully!</p>}</div></div><div className="bg-slate-800 rounded-xl shadow-sm p-6"><h2 className="text-lg font-semibold text-white mb-6">Change Password</h2><div className="space-y-4"><div><label className="block text-sm font-medium text-slate-200 mb-2">Current Password</label><input type="password" className="w-full px-4 py-2 bg-slate-700 border-slate-600 rounded-lg focus:border-amber-500 focus:outline-none text-white" /></div><div><label className="block text-sm font-medium text-slate-200 mb-2">New Password</label><input type="password" className="w-full px-4 py-2 bg-slate-700 border-slate-600 rounded-lg focus:border-amber-500 focus:outline-none text-white" /></div><div><label className="block text-sm font-medium text-slate-200 mb-2">Confirm New Password</label><input type="password" className="w-full px-4 py-2 bg-slate-700 border-slate-600 rounded-lg focus:border-amber-500 focus:outline-none text-white" /></div><button onClick={() => { setPasswordUpdated(true); setTimeout(() => setPasswordUpdated(false), 3000); }} className="px-6 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors cursor-pointer">{passwordUpdated ? 'Updated!' : 'Update Password'}</button>{passwordUpdated && <p className="text-green-400 text-sm">Password updated successfully!</p>}</div></div></div><div className="space-y-6"><div className="bg-slate-800 rounded-xl shadow-sm p-6"><h2 className="text-lg font-semibold text-white mb-6">Business Information</h2><div className="space-y-4"><div><label className="block text-sm font-medium text-slate-200 mb-2">Business Name</label><input type="text" defaultValue="Alphamobitech" className="w-full px-4 py-2 bg-slate-700 border-slate-600 rounded-lg focus:border-amber-500 focus:outline-none text-white" /></div><div><label className="block text-sm font-medium text-slate-200 mb-2">Address</label><input type="text" defaultValue="Stan Bank Building, Moi Avenue, Across Archives Floor 3 Room 10" className="w-full px-4 py-2 bg-slate-700 border-slate-600 rounded-lg focus:border-amber-500 focus:outline-none text-white" /></div><div><label className="block text-sm font-medium text-slate-200 mb-2">Working Hours</label><input type="text" defaultValue="Mon-Sun: 7AM - 8PM" className="w-full px-4 py-2 bg-slate-700 border-slate-600 rounded-lg focus:border-amber-500 focus:outline-none text-white" /></div><div><label className="block text-sm font-medium text-slate-200 mb-2">M-Pesa Paybill</label><input type="text" defaultValue="714888" className="w-full px-4 py-2 bg-slate-700 border-slate-600 rounded-lg focus:border-amber-500 focus:outline-none text-white" /></div><div><label className="block text-sm font-medium text-slate-200 mb-2">M-Pesa Account</label><input type="text" defaultValue="169405" className="w-full px-4 py-2 bg-slate-700 border-slate-600 rounded-lg focus:border-amber-500 focus:outline-none text-white" /></div></div></div><div className="bg-slate-800 rounded-xl shadow-sm p-6"><h2 className="text-lg font-semibold text-white mb-6">Notifications</h2><div className="space-y-4"><label className="flex items-center justify-between cursor-pointer"><span className="text-sm text-slate-200">Email notifications for new bookings</span><input type="checkbox" defaultChecked className="w-5 h-5 text-amber-500 rounded cursor-pointer" /></label><label className="flex items-center justify-between cursor-pointer"><span className="text-sm text-slate-200">WhatsApp notifications</span><input type="checkbox" defaultChecked className="w-5 h-5 text-amber-500 rounded cursor-pointer" /></label><label className="flex items-center justify-between cursor-pointer"><span className="text-sm text-slate-200">Daily reports</span><input type="checkbox" className="w-5 h-5 text-amber-500 rounded cursor-pointer" /></label></div></div></div></div></div>);
   };
 
-  const CustomersContent = () => {
-    const customers = [
-      { id: 1, name: 'Sarah Johnson', email: 'sarah@email.com', phone: '0703555449', totalBookings: 5, spent: 12500 },
-      { id: 2, name: 'David Kamau', email: 'david@email.com', phone: '0712345678', totalBookings: 3, spent: 8500 },
-      { id: 3, name: 'Emily Rodriguez', email: 'emily@email.com', phone: '0723456789', totalBookings: 2, spent: 5500 },
-      { id: 4, name: 'Michael Ochieng', email: 'michael@email.com', phone: '0734567890', totalBookings: 1, spent: 3500 },
-      { id: 5, name: 'Faith Nekesa', email: 'faith@email.com', phone: '0745678901', totalBookings: 4, spent: 15000 },
-    ];
-
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-white">Customers</h1>
-          <button className="flex items-center gap-2 bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600 transition-colors cursor-pointer">
-            <Plus className="w-5 h-5" />
-            <span>Export</span>
-          </button>
-        </div>
-        <div className="bg-slate-800 rounded-xl shadow-sm overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-slate-800/50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Customer</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Phone</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Bookings</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Total Spent</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-700/30">
-              {customers.map((customer) => (
-                <tr key={customer.id} className="hover:bg-slate-700/50 transition-colors">
-                  <td className="px-6 py-4">
-                    <div>
-                      <div className="font-medium text-white">{customer.name}</div>
-                      <div className="text-sm text-slate-400">{customer.email}</div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-slate-300">{customer.phone}</td>
-                  <td className="px-6 py-4 text-sm text-slate-300">{customer.totalBookings}</td>
-                  <td className="px-6 py-4 text-sm font-semibold text-amber-400">KSh {customer.spent.toLocaleString()}</td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-2">
-                      <button className="p-2 text-slate-500 hover:text-amber-400 hover:bg-amber-500/10 rounded-lg transition-colors cursor-pointer"><Eye className="w-4 h-4" /></button>
-                      <button className="p-2 text-slate-500 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors cursor-pointer"><Phone className="w-4 h-4" /></button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    );
+  // ─── RENDER ───
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'dashboard': return <DashboardContent />;
+      case 'orders': return <OrdersContent />;
+      case 'bookings': return <BookingsContent />;
+      case 'customers': return <CustomersContent />;
+      case 'services': return <ServicesContent />;
+      case 'products': return <ProductsContent />;
+      case 'gallery': return <GalleryContent />;
+      case 'content': return <ContentManagementContent />;
+      case 'analytics': return <AnalyticsContent />;
+      case 'settings': return <SettingsContent />;
+      default: return <DashboardContent />;
+    }
   };
 
-   const renderContent = () => {
-     switch (activeTab) {
-       case 'dashboard': return <DashboardContent />;
-       case 'orders': return <OrdersContent />;
-       case 'bookings': return <BookingsContent />;
-       case 'customers': return <CustomersContent />;
-       case 'services': return <ServicesContent />;
-       case 'products': return <ProductsContent />;
-       case 'gallery': return <GalleryContent />;
-       case 'content': return <ContentManagementContent />;
-       case 'analytics': return <AnalyticsContent />;
-       case 'settings': return <SettingsContent />;
-       default: return <DashboardContent />;
-     }
-   };
-
+  // ─── BOOKING MODAL ───
   const BookingModal = () => {
     if (!viewingBooking) return null;
-    return (
-      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setViewingBooking(null)}>
-        <div className="bg-slate-800 rounded-2xl p-6 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-xl font-bold text-white">Booking Details</h3>
-            <button onClick={() => setViewingBooking(null)} className="p-2 hover:bg-slate-700 rounded-lg">
-              <XCircle className="w-5 h-5" />
-            </button>
-          </div>
-          <div className="space-y-3">
-            <div><span className="text-sm text-slate-400">ID:</span> <span className="font-medium">{viewingBooking.id}</span></div>
-            <div><span className="text-sm text-slate-400">Customer:</span> <span className="font-medium">{viewingBooking.customerName}</span></div>
-            <div><span className="text-sm text-slate-400">Phone:</span> <span className="font-medium">{viewingBooking.phone}</span></div>
-            <div><span className="text-sm text-slate-400">Device:</span> <span className="font-medium">{viewingBooking.device}</span></div>
-            <div><span className="text-sm text-slate-400">Service:</span> <span className="font-medium">{viewingBooking.service}</span></div>
-            <div><span className="text-sm text-slate-400">Status:</span> <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-              viewingBooking.status === 'completed' ? 'bg-green-500/10 text-green-400' :
-              viewingBooking.status === 'in-progress' ? 'bg-amber-500/10 text-amber-400' :
-              viewingBooking.status === 'pending' ? 'bg-blue-500/10 text-blue-400' :
-              'bg-red-500/10 text-red-400'
-            }`}>{viewingBooking.status}</span></div>
-            <div><span className="text-sm text-slate-400">Date:</span> <span className="font-medium">{viewingBooking.date}</span></div>
-            <div><span className="text-sm text-slate-400">Amount:</span> <span className="font-bold text-amber-400">KSh {viewingBooking.amount.toLocaleString()}</span></div>
-            {viewingBooking.notes && <div><span className="text-sm text-slate-400">Notes:</span> <p className="text-sm mt-1">{viewingBooking.notes}</p></div>}
-          </div>
-        </div>
-      </div>
-    );
+    return (<div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setViewingBooking(null)}><div className="bg-slate-800 rounded-2xl p-6 max-w-md w-full" onClick={(e) => e.stopPropagation()}><div className="flex justify-between items-center mb-4"><h3 className="text-xl font-bold text-white">Booking Details</h3><button onClick={() => setViewingBooking(null)} className="p-2 hover:bg-slate-700 rounded-lg"><XCircle className="w-5 h-5" /></button></div><div className="space-y-3 text-white"><div><span className="text-sm text-slate-400">ID:</span> <span className="font-medium">{viewingBooking.id}</span></div><div><span className="text-sm text-slate-400">Customer:</span> <span className="font-medium">{viewingBooking.customerName}</span></div><div><span className="text-sm text-slate-400">Phone:</span> <span className="font-medium">{viewingBooking.phone}</span></div><div><span className="text-sm text-slate-400">Device:</span> <span className="font-medium">{viewingBooking.device}</span></div><div><span className="text-sm text-slate-400">Service:</span> <span className="font-medium">{viewingBooking.service}</span></div><div><span className="text-sm text-slate-400">Amount:</span> <span className="font-bold text-amber-400">KSh {viewingBooking.amount.toLocaleString()}</span></div></div></div></div>);
   };
 
-interface EditBookingModalProps {
-  booking: Booking;
-  onClose: () => void;
-  onSave: (updated: Booking) => void;
-}
-
-const EditBookingModal: React.FC<EditBookingModalProps> = ({ booking, onClose, onSave }) => {
-  const [editForm, setEditForm] = useState(booking);
-
-  const handleSave = () => {
-    onSave(editForm);
+  interface EditBookingModalProps { booking: Booking; onClose: () => void; onSave: (updated: Booking) => void; }
+  const EditBookingModal: React.FC<EditBookingModalProps> = ({ booking, onClose, onSave }) => {
+    const [editForm, setEditForm] = useState(booking);
+    return (<div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={onClose}><div className="bg-slate-800 rounded-2xl p-6 max-w-md w-full" onClick={(e) => e.stopPropagation()}><div className="flex justify-between items-center mb-4"><h3 className="text-xl font-bold text-white">Edit Booking</h3><button onClick={onClose} className="p-2 hover:bg-slate-700 rounded-lg"><XCircle className="w-5 h-5" /></button></div><div className="space-y-3"><div><label className="block text-sm font-medium text-slate-200 mb-1">Status</label><select value={editForm.status} onChange={(e) => setEditForm({...editForm, status: e.target.value as Booking['status']})} className="w-full px-3 py-2 bg-slate-700 border-slate-600 rounded-lg text-white"><option value="pending">Pending</option><option value="in-progress">In Progress</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option></select></div><div><label className="block text-sm font-medium text-slate-200 mb-1">Amount (KSh)</label><input type="number" value={editForm.amount} onChange={(e) => setEditForm({...editForm, amount: parseInt(e.target.value) || 0})} className="w-full px-3 py-2 bg-slate-700 border-slate-600 rounded-lg text-white" /></div><div><label className="block text-sm font-medium text-slate-200 mb-1">Notes</label><textarea value={editForm.notes || ''} onChange={(e) => setEditForm({...editForm, notes: e.target.value})} className="w-full px-3 py-2 bg-slate-700 border-slate-600 rounded-lg text-white" rows={3} /></div><div className="flex gap-3 pt-2"><button onClick={() => { onSave(editForm); }} className="flex-1 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600">Save</button><button onClick={onClose} className="flex-1 py-2 bg-slate-600 rounded-lg hover:bg-slate-500 text-white">Cancel</button></div></div></div></div>);
   };
 
-  return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={onClose}>
-      <div className="bg-slate-800 rounded-2xl p-6 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-xl font-bold text-white">Edit Booking</h3>
-          <button onClick={onClose} className="p-2 hover:bg-slate-700 rounded-lg">
-            <XCircle className="w-5 h-5" />
-          </button>
-        </div>
-        <div className="space-y-3">
-          <div>
-            <label className="block text-sm font-medium text-slate-200 mb-1">Status</label>
-            <select value={editForm.status} onChange={(e) => setEditForm({...editForm, status: e.target.value as Booking['status']})} className="w-full px-3 py-2 bg-slate-700 border-slate-600 rounded-lg">
-              <option value="pending">Pending</option>
-              <option value="in-progress">In Progress</option>
-              <option value="completed">Completed</option>
-              <option value="cancelled">Cancelled</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-200 mb-1">Amount (KSh)</label>
-            <input type="number" value={editForm.amount} onChange={(e) => setEditForm({...editForm, amount: parseInt(e.target.value) || 0})} className="w-full px-3 py-2 bg-slate-700 border-slate-600 rounded-lg" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-200 mb-1">Notes</label>
-            <textarea value={editForm.notes || ''} onChange={(e) => setEditForm({...editForm, notes: e.target.value})} className="w-full px-3 py-2 bg-slate-700 border-slate-600 rounded-lg" rows={3} />
-          </div>
-          <div className="flex gap-3 pt-2">
-            <button onClick={handleSave} className="flex-1 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600">Save</button>
-            <button onClick={onClose} className="flex-1 py-2 bg-slate-600 rounded-lg hover:bg-slate-500">Cancel</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
+  // ─── PRODUCT FORM MODAL ───
+  const ProductFormModal = () => {
+    if (!showProductForm) return null;
+    return (<div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => { setShowProductForm(false); setEditingProduct(null); setProductForm({}); }}><div className="bg-slate-800 rounded-2xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}><div className="flex justify-between items-center mb-4"><h3 className="text-xl font-bold text-white">{editingProduct ? 'Edit Product' : 'Add Product'}</h3><button onClick={() => { setShowProductForm(false); setEditingProduct(null); setProductForm({}); }} className="p-2 hover:bg-slate-700 rounded-lg text-white"><X className="w-5 h-5" /></button></div><div className="grid md:grid-cols-2 gap-4"><div><label className="block text-sm text-slate-300 mb-1">Name *</label><input type="text" value={productForm.name || ''} onChange={e => setProductForm({...productForm, name: e.target.value})} className="w-full px-3 py-2 bg-slate-700 rounded-lg text-white" /></div><div><label className="block text-sm text-slate-300 mb-1">Brand *</label><select value={productForm.brand || ''} onChange={e => setProductForm({...productForm, brand: e.target.value})} className="w-full px-3 py-2 bg-slate-700 rounded-lg text-white"><option value="">Select</option>{BRANDS.map(b => <option key={b} value={b}>{b}</option>)}</select></div><div><label className="block text-sm text-slate-300 mb-1">Category</label><select value={productForm.category || 'phone'} onChange={e => setProductForm({...productForm, category: e.target.value})} className="w-full px-3 py-2 bg-slate-700 rounded-lg text-white">{PRODUCT_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}</select></div><div><label className="block text-sm text-slate-300 mb-1">Price (KSh) *</label><input type="number" value={productForm.price || ''} onChange={e => setProductForm({...productForm, price: parseInt(e.target.value) || 0})} className="w-full px-3 py-2 bg-slate-700 rounded-lg text-white" /></div><div className="md:col-span-2"><label className="block text-sm text-slate-300 mb-1">Description</label><textarea value={productForm.description || ''} onChange={e => setProductForm({...productForm, description: e.target.value})} className="w-full px-3 py-2 bg-slate-700 rounded-lg text-white" rows={2} /></div><div className="md:col-span-2"><label className="block text-sm text-slate-300 mb-1">Image URL</label><input type="text" value={productForm.image || ''} onChange={e => setProductForm({...productForm, image: e.target.value})} className="w-full px-3 py-2 bg-slate-700 rounded-lg text-white" placeholder="/images/phones/product-name.jpg" /></div><div className="md:col-span-2"><label className="block text-sm text-slate-300 mb-1">Or Upload Image (max 2MB)</label><input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, (url) => setProductForm({...productForm, image: url}))} className="w-full px-3 py-2 bg-slate-700 rounded-lg text-white" /></div><div><label className="block text-sm text-slate-300 mb-1">Specs (comma-separated)</label><input type="text" value={(productForm.specs || []).join(', ')} onChange={e => setProductForm({...productForm, specs: e.target.value.split(',').map(s => s.trim()).filter(Boolean)})} className="w-full px-3 py-2 bg-slate-700 rounded-lg text-white" placeholder="8GB RAM, 256GB Storage" /></div><div><label className="block text-sm text-slate-300 mb-1">Features (comma-separated)</label><input type="text" value={(productForm.features || []).join(', ')} onChange={e => setProductForm({...productForm, features: e.target.value.split(',').map(s => s.trim()).filter(Boolean)})} className="w-full px-3 py-2 bg-slate-700 rounded-lg text-white" placeholder="Brand New, 1 Year Warranty" /></div><div><label className="block text-sm text-slate-300 mb-1">Badge</label><select value={productForm.badge || ''} onChange={e => setProductForm({...productForm, badge: e.target.value})} className="w-full px-3 py-2 bg-slate-700 rounded-lg text-white">{BADGE_OPTIONS.map(b => <option key={b} value={b}>{b || 'None'}</option>)}</select></div><div><label className="block text-sm text-slate-300 mb-1">Rating</label><input type="number" step="0.1" min="0" max="5" value={productForm.rating || 4.0} onChange={e => setProductForm({...productForm, rating: parseFloat(e.target.value) || 0})} className="w-full px-3 py-2 bg-slate-700 rounded-lg text-white" /></div><div><label className="block text-sm text-slate-300 mb-1">Reviews</label><input type="number" value={productForm.reviews || 0} onChange={e => setProductForm({...productForm, reviews: parseInt(e.target.value) || 0})} className="w-full px-3 py-2 bg-slate-700 rounded-lg text-white" /></div><div className="flex items-center gap-2"><input type="checkbox" checked={productForm.inStock !== false} onChange={e => setProductForm({...productForm, inStock: e.target.checked})} className="w-4 h-4 text-amber-500 rounded" /><label className="text-sm text-slate-300">In Stock</label></div></div><div className="flex gap-3 mt-4 md:col-span-2"><button onClick={saveProduct} className="flex-1 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 cursor-pointer">Save Product</button><button onClick={() => { setShowProductForm(false); setEditingProduct(null); setProductForm({}); }} className="flex-1 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-500 cursor-pointer">Cancel</button></div></div></div>);
+  };
 
-  if (isAuthenticated === null) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-900">
-        <Loader className="w-8 h-8 animate-spin text-amber-500" />
-      </div>
-    );
-  }
+  // ─── GALLERY FORM MODAL ───
+  const GalleryFormModal = () => {
+    if (!showGalleryForm) return null;
+    return (<div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => { setShowGalleryForm(false); setEditingGalleryItem(null); setGalleryForm({}); }}><div className="bg-slate-800 rounded-2xl p-6 max-w-lg w-full" onClick={(e) => e.stopPropagation()}><div className="flex justify-between items-center mb-4"><h3 className="text-xl font-bold text-white">{editingGalleryItem ? 'Edit Gallery Item' : 'Add Gallery Item'}</h3><button onClick={() => { setShowGalleryForm(false); setEditingGalleryItem(null); setGalleryForm({}); }} className="p-2 hover:bg-slate-700 rounded-lg text-white"><X className="w-5 h-5" /></button></div><div className="space-y-4"><div><label className="block text-sm text-slate-300 mb-1">Title *</label><input type="text" value={galleryForm.title || ''} onChange={e => setGalleryForm({...galleryForm, title: e.target.value})} className="w-full px-3 py-2 bg-slate-700 rounded-lg text-white" /></div><div><label className="block text-sm text-slate-300 mb-1">Description</label><input type="text" value={galleryForm.description || ''} onChange={e => setGalleryForm({...galleryForm, description: e.target.value})} className="w-full px-3 py-2 bg-slate-700 rounded-lg text-white" /></div><div><label className="block text-sm text-slate-300 mb-1">Category</label><input type="text" value={galleryForm.category || ''} onChange={e => setGalleryForm({...galleryForm, category: e.target.value})} className="w-full px-3 py-2 bg-slate-700 rounded-lg text-white" /></div><div><label className="block text-sm text-slate-300 mb-1">Image URL</label><input type="text" value={galleryForm.image || ''} onChange={e => setGalleryForm({...galleryForm, image: e.target.value})} className="w-full px-3 py-2 bg-slate-700 rounded-lg text-white" /></div><div><label className="block text-sm text-slate-300 mb-1">Or Upload Image (max 2MB)</label><input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, (url) => setGalleryForm({...galleryForm, image: url}))} className="w-full px-3 py-2 bg-slate-700 rounded-lg text-white" /></div><div className="flex gap-3"><button onClick={saveGalleryItem} className="flex-1 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 cursor-pointer">Save</button><button onClick={() => { setShowGalleryForm(false); setEditingGalleryItem(null); setGalleryForm({}); }} className="flex-1 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-500 cursor-pointer">Cancel</button></div></div></div></div>);
+  };
 
-  if (!isAuthenticated) {
-    return <AdminLogin onLogin={(email, password, rememberMe) => handleLogin(email, password, rememberMe)} onResetPassword={handleResetPassword} error={loginError} />;
-  }
+  // ─── HERO SLIDE FORM MODAL ───
+  const HeroFormModal = () => {
+    if (!showHeroForm || !editingHeroSlide) return null;
+    return (<div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => { setShowHeroForm(false); setEditingHeroSlide(null); }}><div className="bg-slate-800 rounded-2xl p-6 max-w-lg w-full" onClick={(e) => e.stopPropagation()}><div className="flex justify-between items-center mb-4"><h3 className="text-xl font-bold text-white">{heroSlides.includes(editingHeroSlide) ? 'Edit Hero Slide' : 'Add Hero Slide'}</h3><button onClick={() => { setShowHeroForm(false); setEditingHeroSlide(null); }} className="p-2 hover:bg-slate-700 rounded-lg text-white"><X className="w-5 h-5" /></button></div><div className="space-y-4"><div><label className="block text-sm text-slate-300 mb-1">Title *</label><input type="text" value={editingHeroSlide.title} onChange={e => setEditingHeroSlide({...editingHeroSlide, title: e.target.value})} className="w-full px-3 py-2 bg-slate-700 rounded-lg text-white" /></div><div><label className="block text-sm text-slate-300 mb-1">Subtitle</label><input type="text" value={editingHeroSlide.subtitle} onChange={e => setEditingHeroSlide({...editingHeroSlide, subtitle: e.target.value})} className="w-full px-3 py-2 bg-slate-700 rounded-lg text-white" /></div><div><label className="block text-sm text-slate-300 mb-1">Description</label><textarea value={editingHeroSlide.description} onChange={e => setEditingHeroSlide({...editingHeroSlide, description: e.target.value})} className="w-full px-3 py-2 bg-slate-700 rounded-lg text-white" rows={3} /></div><div><label className="block text-sm text-slate-300 mb-1">CTA Text</label><input type="text" value={editingHeroSlide.cta} onChange={e => setEditingHeroSlide({...editingHeroSlide, cta: e.target.value})} className="w-full px-3 py-2 bg-slate-700 rounded-lg text-white" /></div><div className="flex gap-3"><button onClick={saveHeroSlideFn} className="flex-1 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 cursor-pointer">Save</button><button onClick={() => { setShowHeroForm(false); setEditingHeroSlide(null); }} className="flex-1 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-500 cursor-pointer">Cancel</button></div></div></div></div>);
+  };
+
+  // ─── FEATURE FORM MODAL ───
+  const FeatureFormModal = () => {
+    if (!showFeatureForm || !editingFeature) return null;
+    return (<div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => { setShowFeatureForm(false); setEditingFeature(null); }}><div className="bg-slate-800 rounded-2xl p-6 max-w-lg w-full" onClick={(e) => e.stopPropagation()}><div className="flex justify-between items-center mb-4"><h3 className="text-xl font-bold text-white">{features.includes(editingFeature) ? 'Edit Feature' : 'Add Feature'}</h3><button onClick={() => { setShowFeatureForm(false); setEditingFeature(null); }} className="p-2 hover:bg-slate-700 rounded-lg text-white"><X className="w-5 h-5" /></button></div><div className="space-y-4"><div><label className="block text-sm text-slate-300 mb-1">Icon</label><select value={editingFeature.iconName} onChange={e => setEditingFeature({...editingFeature, iconName: e.target.value})} className="w-full px-3 py-2 bg-slate-700 rounded-lg text-white">{AVAILABLE_ICONS.map(icon => <option key={icon} value={icon}>{icon}</option>)}</select></div><div><label className="block text-sm text-slate-300 mb-1">Title *</label><input type="text" value={editingFeature.title} onChange={e => setEditingFeature({...editingFeature, title: e.target.value})} className="w-full px-3 py-2 bg-slate-700 rounded-lg text-white" /></div><div><label className="block text-sm text-slate-300 mb-1">Description</label><input type="text" value={editingFeature.description} onChange={e => setEditingFeature({...editingFeature, description: e.target.value})} className="w-full px-3 py-2 bg-slate-700 rounded-lg text-white" /></div><div className="flex gap-3"><button onClick={saveFeatureFn} className="flex-1 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 cursor-pointer">Save</button><button onClick={() => { setShowFeatureForm(false); setEditingFeature(null); }} className="flex-1 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-500 cursor-pointer">Cancel</button></div></div></div></div>);
+  };
+
+  // ─── SERVICE FORM MODAL ───
+  const ServiceFormModal = () => {
+    if (!showServiceForm || !editingService) return null;
+    return (<div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => { setShowServiceForm(false); setEditingService(null); }}><div className="bg-slate-800 rounded-2xl p-6 max-w-lg w-full" onClick={(e) => e.stopPropagation()}><div className="flex justify-between items-center mb-4"><h3 className="text-xl font-bold text-white">{siteServices.find(s => s.id === editingService.id) ? 'Edit Service' : 'Add Service'}</h3><button onClick={() => { setShowServiceForm(false); setEditingService(null); }} className="p-2 hover:bg-slate-700 rounded-lg text-white"><X className="w-5 h-5" /></button></div><div className="space-y-4"><div><label className="block text-sm text-slate-300 mb-1">Name *</label><input type="text" value={editingService.name} onChange={e => setEditingService({...editingService, name: e.target.value})} className="w-full px-3 py-2 bg-slate-700 rounded-lg text-white" /></div><div><label className="block text-sm text-slate-300 mb-1">Description</label><input type="text" value={editingService.description} onChange={e => setEditingService({...editingService, description: e.target.value})} className="w-full px-3 py-2 bg-slate-700 rounded-lg text-white" /></div><div className="grid grid-cols-2 gap-4"><div><label className="block text-sm text-slate-300 mb-1">Price (KSh)</label><input type="number" value={editingService.price} onChange={e => setEditingService({...editingService, price: parseInt(e.target.value) || 0})} className="w-full px-3 py-2 bg-slate-700 rounded-lg text-white" /></div><div><label className="block text-sm text-slate-300 mb-1">Duration</label><input type="text" value={editingService.duration} onChange={e => setEditingService({...editingService, duration: e.target.value})} className="w-full px-3 py-2 bg-slate-700 rounded-lg text-white" /></div></div><div><label className="block text-sm text-slate-300 mb-1">Category</label><input type="text" value={editingService.category} onChange={e => setEditingService({...editingService, category: e.target.value})} className="w-full px-3 py-2 bg-slate-700 rounded-lg text-white" /></div><div><label className="block text-sm text-slate-300 mb-1">Icon</label><select value={editingService.iconName} onChange={e => setEditingService({...editingService, iconName: e.target.value})} className="w-full px-3 py-2 bg-slate-700 rounded-lg text-white">{AVAILABLE_ICONS.map(icon => <option key={icon} value={icon}>{icon}</option>)}</select></div><div className="flex gap-3"><button onClick={saveSiteServiceFn} className="flex-1 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 cursor-pointer">Save</button><button onClick={() => { setShowServiceForm(false); setEditingService(null); }} className="flex-1 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-500 cursor-pointer">Cancel</button></div></div></div></div>);
+  };
+
+  // ─── MAIN RETURN ───
+  if (isAuthenticated === null) { return (<div className="min-h-screen flex items-center justify-center bg-slate-900"><Loader className="w-8 h-8 animate-spin text-amber-500" /></div>); }
+  if (!isAuthenticated) { return <AdminLogin onLogin={(email, password, rememberMe) => handleLogin(email, password, rememberMe)} onResetPassword={handleResetPassword} error={loginError} />; }
 
   return (
     <div className="flex min-h-screen bg-slate-900 text-slate-100">
@@ -859,39 +358,25 @@ const EditBookingModal: React.FC<EditBookingModalProps> = ({ booking, onClose, o
         <header className="bg-gradient-to-r from-amber-500 to-amber-600 bg-opacity-90 backdrop-blur-sm border-b border-amber-200/20 mx-0 mt-0 px-6 py-4 mb-6 shadow-lg">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-                <LayoutDashboard className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-white capitalize">{activeTab === 'dashboard' ? 'Dashboard Overview' : activeTab}</h1>
-                <p className="text-amber-100/90 text-sm">Welcome back! Here's what's happening today.</p>
-              </div>
+              <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center"><LayoutDashboard className="w-6 h-6 text-white" /></div>
+              <div><h1 className="text-xl font-bold text-white capitalize">{activeTab === 'dashboard' ? 'Dashboard Overview' : activeTab}</h1><p className="text-amber-100/90 text-sm">Welcome back! Here's what's happening today.</p></div>
             </div>
             <div className="flex items-center gap-3 text-amber-100/90">
-              <button className="flex items-center gap-2 px-3 py-1 bg-white/20 rounded-lg hover:bg-white/30 transition-all text-sm">
-                <Calendar className="w-4 h-4" />
-                <span>{new Date().toLocaleDateString()}</span>
-              </button>
-              <button className="flex items-center gap-2 px-3 py-1 bg-white/20 rounded-lg hover:bg-white/30 transition-all text-sm">
-                <Clock className="w-4 h-4" />
-                <span>{new Date().toLocaleTimeString()}</span>
-              </button>
+              <button className="flex items-center gap-2 px-3 py-1 bg-white/20 rounded-lg hover:bg-white/30 transition-all text-sm"><Calendar className="w-4 h-4" /><span>{new Date().toLocaleDateString()}</span></button>
+              <button className="flex items-center gap-2 px-3 py-1 bg-white/20 rounded-lg hover:bg-white/30 transition-all text-sm"><Clock className="w-4 h-4" /><span>{new Date().toLocaleTimeString()}</span></button>
             </div>
           </div>
         </header>
         {renderContent()}
       </main>
+      <Toast />
       <BookingModal />
-      {editingBooking && (
-        <EditBookingModal
-          booking={editingBooking}
-          onClose={() => setEditingBooking(null)}
-          onSave={(updated) => {
-            setBookings(bookings.map(b => b.id === updated.id ? updated : b));
-            setEditingBooking(null);
-          }}
-        />
-      )}
+      {editingBooking && (<EditBookingModal booking={editingBooking} onClose={() => setEditingBooking(null)} onSave={(updated) => { setBookings(bookings.map(b => b.id === updated.id ? updated : b)); setEditingBooking(null); }} />)}
+      <ProductFormModal />
+      <GalleryFormModal />
+      <HeroFormModal />
+      <FeatureFormModal />
+      <ServiceFormModal />
     </div>
   );
 };
