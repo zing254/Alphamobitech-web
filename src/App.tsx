@@ -6,7 +6,8 @@ import {
   Send, CheckCircle, Menu, X, ChevronDown, Users,
   Award, Truck, CreditCard, Headphones, Moon, Sun,
   Check, ShoppingCart, Trash2, Plus, Minus, Laptop, Tablet,
-  Search, Heart, Scale, ImageOff, ArrowUp, XCircle
+  Search, Heart, Scale, ImageOff, ArrowUp, XCircle,
+  AlertTriangle, Sparkles, Globe, RotateCcw, RefreshCw, MessageCircle, Loader
 } from 'lucide-react';
 import AdminDashboard from './AdminDashboard';
 import { PageLoader } from './components/Loading';
@@ -14,11 +15,13 @@ import CookieConsent from './components/CookieConsent';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import TermsOfService from './components/TermsOfService';
 import { validateBookingForm, validateContactForm, sanitizeString, sanitizeEmail, sanitizePhone, generateConfirmationNumber } from './utils/validation';
+import { addTradeIn, getBusinessInfo, type TradeIn } from './data/content';
+import { products } from './data/products';
 
-type Page = 'home' | 'services' | 'gallery' | 'reviews' | 'faq' | 'contact' | 'about' | 'booking' | 'admin' | 'store' | 'cart' | 'checkout' | 'wishlist' | 'orders' | 'privacy' | 'terms';
+type Page = 'home' | 'services' | 'gallery' | 'reviews' | 'faq' | 'contact' | 'about' | 'booking' | 'admin' | 'store' | 'cart' | 'checkout' | 'wishlist' | 'orders' | 'privacy' | 'terms' | 'tradein';
 
 class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean; error: Error | null }> {
-  constructor(props) {
+  constructor(props: { children: ReactNode }) {
     super(props);
     this.state = { hasError: false, error: null };
   }
@@ -208,7 +211,7 @@ const App = () => {
       },
       contact: {
         title: 'Contact Us | Phone Repair Nairobi | Alphamobitech',
-        description: 'Get in touch with Alphamobitech. Call 0703555449, WhatsApp, or visit us at Stan Bank Building, Moi Avenue, Nairobi CBD. Open Mon-Sat 7AM-8PM.',
+        description: `Get in touch with Alphamobitech. Call ${getBusinessInfo().phone}, WhatsApp, or visit us at ${getBusinessInfo().location}. Open ${getBusinessInfo().hours}.`,
       },
       about: {
         title: 'About Us | Phone Repair Experts Nairobi | Alphamobitech',
@@ -273,8 +276,9 @@ const App = () => {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            entry.target.classList.add('animate-fade-in-up');
+            entry.target.classList.add('animate-fade-in-up', 'active');
             observer.unobserve(entry.target);
+
           }
         });
       },
@@ -385,6 +389,7 @@ const App = () => {
     { name: 'Home', id: 'home' as Page },
     { name: 'Services', id: 'services' as Page },
     { name: 'Store', id: 'store' as Page },
+    { name: 'Trade In', id: 'tradein' as Page },
     { name: 'Track', id: 'orders' as Page },
     { name: 'Gallery', id: 'gallery' as Page },
     { name: 'Reviews', id: 'reviews' as Page },
@@ -559,11 +564,11 @@ const App = () => {
       <div className="hidden lg:flex items-center justify-center gap-6 py-2 bg-slate-900/50 border-t border-slate-700/30 text-xs text-slate-400">
         <div className="flex items-center gap-1.5">
           <Clock className="w-3 h-3 text-amber-500" />
-          <span>Mon - Sun: 7AM - 8PM</span>
+          <span>{`Mon - Sun: ${getBusinessInfo().hours}`}</span>
         </div>
         <div className="flex items-center gap-1.5">
           <MapPin className="w-3 h-3 text-amber-500" />
-          <span>Stan Bank Building, Moi Avenue</span>
+          <span>{getBusinessInfo().location}</span>
         </div>
         <div className="flex items-center gap-1.5">
           <Phone className="w-3 h-3 text-amber-500" />
@@ -627,18 +632,12 @@ const App = () => {
 
   const HeroSection = () => (
     <section className="relative min-h-screen flex items-center pt-32 pb-20 overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-      {/* Animated background elements */}
+      {/* Elegant background element */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-20 right-10 w-[500px] h-[500px] bg-amber-500/8 rounded-full blur-3xl animate-morph"></div>
-        <div className="absolute bottom-20 left-10 w-[400px] h-[400px] bg-blue-500/6 rounded-full blur-3xl animate-float-delayed"></div>
-        <div className="absolute top-1/3 left-1/4 w-[300px] h-[300px] bg-amber-400/5 rounded-full blur-3xl animate-ping-slow"></div>
-        <div className="absolute bottom-1/3 right-1/4 w-[350px] h-[350px] bg-purple-500/5 rounded-full blur-3xl animate-morph"></div>
-        {/* Floating particles */}
-        {[...Array(6)].map((_, i) => (
-          <div key={i} className="particle" style={{ left: `${15 + i * 15}%`, bottom: '-10px', animationDelay: `${i * 1.5}s`, animationDuration: `${8 + i * 2}s` }}></div>
-        ))}
-        {/* Grid pattern overlay */}
-        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)', backgroundSize: '60px 60px' }}></div>
+        <div className="absolute top-1/4 right-1/4 w-[600px] h-[600px] bg-primary-500/10 rounded-full blur-[100px] animate-pulse"></div>
+        <div className="absolute bottom-1/4 left-1/4 w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[120px] animate-pulse" style={{animationDelay: '2s'}}></div>
+        {/* Subtle Grid pattern overlay */}
+        <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
       </div>
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 grid lg:grid-cols-2 gap-16 items-center relative z-10">
@@ -700,13 +699,42 @@ const App = () => {
                   { icon: <Battery className="w-10 h-10" />, title: 'Battery', sub: 'Replacement', color: 'green' },
                   { icon: <Shield className="w-10 h-10" />, title: 'Back Glass', sub: 'Replacement', color: 'blue' },
                   { icon: <Zap className="w-10 h-10" />, title: 'Charging', sub: 'Port', color: 'purple' },
-                ].map((item, i) => (
-                  <div key={i} className={`bg-${item.color}-500/10 backdrop-blur rounded-2xl p-6 text-center group hover:bg-${item.color}-500/20 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg cursor-default`}>
-                    <div className={`text-${item.color}-400 mx-auto mb-3 group-hover:scale-110 transition-transform duration-300`}>{item.icon}</div>
-                    <div className="text-white font-bold text-lg">{item.title}</div>
-                    <div className="text-slate-500 text-xs mt-1">{item.sub}</div>
-                  </div>
-                ))}
+                ].map((item, i) => {
+                  const colorClassMap = {
+                    amber: {
+                      cardBg: 'bg-amber-500/10 hover:bg-amber-500/20',
+                      iconText: 'text-amber-400',
+                    },
+                    green: {
+                      cardBg: 'bg-green-500/10 hover:bg-green-500/20',
+                      iconText: 'text-green-400',
+                    },
+                    blue: {
+                      cardBg: 'bg-blue-500/10 hover:bg-blue-500/20',
+                      iconText: 'text-blue-400',
+                    },
+                    purple: {
+                      cardBg: 'bg-purple-500/10 hover:bg-purple-500/20',
+                      iconText: 'text-purple-400',
+                    },
+                  } as const;
+
+                  const classes = colorClassMap[item.color as keyof typeof colorClassMap] ?? colorClassMap.amber;
+
+                  return (
+                    <div
+                      key={i}
+                      className={`backdrop-blur rounded-2xl p-6 text-center group ${classes.cardBg} transition-all duration-300 hover:-translate-y-1 hover:shadow-lg cursor-default`}
+                    >
+                      <div className={`mx-auto mb-3 group-hover:scale-110 transition-transform duration-300 ${classes.iconText}`}>
+                        {item.icon}
+                      </div>
+                      <div className="text-white font-bold text-lg">{item.title}</div>
+                      <div className="text-slate-500 text-xs mt-1">{item.sub}</div>
+                    </div>
+                  );
+                })}
+
               </div>
               <div className="mt-6 text-center">
                 <div className="inline-flex items-center gap-2 bg-green-500/10 border border-green-500/20 text-green-400 px-5 py-2.5 rounded-full text-sm font-medium">
@@ -717,7 +745,7 @@ const App = () => {
             </div>
             {/* Floating badge */}
             <div className="absolute -top-4 -right-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-4 py-2 rounded-xl font-bold text-sm shadow-lg shadow-amber-500/30 animate-float">
-              ⚡ Same Day
+              <Zap className="w-4 h-4 inline" /> Same Day
             </div>
           </div>
         </div>
@@ -746,7 +774,7 @@ const App = () => {
             { icon: <Shield className="w-5 h-5" />, text: 'Warranty on All Repairs', color: 'text-amber-400' },
             { icon: <Truck className="w-5 h-5" />, text: 'Free Pickup & Delivery', color: 'text-blue-400' },
             { icon: <Zap className="w-5 h-5" />, text: 'Same Day Service', color: 'text-yellow-400' },
-            { icon: <CreditCard className="w-5 h-5" />, text: 'M-Pesa: 714888', color: 'text-green-400' },
+            { icon: <CreditCard className="w-5 h-5" />, text: `M-Pesa: ${getBusinessInfo().paybill}`, color: 'text-green-400' },
             { icon: <Headphones className="w-5 h-5" />, text: '24/7 Support', color: 'text-purple-400' },
           ].map((badge, i) => (
             <div key={i} className="flex items-center gap-2.5 text-slate-300 text-sm group cursor-default">
@@ -760,18 +788,18 @@ const App = () => {
   );
 
   const FeatureBanner = () => (
-    <section className="py-20 bg-slate-800">
+    <section className="py-20 bg-transparent border-t border-b border-white/5 relative z-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
           {features.map((feature, i) => (
             <div 
               key={i} 
-              className="group text-center p-6 rounded-2xl hover:bg-gradient-to-br hover:from-amber-950/30 hover:to-slate-800 transition-all duration-300 cursor-pointer"
+              className="group text-center p-6 rounded-2xl hover:bg-white/5 transition-all duration-300 cursor-pointer card-hover"
             >
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-100 to-amber-200 text-amber-600 mb-4 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary-500/10 text-primary-400 mb-4 group-hover:scale-110 group-hover:-translate-y-1 transition-all duration-300 shadow-sm">
                 {feature.icon}
               </div>
-              <h3 className="font-semibold text-white mb-1 group-hover:text-amber-500 transition-colors text-sm">{feature.title}</h3>
+              <h3 className="font-semibold text-white mb-1 group-hover:text-primary-400 transition-colors text-sm">{feature.title}</h3>
               <p className="text-xs text-slate-400 leading-relaxed">{feature.description}</p>
             </div>
           ))}
@@ -781,42 +809,46 @@ const App = () => {
   );
 
   const BrandsSection = () => (
-    <section className="py-20 bg-slate-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="text-center mb-12">
-          <span className="inline-block text-amber-500 font-semibold text-sm uppercase tracking-wider mb-3">Brands We Work With</span>
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            Authorized Repair for <span className="text-amber-500">All Major Brands</span>
+    <section className="py-24 relative overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
+        <div className="text-center mb-16">
+          <span className="inline-block text-amber-500 font-semibold text-xs uppercase tracking-widest mb-4">Brands We Work With</span>
+          <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-6 tracking-tight">
+            Authorized Repair for <span className="gradient-text">All Major Brands</span>
           </h2>
-          <p className="text-slate-400 max-w-2xl mx-auto">We service and sell devices from all top manufacturers with genuine parts and expert technicians</p>
+          <p className="text-slate-400 max-w-2xl mx-auto text-lg">We service and sell devices from all top manufacturers with genuine parts and expert technicians</p>
         </div>
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4">
           {[
-            { name: 'Apple', color: 'from-gray-700 to-gray-900', icon: '🍎' },
-            { name: 'Samsung', color: 'from-blue-700 to-blue-900', icon: '💎' },
-            { name: 'Xiaomi', color: 'from-orange-500 to-orange-700', icon: '🔶' },
-            { name: 'OnePlus', color: 'from-red-600 to-red-800', icon: '➕' },
-            { name: 'Google', color: 'from-green-600 to-green-800', icon: '🔍' },
-            { name: 'Huawei', color: 'from-red-500 to-red-700', icon: '🌸' },
-            { name: 'Oppo', color: 'from-green-500 to-green-700', icon: '📱' },
-            { name: 'Vivo', color: 'from-blue-500 to-blue-700', icon: '🎵' },
-            { name: 'Realme', color: 'from-yellow-500 to-yellow-700', icon: '⚡' },
-            { name: 'Tecno', color: 'from-teal-500 to-teal-700', icon: '📲' },
-            { name: 'Infinix', color: 'from-purple-500 to-purple-700', icon: '🔥' },
-            { name: 'Nokia', color: 'from-blue-600 to-blue-800', icon: '🏔️' },
-            { name: 'Sony', color: 'from-gray-600 to-gray-800', icon: '🎮' },
-            { name: 'LG', color: 'from-pink-500 to-pink-700', icon: '📺' },
-            { name: 'Motorola', color: 'from-gray-500 to-gray-700', icon: '📞' },
-            { name: 'Itel', color: 'from-indigo-500 to-indigo-700', icon: '💡' },
-          ].map((brand) => (
-            <div key={brand.name} className={`group relative bg-gradient-to-br ${brand.color} rounded-xl p-4 text-center hover:scale-105 transition-all duration-300 cursor-pointer shadow-lg hover:shadow-xl`}>
-              <div className="text-2xl mb-1">{brand.icon}</div>
-              <div className="text-white text-xs font-semibold">{brand.name}</div>
-              <div className="absolute inset-0 bg-white/10 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity" />
-            </div>
-          ))}
+            { name: 'Apple', icon: 'Smartphone' },
+            { name: 'Samsung', icon: 'Star' },
+            { name: 'Xiaomi', icon: 'Zap' },
+            { name: 'OnePlus', icon: 'Plus' },
+            { name: 'Google', icon: 'Search' },
+            { name: 'Huawei', icon: 'Award' },
+            { name: 'Oppo', icon: 'Camera' },
+            { name: 'Vivo', icon: 'Headphones' },
+            { name: 'Realme', icon: 'Battery' },
+            { name: 'Tecno', icon: 'Mail' },
+            { name: 'Infinix', icon: 'Zap' },
+            { name: 'Nokia', icon: 'Shield' },
+            { name: 'Sony', icon: 'Speaker' },
+            { name: 'LG', icon: 'Smartphone' },
+            { name: 'Motorola', icon: 'Phone' },
+            { name: 'Itel', icon: 'Award' },
+          ].map((brand) => {
+            const IconComponent = {
+              Smartphone, Star, Zap, Plus, Search, Award, Camera, Headphones, Battery, Mail, Shield, Speaker, Phone,
+            }[brand.icon] || Smartphone;
+            return (
+              <div key={brand.name} className="group relative card-hover p-5 text-center flex flex-col items-center justify-center cursor-pointer">
+                <IconComponent className="w-8 h-8 mb-2 text-slate-400 group-hover:text-amber-400 group-hover:scale-110 transition-all duration-300" />
+                <div className="text-slate-300 text-xs font-semibold group-hover:text-white transition-colors">{brand.name}</div>
+              </div>
+            );
+          })}
         </div>
-        <div className="mt-10 text-center">
+        <div className="mt-12 text-center">
           <p className="text-slate-500 text-sm">...and many more brands. Contact us if your brand isn't listed.</p>
         </div>
       </div>
@@ -844,7 +876,7 @@ const App = () => {
               className={`px-6 py-3 rounded-full font-medium transition-all ${
                 activeTab === cat 
                   ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-lg' 
-                  : 'bg-slate-800 text-slate-300 hover:bg-amber-50 hover:text-amber-600 border border-slate-700/50'
+                    : 'bg-slate-800 text-slate-300 hover:bg-amber-500/10 hover:text-amber-400 border border-slate-700/50'
               }`}
             >
               {cat}
@@ -856,54 +888,66 @@ const App = () => {
           {filteredServices.map((service, index) => (
             <div 
               key={service.id}
-              className={`group relative bg-slate-800 rounded-2xl p-6 shadow-md hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 cursor-pointer animate-fade-in-up ${
-                service.popular ? 'ring-2 ring-amber-500' : ''
+              className={`group relative card-hover p-6 cursor-pointer animate-fade-in-up ${
+                service.popular ? 'border-primary-500/50 shadow-[0_0_15px_rgba(99,102,241,0.2)]' : ''
               }`}
               style={{ animationDelay: `${index * 100}ms` }}
             >
               {service.popular && (
                 <div className="absolute -top-3 right-4">
-                  <span className="bg-gradient-to-r from-amber-500 to-amber-600 text-white text-xs font-bold px-3 py-1 rounded-full">
+                  <span className="bg-primary-500 text-white text-[10px] uppercase tracking-widest font-bold px-3 py-1 rounded-full shadow-lg shadow-primary-500/20">
                     Popular
                   </span>
                 </div>
               )}
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-100 to-amber-200 text-amber-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+              <div className="w-14 h-14 rounded-2xl bg-primary-500/10 text-primary-400 flex items-center justify-center mb-5 group-hover:scale-110 group-hover:bg-primary-500/20 transition-all duration-300">
                 {service.icon}
               </div>
               <div className="text-xs font-medium text-slate-500 mb-2">{service.category}</div>
               <h3 className="font-bold text-white mb-2">{service.name}</h3>
               <p className="text-sm text-slate-400 mb-4">{service.description}</p>
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center justify-between mb-5">
                 <div>
-                  <span className="text-2xl font-bold text-amber-600">KSh {service.price.toLocaleString()}</span>
+                  <span className="text-xl font-bold text-white group-hover:text-primary-400 transition-colors">KSh {service.price.toLocaleString()}</span>
                 </div>
-                <div className="flex items-center gap-1 text-slate-500 text-sm">
-                  <Clock className="w-4 h-4" />
+                <div className="flex items-center gap-1.5 text-slate-400 text-xs font-medium">
+                  <Clock className="w-3.5 h-3.5" />
                   {service.duration}
                 </div>
               </div>
               <button 
                 onClick={() => setCurrentPage('booking')}
-                className="w-full py-3 bg-slate-800 text-white rounded-xl font-medium hover:bg-amber-600 hover:scale-105 transition-all cursor-pointer flex items-center justify-center gap-2 group"
+                className="w-full py-2.5 bg-white/5 border border-white/10 text-white rounded-xl text-sm font-medium hover:bg-primary-500 hover:border-primary-500 transition-all cursor-pointer flex items-center justify-center gap-2 group/btn"
               >
                 Book Now
-                <Check className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-all" />
+                <Check className="w-4 h-4 opacity-0 group-hover/btn:opacity-100 transition-all" />
               </button>
             </div>
           ))}
+        </div>
+
+        <div className="mt-12 bg-gradient-to-r from-amber-600/10 via-amber-500/5 to-amber-600/10 border border-amber-500/20 rounded-3xl p-8 text-center">
+          <div className="max-w-2xl mx-auto">
+            <RefreshCw className="w-12 h-12 text-amber-400 mx-auto mb-4" />
+            <h3 className="text-2xl font-bold text-white mb-2">Trade In Your Old Device</h3>
+            <p className="text-slate-400 mb-6">Get cash for your used phone, tablet, or laptop. We accept all brands and conditions.</p>
+            <button onClick={() => setCurrentPage('tradein')}
+              className="px-8 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-xl font-bold hover:from-amber-600 hover:to-amber-700 transition-all shadow-lg shadow-amber-500/20 cursor-pointer">
+              Start Trade-In →
+            </button>
+          </div>
         </div>
       </div>
     </section>
   );
 
   const GallerySection = () => (
-    <section id="gallery" className="py-24 bg-slate-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="text-center mb-12">
-          <span className="inline-block text-amber-500 font-semibold text-sm uppercase tracking-wider mb-3">Our Work</span>
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            Repair <span className="text-amber-500">Gallery</span>
+    <section id="gallery" className="py-24 relative overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
+        <div className="text-center mb-16">
+          <span className="inline-block text-primary-400 font-semibold text-xs uppercase tracking-widest mb-4">Our Work</span>
+          <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-6 tracking-tight">
+            Repair <span className="gradient-text">Gallery</span>
           </h2>
           <p className="text-slate-500 max-w-2xl mx-auto">
             See the quality of our work through these completed repairs
@@ -942,15 +986,15 @@ const App = () => {
   );
 
   const ReviewsSection = () => (
-    <section id="reviews" className="py-20 bg-gradient-to-br from-amber-950/20 to-slate-900 reveal">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="text-center mb-12">
-          <span className="inline-block text-amber-500 font-semibold text-sm uppercase tracking-wider mb-3">Testimonials</span>
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            What Our <span className="text-amber-600">Clients Say</span>
+    <section id="reviews" className="py-24 relative overflow-hidden reveal">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
+        <div className="text-center mb-16">
+          <span className="inline-block text-primary-400 font-semibold text-xs uppercase tracking-widest mb-4">Testimonials</span>
+          <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-6 tracking-tight">
+            Client <span className="gradient-text">Feedback</span>
           </h2>
-          <p className="text-slate-300 max-w-2xl mx-auto">
-            Real feedback from our valued customers
+          <p className="text-slate-400 max-w-2xl mx-auto text-lg">
+            Real stories from our valued customers
           </p>
         </div>
 
@@ -958,7 +1002,7 @@ const App = () => {
           {testimonials.map((testimonial, i) => (
             <div 
               key={i}
-              className="group bg-slate-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+              className="card-hover p-6 flex flex-col justify-between"
               style={{ animationDelay: `${i * 100}ms` }}
             >
               <div className="flex items-center gap-1 mb-4">
@@ -984,12 +1028,12 @@ const App = () => {
   );
 
   const FAQSection = () => (
-    <section id="faq" className="py-20 bg-slate-800 reveal">
-      <div className="max-w-3xl mx-auto px-4">
-        <div className="text-center mb-12">
-          <span className="inline-block text-amber-500 font-semibold text-sm uppercase tracking-wider mb-3">Help & Support</span>
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            Frequently Asked <span className="text-amber-600">Questions</span>
+    <section id="faq" className="py-24 relative overflow-hidden reveal">
+      <div className="max-w-3xl mx-auto px-4 relative z-10">
+        <div className="text-center mb-16">
+          <span className="inline-block text-primary-400 font-semibold text-xs uppercase tracking-widest mb-4">Help & Support</span>
+          <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-6 tracking-tight">
+            Frequently Asked <span className="gradient-text">Questions</span>
           </h2>
           <p className="text-slate-300">
             Find answers to common questions about our services
@@ -1000,14 +1044,14 @@ const App = () => {
           {faqs.map((faq, i) => (
             <div 
               key={i}
-              className={`border border-slate-700/50 rounded-xl overflow-hidden transition-all ${activeFaq === i ? 'border-amber-500 shadow-lg' : ''}`}
+              className={`glass-dark rounded-xl overflow-hidden transition-all duration-300 ${activeFaq === i ? 'border-primary-500 shadow-[0_0_15px_rgba(99,102,241,0.2)]' : ''}`}
             >
               <button
                 onClick={() => setActiveFaq(activeFaq === i ? null : i)}
-                className="w-full flex items-center justify-between p-5 text-left bg-slate-800 hover:bg-slate-800/30 transition-colors"
+                className="w-full flex items-center justify-between p-6 text-left hover:bg-white/5 transition-colors"
               >
-                <span className="font-semibold text-white pr-4">{faq.q}</span>
-                <ChevronDown className={`w-5 h-5 text-amber-600 flex-shrink-0 transition-transform ${activeFaq === i ? 'rotate-180' : ''}`} />
+                <span className="font-medium text-white pr-4">{faq.q}</span>
+                <ChevronDown className={`w-5 h-5 text-primary-400 flex-shrink-0 transition-transform duration-300 ${activeFaq === i ? 'rotate-180' : ''}`} />
               </button>
               <div className={`overflow-hidden transition-all ${activeFaq === i ? 'max-h-40' : 'max-h-0'}`}>
                 <p className="px-5 pb-5 text-slate-300">{faq.a}</p>
@@ -1020,12 +1064,13 @@ const App = () => {
   );
 
   const AboutSection = () => (
-    <section id="about" className="py-20 bg-slate-800/30 reveal">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+    <section id="about" className="py-24 relative overflow-hidden reveal">
+      <div className="absolute inset-0 bg-primary-500/5 blur-[150px] pointer-events-none rounded-full transform -translate-x-1/2 -translate-y-1/2"></div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
+        <div className="grid lg:grid-cols-2 gap-16 items-center">
           <div>
-            <span className="inline-block text-amber-500 font-semibold text-sm uppercase tracking-wider mb-3">About Us</span>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+            <span className="inline-block text-primary-400 font-semibold text-xs uppercase tracking-widest mb-4">About Us</span>
+            <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-6 tracking-tight leading-tight">
               Your Trusted Phone Repair Experts in Nairobi
             </h2>
             <p className="text-slate-300 mb-6">
@@ -1039,10 +1084,10 @@ const App = () => {
               times, affordable prices, and exceptional customer service.
             </p>
 
-            <div className="grid grid-cols-2 gap-6 mb-8">
+            <div className="grid grid-cols-2 gap-6 mb-10">
               {stats.map((stat, i) => (
-                <div key={i} className="bg-slate-800 rounded-xl p-4 shadow-md">
-                  <div className="text-3xl font-bold text-amber-600">{stat.number}</div>
+                <div key={i} className="glass-dark rounded-xl p-5 card-hover cursor-default">
+                  <div className="text-4xl font-extrabold text-primary-400 mb-1">{stat.number}</div>
                   <div className="text-sm text-slate-400">{stat.label}</div>
                 </div>
               ))}
@@ -1050,35 +1095,34 @@ const App = () => {
 
             <button 
               onClick={() => setCurrentPage('contact')}
-              className="flex items-center gap-2 text-amber-600 font-semibold hover:gap-3 transition-all"
+              className="flex items-center gap-2 text-primary-400 font-semibold hover:gap-3 transition-all"
             >
               Contact Us <ArrowRight className="w-5 h-5" />
             </button>
           </div>
 
           <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-amber-400 to-orange-500 rounded-3xl rotate-3"></div>
-            <div className="relative bg-slate-800 rounded-3xl p-8 shadow-2xl">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-slate-800/10 backdrop-blur rounded-2xl p-6 text-center">
-                  <Award className="w-12 h-12 text-amber-400 mx-auto mb-3" />
+            <div className="relative glass-dark rounded-3xl p-8 card-hover">
+              <div className="grid grid-cols-2 gap-5">
+                <div className="bg-white/5 backdrop-blur rounded-2xl p-6 text-center hover:bg-white/10 transition-colors">
+                  <Award className="w-10 h-10 text-primary-400 mx-auto mb-3" />
                   <div className="text-white font-bold">Certified</div>
-                  <div className="text-slate-500 text-sm">Technicians</div>
+                  <div className="text-slate-400 text-xs mt-1">Technicians</div>
                 </div>
-                <div className="bg-slate-800/10 backdrop-blur rounded-2xl p-6 text-center">
-                  <Shield className="w-12 h-12 text-green-400 mx-auto mb-3" />
+                <div className="bg-white/5 backdrop-blur rounded-2xl p-6 text-center hover:bg-white/10 transition-colors">
+                  <Shield className="w-10 h-10 text-emerald-400 mx-auto mb-3" />
                   <div className="text-white font-bold">Warranty</div>
-                  <div className="text-slate-500 text-sm">Guaranteed</div>
+                  <div className="text-slate-400 text-xs mt-1">Guaranteed</div>
                 </div>
-                <div className="bg-slate-800/10 backdrop-blur rounded-2xl p-6 text-center">
-                  <Zap className="w-12 h-12 text-blue-400 mx-auto mb-3" />
+                <div className="bg-white/5 backdrop-blur rounded-2xl p-6 text-center hover:bg-white/10 transition-colors">
+                  <Zap className="w-10 h-10 text-blue-400 mx-auto mb-3" />
                   <div className="text-white font-bold">Fast</div>
-                  <div className="text-slate-500 text-sm">Service</div>
+                  <div className="text-slate-400 text-xs mt-1">Service</div>
                 </div>
-                <div className="bg-slate-800/10 backdrop-blur rounded-2xl p-6 text-center">
-                  <Users className="w-12 h-12 text-purple-400 mx-auto mb-3" />
+                <div className="bg-white/5 backdrop-blur rounded-2xl p-6 text-center hover:bg-white/10 transition-colors">
+                  <Users className="w-10 h-10 text-purple-400 mx-auto mb-3" />
                   <div className="text-white font-bold">Expert</div>
-                  <div className="text-slate-500 text-sm">Support</div>
+                  <div className="text-slate-400 text-xs mt-1">Support</div>
                 </div>
               </div>
             </div>
@@ -1089,56 +1133,57 @@ const App = () => {
   );
 
   const BookingSection = () => (
-    <section id="booking" className="py-20 bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 reveal">
-      <div className="max-w-4xl mx-auto px-4">
-        <div className="text-center mb-12">
-          <span className="inline-block text-amber-500 font-semibold text-sm uppercase tracking-wider mb-3">Get Started</span>
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            Book Your <span className="text-amber-500">Repair</span>
+    <section id="booking" className="py-24 relative overflow-hidden reveal">
+      <div className="absolute inset-0 bg-primary-500/5 blur-[150px] pointer-events-none rounded-full transform translate-x-1/2 translate-y-1/2"></div>
+      <div className="max-w-4xl mx-auto px-4 relative z-10">
+        <div className="text-center mb-16">
+          <span className="inline-block text-primary-400 font-semibold text-xs uppercase tracking-widest mb-4">Get Started</span>
+          <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-6 tracking-tight">
+            Book Your <span className="gradient-text">Repair</span>
           </h2>
-          <p className="text-slate-500">
+          <p className="text-slate-400 text-lg">
             Fill out the form below and we'll get back to you within minutes
           </p>
         </div>
 
         {formSubmitted ? (
-          <div className="bg-slate-800 rounded-2xl p-12 text-center">
-            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <CheckCircle className="w-10 h-10 text-green-600" />
+          <div className="glass-dark rounded-2xl p-12 text-center card-hover">
+            <div className="w-20 h-20 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
+              <CheckCircle className="w-10 h-10 text-emerald-400" />
             </div>
             <h3 className="text-2xl font-bold text-white mb-2">Booking Submitted!</h3>
-            <p className="text-slate-300 mb-6">We'll contact you shortly to confirm your appointment.</p>
+            <p className="text-slate-400 mb-6">We'll contact you shortly to confirm your appointment.</p>
             <button 
               onClick={() => setFormSubmitted(false)}
-              className="text-amber-600 font-medium hover:underline"
+              className="text-primary-400 font-medium hover:text-primary-300 transition-colors hover:underline"
             >
               Book Another Service
             </button>
           </div>
         ) : (
-          <div className="bg-slate-800 rounded-2xl p-8 shadow-2xl">
+          <div className="glass-dark rounded-3xl p-8 md:p-10 card-hover">
             <form onSubmit={handleBookingSubmit} className="space-y-6">
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-slate-200 mb-2">Your Name</label>
+                  <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Your Name</label>
                   <input 
                     type="text" 
                     required
                     value={bookingForm.name}
                     onChange={(e) => { setBookingForm({...bookingForm, name: e.target.value}); setBookingErrors(prev => ({...prev, name: ''})); }}
-                    className={`w-full px-4 py-3 bg-slate-700 text-white rounded-xl border ${bookingErrors.name ? 'border-red-500' : 'border-slate-700/50'} focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none transition-all`}
+                    className={`input-enhanced ${bookingErrors.name ? 'border-red-500/50 focus:border-red-500' : ''}`}
                     placeholder="John Doe"
                   />
                   {bookingErrors.name && <p className="text-red-500 text-sm mt-1">{bookingErrors.name}</p>}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-200 mb-2">Phone Number</label>
+                  <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Phone Number</label>
                   <input 
                     type="tel" 
                     required
                     value={bookingForm.phone}
                     onChange={(e) => { setBookingForm({...bookingForm, phone: e.target.value}); setBookingErrors(prev => ({...prev, phone: ''})); }}
-                    className={`w-full px-4 py-3 bg-slate-700 text-white rounded-xl border ${bookingErrors.phone ? 'border-red-500' : 'border-slate-700/50'} focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none transition-all`}
+                    className={`input-enhanced ${bookingErrors.phone ? 'border-red-500/50 focus:border-red-500' : ''}`}
                     placeholder="0700000000"
                   />
                   {bookingErrors.phone && <p className="text-red-500 text-sm mt-1">{bookingErrors.phone}</p>}
@@ -1146,12 +1191,12 @@ const App = () => {
               </div>
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-slate-200 mb-2">Device Brand</label>
+                  <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Device Brand</label>
                   <select 
                     required
                     value={bookingForm.device}
                     onChange={(e) => { setBookingForm({...bookingForm, device: e.target.value}); setBookingErrors(prev => ({...prev, device: ''})); }}
-                    className={`w-full px-4 py-3 bg-slate-700 text-white rounded-xl border ${bookingErrors.device ? 'border-red-500' : 'border-slate-700/50'} focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none transition-all`}
+                    className={`input-enhanced appearance-none bg-transparent ${bookingErrors.device ? 'border-red-500/50 focus:border-red-500' : ''}`}
                   >
                     <option value="">Select Brand</option>
                     <option value="iphone">iPhone</option>
@@ -1165,12 +1210,12 @@ const App = () => {
                   {bookingErrors.device && <p className="text-red-500 text-sm mt-1">{bookingErrors.device}</p>}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-200 mb-2">Service Required</label>
+                  <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Service Required</label>
                   <select 
                     required
                     value={bookingForm.service}
                     onChange={(e) => { setBookingForm({...bookingForm, service: e.target.value}); setBookingErrors(prev => ({...prev, service: ''})); }}
-                    className={`w-full px-4 py-3 bg-slate-700 text-white rounded-xl border ${bookingErrors.service ? 'border-red-500' : 'border-slate-700/50'} focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none transition-all`}
+                    className={`input-enhanced appearance-none bg-transparent ${bookingErrors.service ? 'border-red-500/50 focus:border-red-500' : ''}`}
                   >
                     <option value="">Select Service</option>
                     <option value="screen">Screen Replacement</option>
@@ -1187,18 +1232,17 @@ const App = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-200 mb-2">Additional Notes</label>
+                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Additional Notes</label>
                 <textarea 
-                  rows={4}
                   value={bookingForm.notes}
                   onChange={(e) => setBookingForm({...bookingForm, notes: e.target.value})}
-                  className="w-full px-4 py-3 bg-slate-700 text-white placeholder-slate-400 rounded-xl border border-slate-700/50 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none transition-all resize-none"
-                  placeholder="Describe your issue..."
-                />
+                  className="input-enhanced h-32 resize-none"
+                  placeholder="Tell us more about the issue..."
+                ></textarea>
               </div>
               <button 
                 type="submit"
-                className="w-full py-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-xl font-semibold hover:from-amber-600 hover:to-amber-700 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 group overflow-hidden relative"
+                className="btn-primary w-full py-4 text-lg flex items-center justify-center gap-2 group overflow-hidden relative"
               >
                 <span className="relative z-10 flex items-center gap-2">
                   <Send className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
@@ -1213,23 +1257,271 @@ const App = () => {
     </section>
   );
 
+  const TradeInSection = () => {
+    const [form, setForm] = useState({
+      customerName: '', email: '', phone: '',
+      deviceBrand: '', deviceModel: '', storage: '',
+      condition: 'good' as TradeIn['condition'],
+      imei: '', notes: '',
+      tradeInProductId: '', desiredUpgradeId: '',
+    });
+    const [submitted, setSubmitted] = useState(false);
+    const [loading, setLoading] = useState(false);
+
+    const tradeInProducts = products.filter(product => ['phone', 'tablet', 'laptop'].includes(product.category));
+    const selectedTradeInProduct = tradeInProducts.find(product => product.id.toString() === form.tradeInProductId);
+    const selectedUpgradeProduct = tradeInProducts.find(product => product.id.toString() === form.desiredUpgradeId);
+    const conditionMultipliers: Record<TradeIn['condition'], number> = {
+      mint: 0.82, good: 0.62, fair: 0.42, poor: 0.22, damaged: 0.08,
+    };
+    const storageMultiplier = form.storage.includes('512') || form.storage.includes('1TB') ? 1.1 : form.storage.includes('256') ? 1.05 : 1;
+    const estimatedValue = selectedTradeInProduct
+      ? Math.max(2500, Math.round(selectedTradeInProduct.price * conditionMultipliers[form.condition] * storageMultiplier))
+      : 0;
+    const topUpAmount = selectedUpgradeProduct ? Math.max(0, selectedUpgradeProduct.price - estimatedValue) : 0;
+
+    const formatCurrency = (value: number) =>
+      new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES', maximumFractionDigits: 0 }).format(value);
+
+    const handleSubmit = (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!form.customerName || !form.phone || !form.deviceBrand || !form.deviceModel) return;
+      setLoading(true);
+      const tradeIn: TradeIn = {
+        id: `TI-${Date.now().toString(36).toUpperCase()}`,
+        customerName: form.customerName,
+        email: form.email,
+        phone: form.phone,
+        deviceBrand: form.deviceBrand,
+        deviceModel: form.deviceModel,
+        storage: form.storage,
+        condition: form.condition,
+        imei: form.imei,
+        notes: form.notes,
+        estimatedValue,
+        status: 'pending',
+        createdAt: new Date().toISOString(),
+      };
+      setTimeout(() => {
+        addTradeIn(tradeIn);
+        setLoading(false);
+        setSubmitted(true);
+      }, 800);
+    };
+
+    const conditionLabels: Record<TradeIn['condition'], string> = {
+      mint: 'Mint - Like New', good: 'Good - Minor Wear', fair: 'Fair - Visible Wear', poor: 'Poor - Heavy Wear', damaged: 'Damaged - Not Working',
+    };
+
+    const handleProductSelection = (productId: string) => {
+      const product = tradeInProducts.find(item => item.id.toString() === productId);
+      setForm(prev => ({
+        ...prev,
+        tradeInProductId: productId,
+        deviceBrand: product?.brand ?? prev.deviceBrand,
+        deviceModel: product?.name ?? prev.deviceModel,
+        storage: product?.specs.find(spec => /(GB|TB)/.test(spec))?.replace('Storage', '').trim() ?? prev.storage,
+      }));
+    };
+
+    if (submitted) {
+      return (
+        <section className="min-h-screen pt-28 pb-24 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
+          <div className="max-w-lg mx-auto px-4 text-center">
+            <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+              <CheckCircle className="w-10 h-10 text-green-400" />
+            </div>
+            <h2 className="text-3xl font-bold text-white mb-4">Trade-In Submitted!</h2>
+            <p className="text-slate-400 mb-8">Thank you! Our team will review your device details and contact you within 24 hours with a valuation and next steps.</p>
+            <button onClick={() => {
+              setSubmitted(false);
+              setForm({
+                customerName: '', email: '', phone: '', deviceBrand: '', deviceModel: '', storage: '',
+                condition: 'good', imei: '', notes: '', tradeInProductId: '', desiredUpgradeId: '',
+              });
+            }} className="px-6 py-3 bg-amber-500 text-white rounded-xl font-medium hover:bg-amber-600 transition-all cursor-pointer">
+              Submit Another Device
+            </button>
+          </div>
+        </section>
+      );
+    }
+
+    return (
+      <section className="min-h-screen pt-28 pb-24 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-10">
+            <span className="inline-block text-amber-500 font-semibold text-sm uppercase tracking-wider mb-3">Trade In Your Device</span>
+            <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-3">
+              Instantly value your old device and calculate the cash difference.
+            </h1>
+            <p className="text-slate-400 max-w-2xl mx-auto">
+              Submit your device details, choose the phone or tablet you want next, and see a live trade-in quote with top-up guidance.
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-[2fr_1fr] gap-6 mb-10">
+            <div className="bg-slate-900/80 border border-slate-700 rounded-3xl p-6 shadow-lg shadow-black/20">
+              <div className="flex items-center justify-between gap-4 mb-6">
+                <div>
+                  <p className="text-sm uppercase tracking-[0.3em] text-slate-500 mb-2">Instant Quote</p>
+                  <h2 className="text-2xl font-bold text-white">Smart Trade-In Calculator</h2>
+                </div>
+                <div className="rounded-3xl px-4 py-2 bg-amber-500/10 text-amber-200 text-sm font-semibold">Auto Top-Up</div>
+              </div>
+
+              <div className="grid sm:grid-cols-3 gap-4 mb-5">
+                <div className="rounded-3xl bg-slate-800/80 p-4 border border-slate-700">
+                  <p className="text-xs uppercase tracking-[0.28em] text-slate-500 mb-2">Trade-In Value</p>
+                  <p className="text-3xl font-bold text-emerald-300">{formatCurrency(estimatedValue)}</p>
+                </div>
+                <div className="rounded-3xl bg-slate-800/80 p-4 border border-slate-700">
+                  <p className="text-xs uppercase tracking-[0.28em] text-slate-500 mb-2">Upgrade Price</p>
+                  <p className="text-3xl font-bold text-amber-300">{selectedUpgradeProduct ? formatCurrency(selectedUpgradeProduct.price) : '--'}</p>
+                </div>
+                <div className="rounded-3xl bg-slate-800/80 p-4 border border-slate-700">
+                  <p className="text-xs uppercase tracking-[0.28em] text-slate-500 mb-2">{selectedUpgradeProduct ? (topUpAmount > 0 ? 'Top-Up Needed' : 'Potential Savings') : 'Cash Difference'}</p>
+                  <p className={`text-3xl font-bold ${selectedUpgradeProduct ? (topUpAmount > 0 ? 'text-amber-300' : 'text-emerald-300') : 'text-slate-300'}`}>{selectedUpgradeProduct ? formatCurrency(topUpAmount) : '--'}</p>
+                </div>
+              </div>
+
+              <p className="text-sm text-slate-400">
+                {selectedUpgradeProduct
+                  ? topUpAmount > 0
+                    ? `Add ${formatCurrency(topUpAmount)} to your trade-in and upgrade to ${selectedUpgradeProduct.name}.`
+                    : `Great news — your trade-in can cover the upgrade to ${selectedUpgradeProduct.name}.` 
+                  : 'Choose an upgrade device to calculate the instant cash difference.'}
+              </p>
+            </div>
+
+            <div className="bg-slate-800/60 border border-slate-700 rounded-3xl p-6">
+              <h2 className="text-xl font-semibold text-white mb-4">Trade-In Notes</h2>
+              <ul className="space-y-3 text-slate-400 text-sm">
+                <li className="flex gap-3"><span className="text-amber-400">•</span> We accept all brands and conditions, including damaged units.</li>
+                <li className="flex gap-3"><span className="text-amber-400">•</span> Upload your device details now and get a quote within 24 hours.</li>
+                <li className="flex gap-3"><span className="text-amber-400">•</span> Use the top-up estimate to upgrade with confidence.</li>
+                <li className="flex gap-3"><span className="text-amber-400">•</span> Your final offer is confirmed after physical inspection.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="grid gap-6 bg-slate-800/60 border border-slate-700 rounded-3xl p-8 shadow-inner shadow-black/20">
+            <h2 className="text-2xl font-bold text-white">Device Details</h2>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="grid lg:grid-cols-2 gap-5">
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-1.5">Your Name *</label>
+                  <input type="text" required value={form.customerName} onChange={e => setForm({ ...form, customerName: e.target.value })}
+                    className="w-full px-4 py-3 bg-slate-900/70 border border-slate-700 rounded-2xl text-white placeholder-slate-500 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all" placeholder="John Doe" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-1.5">Phone *</label>
+                  <input type="tel" required value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })}
+                    className="w-full px-4 py-3 bg-slate-900/70 border border-slate-700 rounded-2xl text-white placeholder-slate-500 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all" placeholder="0700 000 000" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-1.5">Email</label>
+                  <input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })}
+                    className="w-full px-4 py-3 bg-slate-900/70 border border-slate-700 rounded-2xl text-white placeholder-slate-500 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all" placeholder="john@email.com" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-1.5">Select Your Current Device *</label>
+                  <select required value={form.tradeInProductId} onChange={e => handleProductSelection(e.target.value)}
+                    className="w-full px-4 py-3 bg-slate-900/70 border border-slate-700 rounded-2xl text-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all">
+                    <option value="">Choose a device</option>
+                    {tradeInProducts.map(product => (
+                      <option key={product.id} value={product.id}>{`${product.brand} ${product.name} — KES ${product.price.toLocaleString()}`}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-1.5">Choose Upgrade Device</label>
+                  <select value={form.desiredUpgradeId} onChange={e => setForm({ ...form, desiredUpgradeId: e.target.value })}
+                    className="w-full px-4 py-3 bg-slate-900/70 border border-slate-700 rounded-2xl text-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all">
+                    <option value="">Select upgrade</option>
+                    {tradeInProducts.map(product => (
+                      <option key={product.id} value={product.id}>{`${product.brand} ${product.name} — KES ${product.price.toLocaleString()}`}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-1.5">Device Model *</label>
+                  <input type="text" required value={form.deviceModel} onChange={e => setForm({ ...form, deviceModel: e.target.value })}
+                    className="w-full px-4 py-3 bg-slate-900/70 border border-slate-700 rounded-2xl text-white placeholder-slate-500 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all" placeholder="iPhone 14 Pro Max" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-1.5">Storage / Capacity</label>
+                  <select value={form.storage} onChange={e => setForm({ ...form, storage: e.target.value })}
+                    className="w-full px-4 py-3 bg-slate-900/70 border border-slate-700 rounded-2xl text-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all">
+                    <option value="">Select storage</option>
+                    {['16GB', '32GB', '64GB', '128GB', '256GB', '512GB', '1TB'].map(s => (
+                      <option key={s} value={s}>{s}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-1.5">Condition *</label>
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+                  {(Object.keys(conditionLabels) as TradeIn['condition'][]).map(c => (
+                    <button key={c} type="button" onClick={() => setForm({ ...form, condition: c })}
+                      className={`px-3 py-2.5 rounded-xl text-xs font-medium border transition-all cursor-pointer ${form.condition === c ? 'bg-amber-500/10 border-amber-500/30 text-amber-400' : 'bg-slate-900/50 border-slate-700 text-slate-400 hover:border-slate-600'}`}>
+                      {conditionLabels[c].split(' - ')[0]}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid lg:grid-cols-2 gap-5">
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-1.5">IMEI (optional)</label>
+                  <input type="text" value={form.imei} onChange={e => setForm({ ...form, imei: e.target.value })}
+                    className="w-full px-4 py-3 bg-slate-900/70 border border-slate-700 rounded-2xl text-white placeholder-slate-500 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all" placeholder="Enter IMEI number" />
+                </div>
+                <div className="flex items-end">
+                  <p className="text-xs text-slate-500 mb-2">IMEI helps us verify the device. Dial *#06# to find yours.</p>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-1.5">Additional Notes</label>
+                <textarea value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} rows={4}
+                  className="w-full px-4 py-3 bg-slate-900/70 border border-slate-700 rounded-2xl text-white placeholder-slate-500 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all resize-none"
+                  placeholder="Describe any issues, accessories included, or other details..." />
+              </div>
+
+              <button type="submit" disabled={loading}
+                className="w-full py-3.5 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-2xl font-bold text-base hover:from-amber-600 hover:to-amber-700 transition-all shadow-lg shadow-amber-500/20 disabled:opacity-40 cursor-pointer flex items-center justify-center gap-2">
+                {loading ? <><Loader className="w-5 h-5 animate-spin" /> Submitting...</> : <><RefreshCw className="w-5 h-5" /> Submit Trade-In</>}
+              </button>
+
+              <p className="text-xs text-slate-500 text-center">By submitting, you agree to our terms and conditions. We will review your device and contact you with a quote.</p>
+            </form>
+          </div>
+        </div>
+      </section>
+    );
+  };
+
   const ContactSection = () => (
-    <section id="contact" className="py-20 bg-slate-800 reveal">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="text-center mb-12">
-          <span className="inline-block text-amber-500 font-semibold text-sm uppercase tracking-wider mb-3">Contact Us</span>
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            Get In <span className="text-amber-600">Touch</span>
+    <section id="contact" className="py-24 relative overflow-hidden reveal">
+      <div className="absolute inset-0 bg-primary-500/5 blur-[150px] pointer-events-none rounded-full transform -translate-x-1/2 translate-y-1/2"></div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
+        <div className="text-center mb-16">
+          <span className="inline-block text-primary-400 font-semibold text-xs uppercase tracking-widest mb-4">Contact Us</span>
+          <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-6 tracking-tight">
+            Get In <span className="gradient-text">Touch</span>
           </h2>
-          <p className="text-slate-300 max-w-2xl mx-auto">
+          <p className="text-slate-400 max-w-2xl mx-auto text-lg">
             Have questions? We'd love to hear from you
           </p>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-8">
           <div className="space-y-6">
-            <div className="bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl p-8 text-white">
-              <h3 className="text-2xl font-bold mb-6">Contact Information</h3>
+            <div className="glass-dark card-hover p-8 md:p-10">
+              <h3 className="text-2xl font-bold text-white mb-8">Contact Information</h3>
               <div className="space-y-4">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-slate-800/20 rounded-xl flex items-center justify-center">
@@ -1255,7 +1547,7 @@ const App = () => {
                   </div>
                   <div>
                     <div className="font-semibold">Email</div>
-                     <div className="opacity-80">alphamobitech767@gmail.com</div>
+                      <div className="opacity-80">{getBusinessInfo().email}</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
@@ -1286,75 +1578,75 @@ const App = () => {
             </div>
           </div>
 
-          <div className="bg-slate-800/30 rounded-2xl p-8">
+          <div className="glass-dark card-hover p-8 md:p-10">
             {contactSuccess ? (
-              <div className="text-center py-8">
-                <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <CheckCircle className="w-10 h-10 text-green-600" />
+              <div className="text-center py-12">
+                <div className="w-20 h-20 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <CheckCircle className="w-10 h-10 text-emerald-400" />
                 </div>
                 <h3 className="text-2xl font-bold text-white mb-2">Message Sent!</h3>
-                <p className="text-slate-300">We'll get back to you shortly.</p>
+                <p className="text-slate-400">We'll get back to you shortly.</p>
               </div>
             ) : (
               <>
-                <h3 className="text-2xl font-bold text-white mb-6">Send us a Message</h3>
-                <form onSubmit={handleContactSubmit} className="space-y-4">
+                <h3 className="text-2xl font-bold text-white mb-8">Send us a Message</h3>
+                <form onSubmit={handleContactSubmit} className="space-y-6">
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-slate-200 mb-2">Name</label>
+                      <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Name</label>
                       <input 
                         type="text" 
                         required
                         value={contactFormData.name}
                         onChange={(e) => { setContactFormData({...contactFormData, name: e.target.value}); setContactErrors(prev => ({...prev, name: ''})); }}
-                        className={`w-full px-4 py-3 bg-slate-700 text-white rounded-xl border ${contactErrors.name ? 'border-red-500' : 'border-slate-700/50'} focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none transition-all`}
+                        className={`input-enhanced ${contactErrors.name ? 'border-red-500/50 focus:border-red-500' : ''}`}
                         placeholder="Your Name"
                       />
                       {contactErrors.name && <p className="text-red-500 text-sm mt-1">{contactErrors.name}</p>}
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-slate-200 mb-2">Email</label>
+                      <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Email</label>
                       <input 
                         type="email" 
                         required
                         value={contactFormData.email}
                         onChange={(e) => { setContactFormData({...contactFormData, email: e.target.value}); setContactErrors(prev => ({...prev, email: ''})); }}
-                        className={`w-full px-4 py-3 bg-slate-700 text-white rounded-xl border ${contactErrors.email ? 'border-red-500' : 'border-slate-700/50'} focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none transition-all`}
+                        className={`input-enhanced ${contactErrors.email ? 'border-red-500/50 focus:border-red-500' : ''}`}
                         placeholder="your@email.com"
                       />
                       {contactErrors.email && <p className="text-red-500 text-sm mt-1">{contactErrors.email}</p>}
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-200 mb-2">Phone</label>
+                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Phone</label>
                     <input 
                       type="tel" 
                       required
                       value={contactFormData.phone}
                       onChange={(e) => { setContactFormData({...contactFormData, phone: e.target.value}); setContactErrors(prev => ({...prev, phone: ''})); }}
-                      className={`w-full px-4 py-3 bg-slate-700 text-white rounded-xl border ${contactErrors.phone ? 'border-red-500' : 'border-slate-700/50'} focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none transition-all`}
+                      className={`input-enhanced ${contactErrors.phone ? 'border-red-500/50 focus:border-red-500' : ''}`}
                       placeholder="0700000000"
                     />
                     {contactErrors.phone && <p className="text-red-500 text-sm mt-1">{contactErrors.phone}</p>}
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-200 mb-2">Message</label>
+                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Message</label>
                     <textarea 
-                      rows={4}
+                      rows={5}
                       required
                       value={contactFormData.message}
                       onChange={(e) => { setContactFormData({...contactFormData, message: e.target.value}); setContactErrors(prev => ({...prev, message: ''})); }}
-                      className={`w-full px-4 py-3 bg-slate-700 text-white rounded-xl border ${contactErrors.message ? 'border-red-500' : 'border-slate-700/50'} focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none transition-all resize-none`}
+                      className={`input-enhanced resize-none ${contactErrors.message ? 'border-red-500/50 focus:border-red-500' : ''}`}
                       placeholder="Your message..."
                     />
                     {contactErrors.message && <p className="text-red-500 text-sm mt-1">{contactErrors.message}</p>}
                   </div>
                   <button 
                     type="submit"
-                    className="w-full py-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-xl font-semibold hover:from-amber-600 hover:to-amber-700 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 group"
+                    className="btn-primary w-full py-4 text-lg flex items-center justify-center gap-2 group overflow-hidden relative"
                   >
-                    <Send className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
                     <span>Send Message</span>
+                    <Send className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" />
                   </button>
                 </form>
               </>
@@ -1400,14 +1692,14 @@ const App = () => {
           </div>
 
           <div>
-            <h4 className="text-lg font-bold mb-6">Quick Links</h4>
+            <h4 className="text-lg font-bold mb-6 text-white">Quick Links</h4>
             <ul className="space-y-3">
               {navItems.map((item) => (
                 <li key={item.id}>
                   <a 
                     href="#"
                     onClick={(e) => { e.preventDefault(); setCurrentPage(item.id); }}
-                    className="text-slate-500 hover:text-amber-500 transition-colors"
+                    className="text-slate-400 hover:text-primary-400 transition-colors"
                   >
                     {item.name}
                   </a>
@@ -1417,14 +1709,14 @@ const App = () => {
           </div>
 
           <div>
-            <h4 className="text-lg font-bold mb-6">Services</h4>
+            <h4 className="text-lg font-bold mb-6 text-white">Services</h4>
             <ul className="space-y-3">
-              <li><a href="#" className="text-slate-500 hover:text-amber-500 transition-colors">Screen Replacement</a></li>
-              <li><a href="#" className="text-slate-500 hover:text-amber-500 transition-colors">Battery Replacement</a></li>
-              <li><a href="#" className="text-slate-500 hover:text-amber-500 transition-colors">Back Glass Replacement</a></li>
-              <li><a href="#" className="text-slate-500 hover:text-amber-500 transition-colors">Charging Port</a></li>
-              <li><a href="#" className="text-slate-500 hover:text-amber-500 transition-colors">Water Damage</a></li>
-              <li><a href="#" className="text-slate-500 hover:text-amber-500 transition-colors">Screen Guard</a></li>
+              <li><a href="#" className="text-slate-400 hover:text-primary-400 transition-colors">Screen Replacement</a></li>
+              <li><a href="#" className="text-slate-400 hover:text-primary-400 transition-colors">Battery Replacement</a></li>
+              <li><a href="#" className="text-slate-400 hover:text-primary-400 transition-colors">Back Glass Replacement</a></li>
+              <li><a href="#" className="text-slate-400 hover:text-primary-400 transition-colors">Charging Port</a></li>
+              <li><a href="#" className="text-slate-400 hover:text-primary-400 transition-colors">Water Damage</a></li>
+              <li><a href="#" className="text-slate-400 hover:text-primary-400 transition-colors">Screen Guard</a></li>
             </ul>
           </div>
 
@@ -1437,7 +1729,7 @@ const App = () => {
               </li>
               <li className="flex items-center gap-3 text-slate-500">
                 <Mail className="w-5 h-5 text-amber-500" />
-                 <span>alphamobitech767@gmail.com</span>
+                  <span>{getBusinessInfo().email}</span>
               </li>
               <li className="flex items-center gap-3 text-slate-500">
                 <MapPin className="w-5 h-5 text-amber-500" />
@@ -1512,11 +1804,11 @@ const App = () => {
                   <div className="flex flex-col sm:flex-row gap-3 sm:gap-6 mt-1">
                    <div>
                      <span className="text-amber-100 text-sm">Paybill:</span>
-                     <span className="font-bold text-lg ml-2">714888</span>
+                     <span className="font-bold text-lg ml-2">{getBusinessInfo().paybill}</span>
                    </div>
                    <div>
                      <span className="text-amber-100 text-sm">Account:</span>
-                     <span className="font-bold text-lg ml-2">169405</span>
+                     <span className="font-bold text-lg ml-2">{getBusinessInfo().account}</span>
                    </div>
                   </div>
                 </div>
@@ -1524,17 +1816,17 @@ const App = () => {
                <div className="bg-slate-800/20 rounded-xl px-4 py-2 text-sm font-medium whitespace-nowrap">
                  Pay via Lipa Na M-Pesa
                </div>
-               <div className="mt-4 p-3 bg-amber-50/10 rounded-lg">
-                 <p className="text-amber-800 text-sm mb-1"><strong>Location:</strong> Stan Bank Building, Moi Avenue, Across Archives Floor 3 Room 10</p>
-                 <p className="text-amber-800 text-sm mb-1"><strong>Email:</strong> alphamobitech767@gmail.com</p>
-                 <p className="text-amber-800 text-sm"><strong>Hours:</strong> 7AM - 8PM</p>
-               </div>
+                <div className="mt-4 p-3 bg-amber-500/10 rounded-lg border border-amber-500/20">
+                   <p className="text-amber-300 text-sm mb-1"><strong>Location:</strong> {getBusinessInfo().location}</p>
+                   <p className="text-amber-300 text-sm mb-1"><strong>Email:</strong> {getBusinessInfo().email}</p>
+                   <p className="text-amber-300 text-sm"><strong>Hours:</strong> {getBusinessInfo().hours}</p>
+                </div>
             </div>
           </div>
 
-          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-8 flex items-start gap-3">
-            <span className="text-2xl flex-shrink-0">⚠️</span>
-            <p className="text-amber-800 font-medium text-sm">
+          <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 mb-8 flex items-start gap-3">
+            <AlertTriangle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+            <p className="text-amber-300 font-medium text-sm">
               Always confirm availability and price before ordering. Stock and prices may change without notice. Contact us on WhatsApp for real-time availability.
             </p>
           </div>
@@ -1542,13 +1834,13 @@ const App = () => {
           {(newCount > 0 || hotCount > 0) && (
             <div className="flex flex-wrap gap-3 mb-6 justify-center">
               {newCount > 0 && (
-                <span className="inline-flex items-center gap-2 bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-sm font-medium">
-                  <span className="text-blue-500">🆕</span> {newCount} New Arrivals
+                <span className="inline-flex items-center gap-2 bg-blue-500/10 text-blue-400 px-4 py-2 rounded-full text-sm font-medium border border-blue-500/20">
+                  <Sparkles className="w-4 h-4" /> {newCount} New Arrivals
                 </span>
               )}
               {hotCount > 0 && (
-                <span className="inline-flex items-center gap-2 bg-red-100 text-red-700 px-4 py-2 rounded-full text-sm font-medium">
-                  <span className="text-red-500">🔥</span> {hotCount} Hot Deals
+                <span className="inline-flex items-center gap-2 bg-red-500/10 text-red-400 px-4 py-2 rounded-full text-sm font-medium border border-red-500/20">
+                  <Zap className="w-4 h-4" /> {hotCount} Hot Deals
                 </span>
               )}
             </div>
@@ -1567,7 +1859,7 @@ const App = () => {
             </div>
             <div className="flex items-center gap-3">
               {compareList.length > 0 && (
-                <button onClick={() => setShowCompare(true)} className="flex items-center gap-2 px-4 py-2 bg-amber-100 text-amber-700 rounded-lg hover:bg-amber-200 transition-colors">
+                <button onClick={() => setShowCompare(true)} className="flex items-center gap-2 px-4 py-2 bg-amber-500/10 text-amber-400 rounded-lg hover:bg-amber-500/20 border border-amber-500/20 transition-colors">
                   <Scale className="w-4 h-4" />
                   Compare ({compareList.length})
                 </button>
@@ -1584,26 +1876,29 @@ const App = () => {
 
           <div className="flex flex-wrap justify-center gap-3 mb-10">
             {[
-              { id: 'all', label: 'All Products', icon: '📱' },
-              { id: 'iphone', label: 'iPhone', icon: '🍎' },
-              { id: 'samsung', label: 'Samsung', icon: '💎' },
-              { id: 'xiaomi', label: 'Xiaomi/Redmi', icon: '🔶' },
-              { id: 'tablet', label: 'Tablets', icon: '📋' },
-              { id: 'laptop', label: 'Laptops', icon: '💻' },
-            ].map(cat => (
-              <button
-                key={cat.id}
-                onClick={() => setActiveBrand(cat.id)}
-                className={`px-5 py-2.5 rounded-full font-medium transition-all shadow-sm ${
-                  activeBrand === cat.id
-                    ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-amber-200'
-                    : 'bg-slate-800 text-slate-200 hover:bg-amber-50 hover:text-amber-600 border border-slate-700/50'
-                }`}
-              >
-                <span className="mr-1.5">{cat.icon}</span>
-                {cat.label}
-              </button>
-            ))}
+              { id: 'all', label: 'All Products', icon: 'Smartphone' },
+              { id: 'iphone', label: 'iPhone', icon: 'Smartphone' },
+              { id: 'samsung', label: 'Samsung', icon: 'Star' },
+              { id: 'xiaomi', label: 'Xiaomi/Redmi', icon: 'Zap' },
+              { id: 'tablet', label: 'Tablets', icon: 'Tablet' },
+              { id: 'laptop', label: 'Laptops', icon: 'Laptop' },
+            ].map(cat => {
+              const IconComponent = { Smartphone, Star, Zap, Tablet, Laptop }[cat.icon] || Smartphone;
+              return (
+                <button
+                  key={cat.id}
+                  onClick={() => setActiveBrand(cat.id)}
+                  className={`px-5 py-2.5 rounded-full font-medium transition-all shadow-sm flex items-center gap-2 ${
+                    activeBrand === cat.id
+                      ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-amber-200'
+                      : 'bg-slate-800 text-slate-200 hover:bg-amber-500/10 hover:text-amber-400 border border-slate-700/50'
+                  }`}
+                >
+                  <IconComponent className="w-4 h-4" />
+                  {cat.label}
+                </button>
+              );
+            })}
           </div>
 
           {filteredProducts.length === 0 ? (
@@ -1660,25 +1955,25 @@ const App = () => {
                   <div className="p-4">
                     <div className="flex items-center gap-2 mb-1 flex-wrap">
                       <span className={`text-xs font-semibold px-2 py-0.5 rounded ${
-                        product.brand === 'Apple' ? 'bg-slate-100 text-slate-300' :
-                        product.brand === 'Samsung' ? 'bg-blue-50 text-blue-600' :
-                        'bg-orange-50 text-orange-600'
+                        product.brand === 'Apple' ? 'bg-slate-700 text-slate-200' :
+                        product.brand === 'Samsung' ? 'bg-blue-500/20 text-blue-400' :
+                        'bg-orange-500/20 text-orange-400'
                       }`}>
                         {product.brand}
                       </span>
                       {product.features.some(f => f.toLowerCase().includes('brand new') || f.toLowerCase().includes('ea warranty')) && (
-                        <span className="text-xs font-semibold px-2 py-0.5 rounded bg-green-500/20 text-green-400 border border-green-500/30">
-                          ✓ Brand New
+                        <span className="text-xs font-semibold px-2 py-0.5 rounded bg-green-500/20 text-green-400 border border-green-500/30 inline-flex items-center gap-1">
+                          <Check className="w-3 h-3" /> Brand New
                         </span>
                       )}
                       {product.features.some(f => f.toLowerCase().includes('refurbished')) && (
-                        <span className="text-xs font-semibold px-2 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30">
-                          ↻ Refurbished
+                        <span className="text-xs font-semibold px-2 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30 inline-flex items-center gap-1">
+                          <RotateCcw className="w-3 h-3" /> Refurbished
                         </span>
                       )}
                       {product.features.some(f => f.toLowerCase().includes('dubai')) && (
-                        <span className="text-xs font-semibold px-2 py-0.5 rounded bg-purple-500/20 text-purple-400 border border-purple-500/30">
-                          🌍 Dubai Version
+                        <span className="text-xs font-semibold px-2 py-0.5 rounded bg-purple-500/20 text-purple-400 border border-purple-500/30 inline-flex items-center gap-1">
+                          <Globe className="w-3 h-3" /> Dubai Version
                         </span>
                       )}
                     </div>
@@ -2046,7 +2341,7 @@ const App = () => {
                 <div>
                   <label className="block text-sm font-medium text-slate-200 mb-2">Payment Method</label>
                   <div className="space-y-2">
-                    <label className="flex items-center gap-3 p-3 border border-amber-500 rounded-xl bg-amber-50 cursor-pointer">
+                    <label className="flex items-center gap-3 p-3 border border-amber-500 rounded-xl bg-amber-500/10 cursor-pointer">
                       <input type="radio" name="payment" value="mpesa" checked={checkoutData.paymentMethod === 'mpesa'} onChange={e => setCheckoutData({...checkoutData, paymentMethod: e.target.value})} />
                       <span>M-Pesa</span>
                     </label>
@@ -2166,6 +2461,7 @@ const App = () => {
         {currentPage === 'contact' && <div className="pt-24"><ContactSection /></div>}
         {currentPage === 'about' && <div className="pt-24"><AboutSection /></div>}
         {currentPage === 'booking' && <div className="pt-24"><BookingSection /></div>}
+        {currentPage === 'tradein' && <TradeInSection />}
         {currentPage === 'privacy' && <div className="pt-24"><PrivacyPolicy /></div>}
         {currentPage === 'terms' && <div className="pt-24"><TermsOfService /></div>}
         {currentPage === 'admin' && <AdminDashboard />}
